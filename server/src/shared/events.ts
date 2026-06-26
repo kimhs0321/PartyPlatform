@@ -19,4 +19,5 @@ export const EVENTS = {
 
   SEND_ROOM_MESSAGE: "send-room-message",
   ROOM_MESSAGES: "room-messages",
+  LEAVE_ROOM: "leave-room",
 } as const;

@@ -51,6 +51,16 @@ export function registerRoomSocket(io: Server, socket: Socket) {
 
     io.emit(EVENTS.ROOMS_UPDATED, roomManager.getAllRooms());
 
+    const roomDto = roomManager.toRoomDto(room.id, (playerId) =>
+      playerManager.getPlayer(playerId)
+    );
+
+    if (roomDto) {
+      room.playerIds.forEach((playerId) => {
+        io.to(playerId).emit(EVENTS.ROOM_INFO, roomDto);
+      });
+    }
+
     console.log(`${player.nickname}님이 ${room.title} 방에 입장`);
   });
 
@@ -87,4 +97,33 @@ export function registerRoomSocket(io: Server, socket: Socket) {
       `[${player.roomId}] ${player.nickname}: ${message.text}`
     );
   });
+
+  socket.on(EVENTS.LEAVE_ROOM, () => {
+    const player = playerManager.getPlayer(socket.id);
+
+    if (!player || !player.roomId) {
+      return;
+    }
+
+    const updatedRoom = roomManager.leaveRoom(player.roomId, player.id);
+
+    playerManager.setPlayerRoom(socket.id, "");
+
+    if (updatedRoom) {
+      const roomDto = roomManager.toRoomDto(updatedRoom.id, (playerId) =>
+        playerManager.getPlayer(playerId)
+      );
+
+      if (roomDto) {
+        updatedRoom.playerIds.forEach((playerId) => {
+          io.to(playerId).emit(EVENTS.ROOM_INFO, roomDto);
+        });
+      }
+    }
+
+    io.emit(EVENTS.ROOMS_UPDATED, roomManager.getAllRooms());
+
+    socket.emit(EVENTS.LEAVE_ROOM);
+  });
+
 }

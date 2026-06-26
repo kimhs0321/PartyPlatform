@@ -1,5 +1,7 @@
 import { io } from "socket.io-client";
 
-export const socket = io("http://localhost:3000", {
+const SERVER_URL = `${window.location.protocol}//${window.location.hostname}:3000`;
+
+export const socket = io(SERVER_URL, {
   autoConnect: false,
 });

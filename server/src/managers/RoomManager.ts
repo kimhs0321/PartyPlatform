@@ -78,6 +78,28 @@ class RoomManager {
 
     return room;
   }
+
+  leaveRoom(roomId: string, playerId: string) {
+    const room = this.rooms.get(roomId);
+
+    if (!room) return null;
+
+    room.playerIds = room.playerIds.filter((id) => id !== playerId);
+
+    if (room.playerIds.length === 0) {
+      this.rooms.delete(roomId);
+      return null;
+    }
+
+    if (room.hostId === playerId) {
+      room.hostId = room.playerIds[0];
+    }
+
+    this.rooms.set(roomId, room);
+
+    return room;
+  }
+    
 }
 
 export const roomManager = new RoomManager();

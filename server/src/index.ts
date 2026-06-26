@@ -6,6 +6,7 @@ import { registerLobbySocket } from "./socket/lobbySocket";
 import { playerManager } from "./managers/PlayerManager";
 import { EVENTS } from "./shared/events";
 import { registerRoomSocket } from "./socket/roomSocket";
+import { roomManager } from "./managers/RoomManager";
 
 const app = express();
 
@@ -16,7 +17,7 @@ const httpServer = http.createServer(app);
 
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: true,
     methods: ["GET", "POST"],
   },
 });
@@ -31,16 +32,36 @@ io.on("connection", (socket) => {
   registerLobbySocket(io, socket);
   registerRoomSocket(io, socket);
 
-  socket.on("disconnect", () => {
-    playerManager.removePlayer(socket.id);
-    io.emit(EVENTS.LOBBY_PLAYERS, playerManager.getAllPlayers());
+socket.on("disconnect", () => {
+  const player = playerManager.getPlayer(socket.id);
 
-    console.log("user disconnected:", socket.id);
-  });
+  if (player?.roomId) {
+    const updatedRoom = roomManager.leaveRoom(player.roomId, player.id);
+
+    if (updatedRoom) {
+      const roomDto = roomManager.toRoomDto(updatedRoom.id, (playerId) =>
+        playerManager.getPlayer(playerId)
+      );
+
+      if (roomDto) {
+        updatedRoom.playerIds.forEach((playerId) => {
+          io.to(playerId).emit(EVENTS.ROOM_INFO, roomDto);
+        });
+      }
+    }
+  }
+
+  playerManager.removePlayer(socket.id);
+
+  io.emit(EVENTS.LOBBY_PLAYERS, playerManager.getAllPlayers());
+  io.emit(EVENTS.ROOMS_UPDATED, roomManager.getAllRooms());
+
+  console.log("user disconnected:", socket.id);
+});
 });
 
 const PORT = 3000;
 
-httpServer.listen(PORT, () => {
-  console.log(`server running on http://localhost:${PORT}`);
+httpServer.listen(PORT, "0.0.0.0", () => {
+  console.log(`server running on http://0.0.0.0:${PORT}`);
 });

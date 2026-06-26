@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import { socket } from "../socket/socket";
 import { EVENTS } from "../shared/events";
 import "../App.css";
+import { useNavigate, useParams } from "react-router-dom";
 
 type RoomPlayer = {
   id: string;
@@ -33,6 +33,7 @@ function RoomPage() {
   const [room, setRoom] = useState<Room | null>(null);
   const [message, setMessage] = useState("");
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!roomId) return;
@@ -47,11 +48,16 @@ function RoomPage() {
       setChatMessages(list);
     });
 
+    socket.on(EVENTS.LEAVE_ROOM, () => {
+      navigate("/lobby");
+    });
+
     return () => {
       socket.off(EVENTS.ROOM_INFO);
       socket.off(EVENTS.ROOM_MESSAGES);
+      socket.off(EVENTS.LEAVE_ROOM);
     };
-  }, [roomId]);
+  }, [roomId, navigate]);
 
   const handleSendMessage = () => {
     const trimmed = message.trim();
@@ -135,7 +141,13 @@ function RoomPage() {
         </div>
 
         <button>게임 시작</button>
-        <button>나가기</button>
+        <button
+          onClick={() => {
+            socket.emit(EVENTS.LEAVE_ROOM);
+          }}
+        >
+          나가기
+        </button>
       </div>
     </div>
   );

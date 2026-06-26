@@ -60,7 +60,7 @@ function LobbyPage() {
 
     socket.emit(EVENTS.CREATE_ROOM, {
       title: title.trim(),
-      maxPlayers: 8,
+      maxPlayers: 10,
       password: "",
     });
   };
