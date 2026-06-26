@@ -1,156 +1,164 @@
 import { useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { socket } from "../socket/socket";
 import { EVENTS } from "../shared/events";
-import "../App.css";
-import { useNavigate, useParams } from "react-router-dom";
+import "./RoomPage.css";
 
-type RoomPlayer = {
+type RoomPlayerDto = {
   id: string;
   nickname: string;
   isHost: boolean;
 };
 
-type Room = {
+type RoomDto = {
   id: string;
   title: string;
   hostId: string;
-  players: RoomPlayer[];
   maxPlayers: number;
+  game: string;
+  players: RoomPlayerDto[];
   status: "waiting" | "playing" | "paused";
 };
 
-type ChatMessage = {
-  id: string;
-  roomId: string;
-  playerId: string;
-  nickname: string;
-  text: string;
-  createdAt: number;
-};
-
-function RoomPage() {
+export default function RoomPage() {
   const { roomId } = useParams();
-  const [room, setRoom] = useState<Room | null>(null);
-  const [message, setMessage] = useState("");
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const location = useLocation();
   const navigate = useNavigate();
 
+  const [room, setRoom] = useState<RoomDto | null>(null);
+
   useEffect(() => {
-    if (!roomId) return;
+    if (!socket.connected) {
+      socket.connect();
+    }
 
-    socket.emit(EVENTS.GET_ROOM, roomId);
+    const fallbackRoom = location.state?.room;
 
-    socket.on(EVENTS.ROOM_INFO, (roomData: Room) => {
-      setRoom(roomData);
-    });
+    if (fallbackRoom && !room) {
+      setRoom({
+        id: fallbackRoom.id,
+        title: fallbackRoom.name,
+        hostId: "",
+        maxPlayers: fallbackRoom.maxPlayers,
+        game: fallbackRoom.game,
+        players: [],
+        status: "waiting",
+      });
+    }
 
-    socket.on(EVENTS.ROOM_MESSAGES, (list: ChatMessage[]) => {
-      setChatMessages(list);
-    });
+    const handleRoomInfo = (roomInfo: RoomDto) => {
+      setRoom(roomInfo);
+    };
 
-    socket.on(EVENTS.LEAVE_ROOM, () => {
+    socket.on(EVENTS.ROOM_INFO, handleRoomInfo);
+
+    if (roomId) {
+      socket.emit(EVENTS.GET_ROOM, roomId);
+    }
+
+    return () => {
+      socket.off(EVENTS.ROOM_INFO, handleRoomInfo);
+    };
+  }, [roomId, location.state, room]);
+
+  const handleLeaveRoom = () => {
+    socket.once(EVENTS.LEAVE_ROOM, () => {
       navigate("/lobby");
     });
 
-    return () => {
-      socket.off(EVENTS.ROOM_INFO);
-      socket.off(EVENTS.ROOM_MESSAGES);
-      socket.off(EVENTS.LEAVE_ROOM);
-    };
-  }, [roomId, navigate]);
-
-  const handleSendMessage = () => {
-    const trimmed = message.trim();
-
-    if (!trimmed) return;
-
-    socket.emit(EVENTS.SEND_ROOM_MESSAGE, trimmed);
-    setMessage("");
+    socket.emit(EVENTS.LEAVE_ROOM);
   };
 
+  if (!room) {
+    return (
+      <div className="room-page">
+        <div className="room-shell">
+          <div className="room-loading">방 정보를 불러오는 중...</div>
+        </div>
+      </div>
+    );
+  }
+
+  const readyCount = room.players.length;
+
   return (
-    <div className="container">
-      <div className="login-card">
-        <h1>{room?.title ?? "방 정보 불러오는 중..."}</h1>
+    <div className="room-page">
+      <div className="room-shell">
+        <header className="room-top">
+          <div>
+            <p className="room-label">대기실</p>
+            <h1>{room.title}</h1>
+            <span>
+              {room.game} · {room.players.length} / {room.maxPlayers}명
+            </span>
+          </div>
 
-        <p>방 번호 : {roomId}</p>
+          <button className="room-exit-button" onClick={handleLeaveRoom}>
+            나가기
+          </button>
+        </header>
 
-        <p>
-          인원 : {room?.players.length ?? 0}/{room?.maxPlayers ?? 0}
-        </p>
+        <main className="room-main">
+          <section className="room-info-panel">
+            <h2>게임 정보</h2>
 
-        <h2>참가자</h2>
-        {room ? (
-          <ul>
-            {room.players.map((player) => (
-              <li key={player.id}>
-                {player.isHost ? "👑 " : "😀 "}
-                {player.nickname}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>참가자 정보를 불러오는 중...</p>
-        )}
+            <div className="info-card">
+              <span>선택된 게임</span>
+              <strong>{room.game}</strong>
+            </div>
 
-        <h2>채팅</h2>
+            <div className="info-card">
+              <span>준비 상태</span>
+              <strong>
+                {readyCount} / {room.players.length}명
+              </strong>
+            </div>
 
-        <div
-          style={{
-            border: "1px solid #ccc",
-            height: "220px",
-            marginBottom: "12px",
-            padding: "10px",
-            overflowY: "auto",
-            textAlign: "left",
-            borderRadius: "8px",
-            background: "#fafafa",
-          }}
-        >
-          {chatMessages.length === 0 ? (
-            <p style={{ color: "#888" }}>아직 채팅이 없습니다.</p>
-          ) : (
-            chatMessages.map((msg) => (
-              <p key={msg.id}>
-                <strong>{msg.nickname}</strong> : {msg.text}
-              </p>
-            ))
-          )}
-        </div>
+            <div className="info-card">
+              <span>방 상태</span>
+              <strong>
+                {room.status === "waiting"
+                  ? "대기 중"
+                  : room.status === "playing"
+                  ? "게임 중"
+                  : "일시정지"}
+              </strong>
+            </div>
+          </section>
 
-        <div
-          style={{
-            display: "flex",
-            gap: "8px",
-            marginBottom: "16px",
-          }}
-        >
-          <input
-            style={{ flex: 1 }}
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleSendMessage();
-              }
-            }}
-            placeholder="메시지를 입력하세요."
-          />
+          <section className="player-panel">
+            <div className="panel-header">
+              <h2>참가자</h2>
+              <span>{room.players.length}명 접속</span>
+            </div>
 
-          <button onClick={handleSendMessage}>전송</button>
-        </div>
+            <div className="player-list">
+              {room.players.map((player) => (
+                <div className="player-row" key={player.id}>
+                  <div className="player-avatar">
+                    {player.nickname[0] ?? "?"}
+                  </div>
 
-        <button>게임 시작</button>
-        <button
-          onClick={() => {
-            socket.emit(EVENTS.LEAVE_ROOM);
-          }}
-        >
-          나가기
-        </button>
+                  <div className="player-info">
+                    <strong>
+                      {player.isHost && "👑 "}
+                      {player.nickname}
+                    </strong>
+                    <span className="waiting">
+                      {player.isHost ? "방장" : "참가자"}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        </main>
+
+        <footer className="room-actions">
+          <button className="ready-button">준비</button>
+          <button className="start-button">게임 시작</button>
+        </footer>
       </div>
     </div>
   );
 }
-
-export default RoomPage;

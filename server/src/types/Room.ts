@@ -8,5 +8,5 @@ export type Room = {
   playerIds: string[];
   password: string;
   status: RoomStatus;
-  game: null;
+  game: string;
 };

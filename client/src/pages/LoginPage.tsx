@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { socket } from "../socket/socket";
-import "../App.css";
 import { EVENTS } from "../shared/events";
+import "./LoginPage.css";
 
 function LoginPage() {
   const [nickname, setNickname] = useState("");
@@ -22,31 +22,30 @@ function LoginPage() {
 
     socket.emit(EVENTS.JOIN_LOBBY, trimmed);
 
-    socket.once(EVENTS.JOIN_LOBBY_SUCCESS, (data) => {
-      console.log("입장 성공:", data);
+    socket.once(EVENTS.JOIN_LOBBY_SUCCESS, () => {
       navigate("/lobby");
     });
   };
 
   return (
-    <div className="container">
+    <div className="login-page">
       <div className="login-card">
-        <h1>PartyPlatform</h1>
-        <h2>🎭 라이어 게임</h2>
+        <h1>Party Platform</h1>
+        <span>닉네임을 입력하고 입장하세요.</span>
 
-        <input
-          type="text"
-          placeholder="닉네임을 입력하세요"
-          value={nickname}
-          onChange={(e) => setNickname(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              handleEnter();
-            }
-          }}
-        />
+        <div className="login-form">
+          <input
+            type="text"
+            placeholder="닉네임"
+            value={nickname}
+            onChange={(e) => setNickname(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleEnter();
+            }}
+          />
 
-        <button onClick={handleEnter}>입장하기</button>
+          <button onClick={handleEnter}>입장하기</button>
+        </div>
       </div>
     </div>
   );

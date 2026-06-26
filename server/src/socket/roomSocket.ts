@@ -7,7 +7,12 @@ import { chatManager } from "../managers/ChatManager";
 export function registerRoomSocket(io: Server, socket: Socket) {
   socket.on(
     EVENTS.CREATE_ROOM,
-    (data: { title: string; maxPlayers: number; password?: string }) => {
+    (data: {
+      title: string;
+      game: string;
+      maxPlayers: number;
+      password?: string;
+    }) => {
       const host = playerManager.getPlayer(socket.id);
 
       if (!host) return;
@@ -16,7 +21,8 @@ export function registerRoomSocket(io: Server, socket: Socket) {
         data.title,
         host,
         data.maxPlayers,
-        data.password ?? ""
+        data.password ?? "",
+        data.game
       );
 
       playerManager.setPlayerRoom(socket.id, room.id);

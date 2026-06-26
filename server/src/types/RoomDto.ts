@@ -9,6 +9,7 @@ export type RoomDto = {
   title: string;
   hostId: string;
   maxPlayers: number;
+  game: string;
   players: RoomPlayerDto[];
   status: "waiting" | "playing" | "paused";
 };

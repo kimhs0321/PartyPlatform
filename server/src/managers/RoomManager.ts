@@ -5,7 +5,13 @@ class RoomManager {
   private rooms = new Map<string, Room>();
   private nextRoomId = 1001;
 
-  createRoom(title: string, host: Player, maxPlayers: number, password = "") {
+  createRoom(
+    title: string,
+    host: Player,
+    maxPlayers: number,
+    password = "",
+    game = "라이어 게임"
+  ) {
     const roomId = String(this.nextRoomId++);
 
     const room: Room = {
@@ -16,12 +22,12 @@ class RoomManager {
       playerIds: [host.id],
       password,
       status: "waiting",
-      game: null,
+      game,
     };
 
-    this.rooms.set(roomId, room);
-    return room;
-  }
+  this.rooms.set(roomId, room);
+  return room;
+}
 
   getAllRooms() {
     return Array.from(this.rooms.values());
@@ -45,6 +51,7 @@ class RoomManager {
       title: room.title,
       hostId: room.hostId,
       maxPlayers: room.maxPlayers,
+      game: room.game,
       status: room.status,
       players: room.playerIds
         .map((playerId) => getPlayer(playerId))
