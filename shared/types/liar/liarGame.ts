@@ -1,5 +1,6 @@
 export type LiarPhase =
   | "WAITING"
+  | "READY_CHECK"
   | "DESCRIPTION"
   | "REACTION"
   | "DISCUSSION"
@@ -64,7 +65,6 @@ export interface LiarGameState {
 
   votes: Record<string, string>;
   tieCandidates: string[];
-
   timerEndsAt: number | null;
   paused: boolean;
 }
@@ -99,6 +99,10 @@ export interface ClientLiarGameState {
 
   votes: Record<string, string>;
   tieCandidates: string[];
+
+  voteCounts: Record<string, number>;
+  topVotedPlayerIds: string[];
+  liarPlayerIds: string[];
 
   timerEndsAt: number | null;
   paused: boolean;

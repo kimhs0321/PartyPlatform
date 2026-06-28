@@ -24,7 +24,6 @@ type RoomDto = {
 };
 
 export default function RoomPage() {
-  console.log("RoomPage Render");
   const { roomId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
@@ -55,18 +54,14 @@ useEffect(() => {
     });
   }
 
-  const handleSocketDisconnect = (reason: string) => {
-    console.log("클라이언트 disconnect:", reason);
-  };
-
-  socket.on("disconnect", handleSocketDisconnect);
-
   const handleRoomInfo = (roomInfo: RoomDto) => {
     setRoom(roomInfo);
   };
 
   const handleGameStarted = (roomInfo: RoomDto) => {
-    setRoom(roomInfo);
+    navigate(`/game/${roomInfo.id}`, {
+      state: { room: roomInfo },
+    });
   };
 
   const handleStartGameFailed = (message: string) => {
@@ -74,7 +69,6 @@ useEffect(() => {
   };
 
   const handleLiarGameState = (state: any) => {
-    console.log("LIAR_GAME_STATE 수신:", state);
     setLiarGameState(state);
   };
 
@@ -92,10 +86,8 @@ useEffect(() => {
     socket.off(EVENTS.GAME_STARTED, handleGameStarted);
     socket.off(EVENTS.START_GAME_FAILED, handleStartGameFailed);
     socket.off(EVENTS.LIAR_GAME_STATE, handleLiarGameState);
-    socket.off("disconnect", handleSocketDisconnect);
   };
 }, [roomId, location.state, navigate]);
-
 
   const handleToggleReady = () => {
     socket.emit(EVENTS.TOGGLE_READY);

@@ -6,6 +6,7 @@ import LiarGame from "../games/LiarGame";
 import MonopolyGame from "../games/MonopolyGame";
 import UnknownGame from "../games/UnknownGame";
 import "./GamePage.css";
+import type { ClientLiarGameState } from "../../../shared/types/liar/liarGame";
 
 type RoomPlayerDto = {
   id: string;
@@ -28,7 +29,7 @@ export default function GamePage() {
   const { roomId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-
+  const [liarGameState, setLiarGameState] = useState<ClientLiarGameState | null>(null);
   const [room, setRoom] = useState<RoomDto | null>(
     location.state?.room ?? null
   );
@@ -53,11 +54,18 @@ export default function GamePage() {
 
     if (roomId) {
       socket.emit(EVENTS.GET_ROOM, roomId);
+      socket.emit(EVENTS.GET_GAME_STATE, roomId);
     }
+    const handleLiarGameState = (state: any) => {
+      setLiarGameState(state);
+    };
+
+    socket.on(EVENTS.LIAR_GAME_STATE, handleLiarGameState);
 
     return () => {
       socket.off(EVENTS.ROOM_INFO, handleRoomInfo);
       socket.off(EVENTS.GAME_ENDED, handleGameEnded);
+      socket.off(EVENTS.LIAR_GAME_STATE, handleLiarGameState);
     };
   }, [roomId, navigate]);
 
@@ -87,7 +95,7 @@ export default function GamePage() {
 
     switch (room.game) {
       case "라이어 게임":
-        return <LiarGame />;
+       return <LiarGame state={liarGameState} />;
 
       case "모노폴리":
         return <MonopolyGame />;

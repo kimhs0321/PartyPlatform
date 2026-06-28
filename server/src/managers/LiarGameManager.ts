@@ -3,7 +3,7 @@ import {
   LiarGameSettings,
   LiarGameState,
   LiarPlayerState,
-} from "../../../shared/types/liar/liarGame.js";
+} from "../../../shared/types/liar/liarGame";
 import { LIAR_KEYWORDS } from "../../../shared/keywords/liarKeywords";
 
 type LiarGamePlayerInput = {
@@ -60,6 +60,12 @@ class LiarGameManager {
     }
 
     const me = game.players.find((player) => player.playerId === playerId);
+    const voteCounts = this.getVoteCounts(game);
+    const topVotedPlayerIds = this.getTopVotedPlayerIds(voteCounts);
+    const liarPlayerIds =
+      game.phase === "RESULT"
+        ? game.players.filter((player) => player.isLiar).map((player) => player.playerId)
+        : [];
 
     return {
       roomId: game.roomId,
@@ -87,6 +93,10 @@ class LiarGameManager {
 
       timerEndsAt: game.timerEndsAt,
       paused: game.paused,
+
+      voteCounts,
+      topVotedPlayerIds,
+      liarPlayerIds,
     };
   }  
 
@@ -102,7 +112,7 @@ class LiarGameManager {
     }
 
     game.round += 1;
-    game.phase = "DESCRIPTION";
+    game.phase = "READY_CHECK";
 
     game.descriptions = [];
     game.normalChats = [];
@@ -140,10 +150,257 @@ class LiarGameManager {
       };
     });
 
+    game.timerEndsAt = Date.now() + 5000;
+
+    this.games.set(roomId, game);
+    return game;
+  }
+
+  startDescriptionPhase(roomId: string): LiarGameState {
+    const game = this.games.get(roomId);
+
+    if (!game) {
+      throw new Error("라이어게임이 생성되지 않았습니다.");
+    }
+
+    if (game.phase !== "READY_CHECK") {
+      throw new Error("설명 단계로 넘어갈 수 없는 상태입니다.");
+    }
+
+    game.phase = "DESCRIPTION";
     game.timerEndsAt = Date.now() + game.settings.descriptionTime * 1000;
 
     this.games.set(roomId, game);
     return game;
+  }
+
+  submitDescription(roomId: string, playerId: string, text: string): LiarGameState {
+    const game = this.games.get(roomId);
+
+    if (!game) {
+      throw new Error("라이어게임이 생성되지 않았습니다.");
+    }
+
+    if (game.phase !== "DESCRIPTION") {
+      throw new Error("지금은 설명 단계가 아닙니다.");
+    }
+
+    const currentPlayerId = game.descriptionOrder[game.currentDescriptionIndex];
+
+    if (currentPlayerId !== playerId) {
+      throw new Error("현재 설명 차례가 아닙니다.");
+    }
+
+    const trimmedText = text.trim();
+
+    if (trimmedText.length < game.settings.minDescriptionLength) {
+      throw new Error(`설명은 최소 ${game.settings.minDescriptionLength}자 이상이어야 합니다.`);
+    }
+
+    if (trimmedText.length > game.settings.maxDescriptionLength) {
+      throw new Error(`설명은 최대 ${game.settings.maxDescriptionLength}자까지 가능합니다.`);
+    }
+
+    const player = game.players.find((p) => p.playerId === playerId);
+
+    if (!player) {
+      throw new Error("플레이어를 찾을 수 없습니다.");
+    }
+
+    if (player.keyword && trimmedText.includes(player.keyword)) {
+      throw new Error("제시어를 직접 사용할 수 없습니다.");
+    }
+
+    game.descriptions.push({
+      playerId,
+      playerName: player.name,
+      text: trimmedText,
+      likes: [],
+      dislikes: [],
+      createdAt: Date.now(),
+    });
+
+    game.currentDescriptionIndex += 1;
+
+    game.players = game.players.map((p) => {
+      if (p.playerId === playerId) {
+        return { ...p, status: "DONE" };
+      }
+
+      const nextPlayerId = game.descriptionOrder[game.currentDescriptionIndex];
+
+      if (p.playerId === nextPlayerId) {
+        return { ...p, status: "ACTIVE" };
+      }
+
+      return p;
+    });
+
+    if (game.currentDescriptionIndex >= game.descriptionOrder.length) {
+      game.phase = "REACTION";
+      game.timerEndsAt = Date.now() + 5000;
+    } else {
+      game.timerEndsAt = Date.now() + game.settings.descriptionTime * 1000;
+    }
+    this.games.set(roomId, game);
+    return game;
+  }
+
+  startDiscussionPhase(roomId: string): LiarGameState {
+    const game = this.games.get(roomId);
+
+    if (!game) {
+      throw new Error("라이어게임이 생성되지 않았습니다.");
+    }
+
+    if (game.phase !== "REACTION") {
+      throw new Error("토론 단계로 넘어갈 수 없는 상태입니다.");
+    }
+
+    game.phase = "DISCUSSION";
+    game.timerEndsAt = Date.now() + game.settings.discussionTime * 1000;
+
+    this.games.set(roomId, game);
+    return game;
+  }
+
+  sendChat(roomId: string, playerId: string, text: string): LiarGameState {
+    const game = this.games.get(roomId);
+
+    if (!game) {
+      throw new Error("라이어게임이 생성되지 않았습니다.");
+    }
+
+    if (game.phase !== "DISCUSSION") {
+      throw new Error("토론 단계에서만 채팅할 수 있습니다.");
+    }
+
+    const player = game.players.find((p) => p.playerId === playerId);
+
+    if (!player) {
+      throw new Error("플레이어를 찾을 수 없습니다.");
+    }
+
+    const trimmedText = text.trim();
+
+    if (!trimmedText) {
+      throw new Error("채팅 내용을 입력하세요.");
+    }
+
+    game.normalChats.push({
+      playerId,
+      playerName: player.name,
+      text: trimmedText,
+      createdAt: Date.now(),
+    });
+
+    this.games.set(roomId, game);
+    return game;
+  }
+
+  startVotingPhase(roomId: string): LiarGameState {
+  const game = this.games.get(roomId);
+
+  if (!game) {
+    throw new Error("라이어게임이 생성되지 않았습니다.");
+  }
+
+  if (game.phase !== "DISCUSSION") {
+    throw new Error("투표 단계로 넘어갈 수 없는 상태입니다.");
+  }
+
+  game.phase = "VOTING";
+  game.votes = {};
+  game.timerEndsAt = Date.now() + game.settings.voteTime * 1000;
+
+  this.games.set(roomId, game);
+  return game;
+}
+
+  submitVote(roomId: string, voterId: string, targetId: string): LiarGameState {
+    const game = this.games.get(roomId);
+
+    if (!game) {
+      throw new Error("라이어게임이 생성되지 않았습니다.");
+    }
+
+    if (game.phase !== "VOTING") {
+      throw new Error("지금은 투표 단계가 아닙니다.");
+    }
+
+    if (voterId === targetId) {
+      throw new Error("자기 자신에게 투표할 수 없습니다.");
+    }
+
+    if (game.votes[voterId]) {
+      throw new Error("이미 투표했습니다.");
+    }
+
+    const target = game.players.find(
+      (player) => player.playerId === targetId && player.status !== "LEFT"
+    );
+
+    if (!target) {
+      throw new Error("투표 대상을 찾을 수 없습니다.");
+    }
+
+    game.votes[voterId] = targetId;
+
+
+    const activePlayers = game.players.filter(
+      (player) => player.status !== "LEFT"
+    );
+
+    if (Object.keys(game.votes).length === activePlayers.length) {
+        game.phase = "VOTING";
+    }
+
+    this.games.set(roomId, game);
+    return game;
+  }
+
+  startResultPhase(roomId: string): LiarGameState {
+    const game = this.games.get(roomId);
+
+    if (!game) {
+      throw new Error("라이어게임이 생성되지 않았습니다.");
+    }
+
+    if (game.phase !== "VOTING") {
+      throw new Error("결과 단계로 넘어갈 수 없습니다.");
+    }
+
+    game.phase = "RESULT";
+    game.timerEndsAt = Date.now() + 5000;
+
+    this.games.set(roomId, game);
+    return game;
+  }
+
+  private getVoteCounts(game: LiarGameState): Record<string, number> {
+    const counts: Record<string, number> = {};
+
+    game.players.forEach((player) => {
+      counts[player.playerId] = 0;
+    });
+
+    Object.values(game.votes).forEach((targetId) => {
+      counts[targetId] = (counts[targetId] ?? 0) + 1;
+    });
+
+    return counts;
+  }
+
+  private getTopVotedPlayerIds(voteCounts: Record<string, number>): string[] {
+    const maxVote = Math.max(...Object.values(voteCounts));
+
+    if (maxVote <= 0) {
+      return [];
+    }
+
+    return Object.entries(voteCounts)
+      .filter(([, count]) => count === maxVote)
+      .map(([playerId]) => playerId);
   }
 
   private shuffle<T>(items: T[]): T[] {

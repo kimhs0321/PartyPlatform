@@ -4,7 +4,7 @@ import { playerManager } from "../managers/PlayerManager";
 import { roomManager } from "../managers/RoomManager";
 import { gameManager } from "../managers/GameManager";
 import { liarGameManager } from "../managers/LiarGameManager";
-console.log("roomSocket loaded");
+
 
 export function registerRoomSocket(io: Server, socket: Socket) {
   socket.on(
@@ -110,8 +110,6 @@ export function registerRoomSocket(io: Server, socket: Socket) {
 
     gameManager.startGame(startedRoom);
 
-    console.log("startedRoom.game =", startedRoom.game);
-
     if (startedRoom.game === "라이어 게임") {
       const players = startedRoom.playerIds
         .map((playerId) => playerManager.getPlayer(playerId))
@@ -137,19 +135,24 @@ export function registerRoomSocket(io: Server, socket: Socket) {
       liarGameManager.createGame(startedRoom.id, players, settings);
       liarGameManager.startRound(startedRoom.id);
 
-      console.log("LIAR_GAME_STATE 이벤트명:", EVENTS.LIAR_GAME_STATE);
+      setTimeout(() => {
+        try {
+          liarGameManager.startDescriptionPhase(startedRoom.id);
 
-      console.log("LIAR_GAME_STATE 전송 대상:", startedRoom.playerIds);
+          startedRoom.playerIds.forEach((playerId) => {
+            const state = liarGameManager.toClientState(startedRoom.id, playerId);
+            io.to(playerId).emit(EVENTS.LIAR_GAME_STATE, state);
+          });
+        } catch {
+          // 이미 게임이 종료됐거나 상태가 바뀐 경우 무시
+        }
+      }, 5000);
 
       startedRoom.playerIds.forEach((playerId) => {
-        console.log("테스트 전송:", playerId);
-
-        io.to(playerId).emit(EVENTS.LIAR_GAME_STATE, {
-          test: true,
-          message: "hello",
-        });
+        const state = liarGameManager.toClientState(startedRoom.id, playerId);
+        io.to(playerId).emit(EVENTS.LIAR_GAME_STATE, state);
       });
-      }
+    }
 
     const roomDto = roomManager.toRoomDto(startedRoom.id, (playerId) =>
       playerManager.getPlayer(playerId)
@@ -158,15 +161,134 @@ export function registerRoomSocket(io: Server, socket: Socket) {
     if (!roomDto) return;
 
     startedRoom.playerIds.forEach((playerId) => {
-  // 테스트 중에는 /game 이동 방지
-  // io.to(playerId).emit(EVENTS.GAME_STARTED, roomDto);
-
-      //io.to(playerId).emit(EVENTS.ROOM_INFO, roomDto);
+      // GamePage 구현 전까지 이동은 막아둠
+      io.to(playerId).emit(EVENTS.GAME_STARTED, roomDto);
+      io.to(playerId).emit(EVENTS.ROOM_INFO, roomDto);
     });
 
     io.emit(EVENTS.ROOMS, roomManager.getAllRooms());
 
     console.log(`${startedRoom.title} 게임 시작`);
+  });
+
+  socket.on(
+    EVENTS.LIAR_SUBMIT_DESCRIPTION,
+    (data: { roomId: string; text: string }) => {
+      const player = playerManager.getPlayer(socket.id);
+
+      if (!player) return;
+
+      try {
+        liarGameManager.submitDescription(data.roomId, player.id, data.text);
+
+        const room = roomManager.getRoom(data.roomId);
+        if (!room) return;
+
+        room.playerIds.forEach((playerId) => {
+          const state = liarGameManager.toClientState(data.roomId, playerId);
+          io.to(playerId).emit(EVENTS.LIAR_GAME_STATE, state);
+        });
+
+        const game = liarGameManager.getGame(data.roomId);
+
+        if (game?.phase === "REACTION") {
+          setTimeout(() => {
+            try {
+              liarGameManager.startDiscussionPhase(data.roomId);
+
+              room.playerIds.forEach((playerId) => {
+                const state = liarGameManager.toClientState(data.roomId, playerId);
+                io.to(playerId).emit(EVENTS.LIAR_GAME_STATE, state);
+              });
+
+              setTimeout(() => {
+                try {
+                  liarGameManager.startVotingPhase(data.roomId);
+
+                  room.playerIds.forEach((playerId) => {
+                    const state = liarGameManager.toClientState(data.roomId, playerId);
+                    io.to(playerId).emit(EVENTS.LIAR_GAME_STATE, state);
+                  });
+                } catch {
+                  // 상태가 이미 바뀌었으면 무시
+                }
+              }, 120000);
+
+            } catch {
+              // 상태가 이미 바뀌었으면 무시
+            }
+          }, 5000);
+        }
+
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "설명 제출 중 오류가 발생했습니다.";
+
+        socket.emit(EVENTS.START_GAME_FAILED, message);
+      }
+    }
+  );
+
+  socket.on(
+    EVENTS.LIAR_SEND_CHAT,
+    (data: { roomId: string; text: string }) => {
+      const player = playerManager.getPlayer(socket.id);
+      if (!player) return;
+
+      try {
+        liarGameManager.sendChat(data.roomId, player.id, data.text);
+
+        const room = roomManager.getRoom(data.roomId);
+        if (!room) return;
+
+        room.playerIds.forEach((playerId) => {
+          const state = liarGameManager.toClientState(data.roomId, playerId);
+          io.to(playerId).emit(EVENTS.LIAR_GAME_STATE, state);
+        });
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "채팅 전송 중 오류가 발생했습니다.";
+
+        socket.emit(EVENTS.START_GAME_FAILED, message);
+      }
+    }
+  );
+
+  socket.on(
+    EVENTS.LIAR_SUBMIT_VOTE,
+    (data: { roomId: string; targetId: string }) => {
+      const player = playerManager.getPlayer(socket.id);
+      if (!player) return;
+
+      try {
+        liarGameManager.submitVote(data.roomId, player.id, data.targetId);
+
+        const room = roomManager.getRoom(data.roomId);
+        if (!room) return;
+
+        room.playerIds.forEach((playerId) => {
+          const state = liarGameManager.toClientState(data.roomId, playerId);
+          io.to(playerId).emit(EVENTS.LIAR_GAME_STATE, state);
+        });
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "투표 중 오류가 발생했습니다.";
+
+        socket.emit(EVENTS.START_GAME_FAILED, message);
+      }
+    }
+  );
+
+  socket.on(EVENTS.GET_GAME_STATE, (roomId: string) => {
+    const player = playerManager.getPlayer(socket.id);
+    if (!player) return;
+
+    try {
+      const state = liarGameManager.toClientState(roomId, player.id);
+      socket.emit(EVENTS.LIAR_GAME_STATE, state);
+    } catch {
+      // 아직 라이어게임 상태가 없으면 무시
+    }
   });
 
   socket.on(EVENTS.END_GAME, () => {

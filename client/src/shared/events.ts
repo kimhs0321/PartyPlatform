@@ -31,6 +31,7 @@ export const EVENTS = {
   GET_GAME_STATE: "get-game-state",
   GAME_STATE: "game-state",
 
+  LIAR_START_GAME: "liar:start-game",
   LIAR_GAME_STATE: "liar:game-state",
   LIAR_SUBMIT_DESCRIPTION: "liar:submit-description",
   LIAR_REACT_DESCRIPTION: "liar:react-description",
