@@ -32,10 +32,10 @@ export default function LobbyPage() {
       setRooms(updatedRooms);
     };
 
-    socket.on(EVENTS.ROOMS_UPDATED, handleRoomsUpdated);
+    socket.on(EVENTS.ROOMS, handleRoomsUpdated);
 
     return () => {
-      socket.off(EVENTS.ROOMS_UPDATED, handleRoomsUpdated);
+      socket.off(EVENTS.ROOMS, handleRoomsUpdated);
     };
   }, []);
 

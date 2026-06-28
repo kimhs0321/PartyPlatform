@@ -2,6 +2,7 @@ export type RoomPlayerDto = {
   id: string;
   nickname: string;
   isHost: boolean;
+  isReady: boolean;
 };
 
 export type RoomDto = {

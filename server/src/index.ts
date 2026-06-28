@@ -7,6 +7,7 @@ import { playerManager } from "./managers/PlayerManager";
 import { EVENTS } from "./shared/events";
 import { registerRoomSocket } from "./socket/roomSocket";
 import { roomManager } from "./managers/RoomManager";
+import { registerGameSocket } from "./socket/gameSocket";
 
 const app = express();
 
@@ -27,10 +28,10 @@ app.get("/", (req, res) => {
 });
 
 io.on("connection", (socket) => {
-  console.log("user connected:", socket.id);
 
   registerLobbySocket(io, socket);
   registerRoomSocket(io, socket);
+  registerGameSocket(io, socket);
 
 socket.on("disconnect", () => {
   const player = playerManager.getPlayer(socket.id);
@@ -54,7 +55,7 @@ socket.on("disconnect", () => {
   playerManager.removePlayer(socket.id);
 
   io.emit(EVENTS.LOBBY_PLAYERS, playerManager.getAllPlayers());
-  io.emit(EVENTS.ROOMS_UPDATED, roomManager.getAllRooms());
+  io.emit(EVENTS.ROOMS, roomManager.getAllRooms());
 
   console.log("user disconnected:", socket.id);
 });

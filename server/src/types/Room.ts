@@ -6,6 +6,7 @@ export type Room = {
   hostId: string;
   maxPlayers: number;
   playerIds: string[];
+  readyPlayerIds: string[];
   password: string;
   status: RoomStatus;
   game: string;

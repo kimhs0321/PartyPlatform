@@ -8,16 +8,26 @@ export const EVENTS = {
   CREATE_ROOM: "create-room",
   CREATE_ROOM_SUCCESS: "create-room-success",
 
+  GET_ROOMS: "get-rooms",
+  ROOMS: "rooms",
+
   JOIN_ROOM: "join-room",
   JOIN_ROOM_SUCCESS: "join-room-success",
-
-  GET_ROOMS: "get-rooms",
-  ROOMS_UPDATED: "rooms-updated",
 
   GET_ROOM: "get-room",
   ROOM_INFO: "room-info",
 
-  SEND_ROOM_MESSAGE: "send-room-message",
-  ROOM_MESSAGES: "room-messages",
   LEAVE_ROOM: "leave-room",
+
+  TOGGLE_READY: "toggle-ready",
+
+  START_GAME: "start-game",
+  GAME_STARTED: "game-started",
+  START_GAME_FAILED: "start-game-failed",
+
+  END_GAME: "end-game",
+  GAME_ENDED: "game-ended",
+  
+  GET_GAME_STATE: "get-game-state",
+  GAME_STATE: "game-state",
 } as const;

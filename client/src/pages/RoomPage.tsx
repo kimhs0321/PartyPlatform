@@ -8,6 +8,7 @@ type RoomPlayerDto = {
   id: string;
   nickname: string;
   isHost: boolean;
+  isReady: boolean;
 };
 
 type RoomDto = {
@@ -24,8 +25,10 @@ export default function RoomPage() {
   const { roomId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-
   const [room, setRoom] = useState<RoomDto | null>(null);
+  const handleStartGame = () => {socket.emit(EVENTS.START_GAME);};
+
+
 
   useEffect(() => {
     if (!socket.connected) {
@@ -50,7 +53,19 @@ export default function RoomPage() {
       setRoom(roomInfo);
     };
 
+    const handleGameStarted = (roomInfo: RoomDto) => {
+      navigate(`/game/${roomInfo.id}`, {
+        state: { room: roomInfo },
+      });
+    };
+
+    const handleStartGameFailed = (message: string) => {
+      alert(message);
+    };
+
     socket.on(EVENTS.ROOM_INFO, handleRoomInfo);
+    socket.on(EVENTS.GAME_STARTED, handleGameStarted);
+    socket.on(EVENTS.START_GAME_FAILED, handleStartGameFailed);
 
     if (roomId) {
       socket.emit(EVENTS.GET_ROOM, roomId);
@@ -58,8 +73,17 @@ export default function RoomPage() {
 
     return () => {
       socket.off(EVENTS.ROOM_INFO, handleRoomInfo);
+      socket.off(EVENTS.GAME_STARTED, handleGameStarted);
+      socket.off(EVENTS.START_GAME_FAILED, handleStartGameFailed);
     };
-  }, [roomId, location.state, room]);
+  }, [roomId, location.state, navigate]);
+
+
+  const handleToggleReady = () => {
+    socket.emit(EVENTS.TOGGLE_READY);
+  };
+
+  
 
   const handleLeaveRoom = () => {
     socket.once(EVENTS.LEAVE_ROOM, () => {
@@ -79,7 +103,17 @@ export default function RoomPage() {
     );
   }
 
-  const readyCount = room.players.length;
+  const readyCount = room.players.filter((player) => player.isReady).length;
+  const me = room.players.find((player) => player.id === socket.id);
+  const isHost = Boolean(me?.isHost);
+
+  const nonHostPlayers = room.players.filter((player) => !player.isHost);
+  const allPlayersReady =
+    nonHostPlayers.length > 0 &&
+    nonHostPlayers.every((player) => player.isReady);
+
+  const canStartGame = isHost && allPlayersReady;
+  
 
   return (
     <div className="room-page">
@@ -144,9 +178,9 @@ export default function RoomPage() {
                       {player.isHost && "👑 "}
                       {player.nickname}
                     </strong>
-                    <span className="waiting">
-                      {player.isHost ? "방장" : "참가자"}
-                    </span>
+                    <span className={player.isReady ? "ready" : "waiting"}>
+                    {player.isHost ? "방장" : player.isReady ? "준비 완료" : "대기 중"}
+                  </span>
                   </div>
                 </div>
               ))}
@@ -155,8 +189,22 @@ export default function RoomPage() {
         </main>
 
         <footer className="room-actions">
-          <button className="ready-button">준비</button>
-          <button className="start-button">게임 시작</button>
+          {!isHost && (
+            <button className="ready-button" onClick={handleToggleReady}>
+              {me?.isReady ? "준비 취소" : "준비"}
+            </button>
+          )}
+
+          {isHost && (
+            <button
+              className="start-button"
+              disabled={!canStartGame}
+              onClick={handleStartGame}
+              title={!canStartGame ? "모든 참가자가 준비해야 시작할 수 있습니다." : ""}
+            >
+              게임 시작
+            </button>
+          )}
         </footer>
       </div>
     </div>

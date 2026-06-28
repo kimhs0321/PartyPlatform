@@ -20,6 +20,7 @@ class RoomManager {
       hostId: host.id,
       maxPlayers,
       playerIds: [host.id],
+      readyPlayerIds: [],
       password,
       status: "waiting",
       game,
@@ -60,8 +61,58 @@ class RoomManager {
           id: player.id,
           nickname: player.nickname,
           isHost: player.id === room.hostId,
+          isReady: room.readyPlayerIds.includes(player.id),
         })),
     };
+  }
+
+  toggleReady(roomId: string, playerId: string) {
+    const room = this.rooms.get(roomId);
+
+    if (!room) return null;
+
+    if (room.readyPlayerIds.includes(playerId)) {
+      room.readyPlayerIds = room.readyPlayerIds.filter((id) => id !== playerId);
+    } else {
+      room.readyPlayerIds.push(playerId);
+    }
+
+    this.rooms.set(roomId, room);
+
+    return room;
+  }
+
+  canStartGame(roomId: string, playerId: string) {
+    const room = this.rooms.get(roomId);
+
+    if (!room) {
+      return false;
+    }
+
+    if (room.hostId !== playerId) {
+      return false;
+    }
+
+    const nonHostPlayerIds = room.playerIds.filter((id) => id !== room.hostId);
+
+    if (nonHostPlayerIds.length === 0) {
+      return false;
+    }
+
+    return nonHostPlayerIds.every((id) => room.readyPlayerIds.includes(id));
+  }
+
+  startGame(roomId: string) {
+    const room = this.rooms.get(roomId);
+
+    if (!room) {
+      return null;
+    }
+
+    room.status = "playing";
+    this.rooms.set(roomId, room);
+
+    return room;
   }
 
   joinRoom(roomId: string, playerId: string) {
@@ -92,6 +143,7 @@ class RoomManager {
     if (!room) return null;
 
     room.playerIds = room.playerIds.filter((id) => id !== playerId);
+    room.readyPlayerIds = room.readyPlayerIds.filter((id) => id !== playerId);
 
     if (room.playerIds.length === 0) {
       this.rooms.delete(roomId);
@@ -106,7 +158,20 @@ class RoomManager {
 
     return room;
   }
-    
+
+  endGame(roomId: string) {
+    const room = this.rooms.get(roomId);
+
+    if (!room) return null;
+
+    room.status = "waiting";
+    room.readyPlayerIds = [];
+
+    this.rooms.set(roomId, room);
+
+    return room;
+  }
+      
 }
 
 export const roomManager = new RoomManager();

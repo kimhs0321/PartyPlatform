@@ -2,7 +2,7 @@ import type { Server, Socket } from "socket.io";
 import { EVENTS } from "../shared/events";
 import { playerManager } from "../managers/PlayerManager";
 import { roomManager } from "../managers/RoomManager";
-import { chatManager } from "../managers/ChatManager";
+import { gameManager } from "../managers/GameManager";
 
 export function registerRoomSocket(io: Server, socket: Socket) {
   socket.on(
@@ -28,14 +28,14 @@ export function registerRoomSocket(io: Server, socket: Socket) {
       playerManager.setPlayerRoom(socket.id, room.id);
 
       socket.emit(EVENTS.CREATE_ROOM_SUCCESS, room);
-      io.emit(EVENTS.ROOMS_UPDATED, roomManager.getAllRooms());
+      io.emit(EVENTS.ROOMS, roomManager.getAllRooms());
 
       console.log("방 생성:", room);
     }
   );
 
   socket.on(EVENTS.GET_ROOMS, () => {
-    socket.emit(EVENTS.ROOMS_UPDATED, roomManager.getAllRooms());
+    socket.emit(EVENTS.ROOMS, roomManager.getAllRooms());
   });
 
   socket.on(EVENTS.JOIN_ROOM, (roomId: string) => {
@@ -55,7 +55,7 @@ export function registerRoomSocket(io: Server, socket: Socket) {
 
     socket.emit(EVENTS.JOIN_ROOM_SUCCESS, room);
 
-    io.emit(EVENTS.ROOMS_UPDATED, roomManager.getAllRooms());
+    io.emit(EVENTS.ROOMS, roomManager.getAllRooms());
 
     const roomDto = roomManager.toRoomDto(room.id, (playerId) =>
       playerManager.getPlayer(playerId)
@@ -80,28 +80,109 @@ export function registerRoomSocket(io: Server, socket: Socket) {
     socket.emit(EVENTS.ROOM_INFO, roomDto);
   });
 
-  socket.on(EVENTS.SEND_ROOM_MESSAGE, (text: string) => {
+  socket.on(EVENTS.TOGGLE_READY, () => {
     const player = playerManager.getPlayer(socket.id);
 
     if (!player || !player.roomId) {
       return;
     }
 
-    const message = chatManager.addMessage(
-      player.roomId,
-      player.id,
-      player.nickname,
-      text
+    const updatedRoom = roomManager.toggleReady(player.roomId, player.id);
+
+    if (!updatedRoom) {
+      return;
+    }
+
+    const roomDto = roomManager.toRoomDto(updatedRoom.id, (playerId) =>
+      playerManager.getPlayer(playerId)
     );
 
-    io.emit(
-      EVENTS.ROOM_MESSAGES,
-      chatManager.getMessages(player.roomId)
+    if (roomDto) {
+      updatedRoom.playerIds.forEach((playerId) => {
+        io.to(playerId).emit(EVENTS.ROOM_INFO, roomDto);
+      });
+    }
+
+    io.emit(EVENTS.ROOMS, roomManager.getAllRooms());
+  });
+
+  socket.on(EVENTS.START_GAME, () => {
+    const player = playerManager.getPlayer(socket.id);
+
+    if (!player || !player.roomId) {
+      return;
+    }
+
+    const canStart = roomManager.canStartGame(player.roomId, player.id);
+
+    if (!canStart) {
+      socket.emit(EVENTS.START_GAME_FAILED, "게임을 시작할 수 없습니다.");
+      return;
+    }
+
+    const startedRoom = roomManager.startGame(player.roomId);
+
+    if (!startedRoom) {
+      return;
+    }
+
+    gameManager.startGame(startedRoom);
+
+    const roomDto = roomManager.toRoomDto(startedRoom.id, (playerId) =>
+      playerManager.getPlayer(playerId)
     );
 
-    console.log(
-      `[${player.roomId}] ${player.nickname}: ${message.text}`
+    if (!roomDto) {
+      return;
+    }
+
+    startedRoom.playerIds.forEach((playerId) => {
+      io.to(playerId).emit(EVENTS.GAME_STARTED, roomDto);
+      io.to(playerId).emit(EVENTS.ROOM_INFO, roomDto);
+    });
+
+    io.emit(EVENTS.ROOMS, roomManager.getAllRooms());
+
+    console.log(`${startedRoom.title} 게임 시작`);
+  });
+
+  socket.on(EVENTS.END_GAME, () => {
+    const player = playerManager.getPlayer(socket.id);
+
+    if (!player || !player.roomId) {
+      return;
+    }
+
+    const room = roomManager.getRoom(player.roomId);
+
+    if (!room || room.hostId !== player.id) {
+      return;
+    }
+
+    const endedRoom = roomManager.endGame(player.roomId);
+
+    if (!endedRoom) {
+      return;
+    }
+
+    gameManager.endGame(player.roomId);
+
+    const roomDto = roomManager.toRoomDto(endedRoom.id, (playerId) =>
+      playerManager.getPlayer(playerId)
     );
+
+    if (!roomDto) {
+      return;
+    }
+
+    endedRoom.playerIds.forEach((playerId) => {
+      io.to(playerId).emit(EVENTS.GAME_ENDED, roomDto);
+      io.to(playerId).emit(EVENTS.ROOM_INFO, roomDto);
+    });
+
+    io.emit(EVENTS.ROOMS, roomManager.getAllRooms());
+
+    console.log(`${endedRoom.title} 게임 종료`);
   });
 
   socket.on(EVENTS.LEAVE_ROOM, () => {
@@ -127,7 +208,7 @@ export function registerRoomSocket(io: Server, socket: Socket) {
       }
     }
 
-    io.emit(EVENTS.ROOMS_UPDATED, roomManager.getAllRooms());
+    io.emit(EVENTS.ROOMS, roomManager.getAllRooms());
 
     socket.emit(EVENTS.LEAVE_ROOM);
   });

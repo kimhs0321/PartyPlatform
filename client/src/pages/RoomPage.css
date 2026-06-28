@@ -160,3 +160,9 @@
   color: #a8acb8;
   text-align: center;
 }
+
+.room-actions button:disabled {
+  background: #3a3d46;
+  color: #7f8492;
+  cursor: not-allowed;
+}
