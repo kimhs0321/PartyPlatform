@@ -4,6 +4,8 @@ import { socket } from "../socket/socket";
 import { EVENTS } from "../shared/events";
 import "./RoomPage.css";
 
+
+
 type RoomPlayerDto = {
   id: string;
   nickname: string;
@@ -22,61 +24,77 @@ type RoomDto = {
 };
 
 export default function RoomPage() {
+  console.log("RoomPage Render");
   const { roomId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const [room, setRoom] = useState<RoomDto | null>(null);
-  const handleStartGame = () => {socket.emit(EVENTS.START_GAME);};
+  const handleStartGame = () => {
+    if (!roomId) return;
+    socket.emit(EVENTS.START_GAME, { roomId });};
+  const [liarGameState, setLiarGameState] = useState<any>(null);
 
 
 
-  useEffect(() => {
-    if (!socket.connected) {
-      socket.connect();
-    }
+useEffect(() => {
+  if (!socket.connected) {
+    socket.connect();
+  }
 
-    const fallbackRoom = location.state?.room;
+  const fallbackRoom = location.state?.room;
 
-    if (fallbackRoom && !room) {
-      setRoom({
-        id: fallbackRoom.id,
-        title: fallbackRoom.name,
-        hostId: "",
-        maxPlayers: fallbackRoom.maxPlayers,
-        game: fallbackRoom.game,
-        players: [],
-        status: "waiting",
-      });
-    }
+  if (fallbackRoom && !room) {
+    setRoom({
+      id: fallbackRoom.id,
+      title: fallbackRoom.name,
+      hostId: "",
+      maxPlayers: fallbackRoom.maxPlayers,
+      game: fallbackRoom.game,
+      players: [],
+      status: "waiting",
+    });
+  }
 
-    const handleRoomInfo = (roomInfo: RoomDto) => {
-      setRoom(roomInfo);
-    };
+  const handleSocketDisconnect = (reason: string) => {
+    console.log("클라이언트 disconnect:", reason);
+  };
 
-    const handleGameStarted = (roomInfo: RoomDto) => {
-      navigate(`/game/${roomInfo.id}`, {
-        state: { room: roomInfo },
-      });
-    };
+  socket.on("disconnect", handleSocketDisconnect);
 
-    const handleStartGameFailed = (message: string) => {
-      alert(message);
-    };
+  const handleRoomInfo = (roomInfo: RoomDto) => {
+    setRoom(roomInfo);
+  };
 
-    socket.on(EVENTS.ROOM_INFO, handleRoomInfo);
-    socket.on(EVENTS.GAME_STARTED, handleGameStarted);
-    socket.on(EVENTS.START_GAME_FAILED, handleStartGameFailed);
+  const handleGameStarted = (roomInfo: RoomDto) => {
+    setRoom(roomInfo);
+  };
 
-    if (roomId) {
-      socket.emit(EVENTS.GET_ROOM, roomId);
-    }
+  const handleStartGameFailed = (message: string) => {
+    alert(message);
+  };
 
-    return () => {
-      socket.off(EVENTS.ROOM_INFO, handleRoomInfo);
-      socket.off(EVENTS.GAME_STARTED, handleGameStarted);
-      socket.off(EVENTS.START_GAME_FAILED, handleStartGameFailed);
-    };
-  }, [roomId, location.state, navigate]);
+  const handleLiarGameState = (state: any) => {
+    console.log("LIAR_GAME_STATE 수신:", state);
+    setLiarGameState(state);
+  };
+
+  socket.on(EVENTS.ROOM_INFO, handleRoomInfo);
+  socket.on(EVENTS.GAME_STARTED, handleGameStarted);
+  socket.on(EVENTS.START_GAME_FAILED, handleStartGameFailed);
+  socket.on(EVENTS.LIAR_GAME_STATE, handleLiarGameState);
+
+  if (roomId) {
+    socket.emit(EVENTS.GET_ROOM, roomId);
+  }
+
+  return () => {
+    socket.off(EVENTS.ROOM_INFO, handleRoomInfo);
+    socket.off(EVENTS.GAME_STARTED, handleGameStarted);
+    socket.off(EVENTS.START_GAME_FAILED, handleStartGameFailed);
+    socket.off(EVENTS.LIAR_GAME_STATE, handleLiarGameState);
+    socket.off("disconnect", handleSocketDisconnect);
+  };
+}, [roomId, location.state, navigate]);
 
 
   const handleToggleReady = () => {
@@ -93,6 +111,8 @@ export default function RoomPage() {
     socket.emit(EVENTS.LEAVE_ROOM);
   };
 
+
+  
   if (!room) {
     return (
       <div className="room-page">
@@ -103,6 +123,8 @@ export default function RoomPage() {
     );
   }
 
+
+  
   const readyCount = room.players.filter((player) => player.isReady).length;
   const me = room.players.find((player) => player.id === socket.id);
   const isHost = Boolean(me?.isHost);
@@ -159,6 +181,24 @@ export default function RoomPage() {
               </strong>
             </div>
           </section>
+          
+          {liarGameState && (
+            <section className="room-info-panel">
+              <h2>라이어게임 상태</h2>
+              <div className="info-card">
+                <span>라운드</span>
+                <strong>{liarGameState.round}</strong>
+              </div>
+              <div className="info-card">
+                <span>단계</span>
+                <strong>{liarGameState.phase}</strong>
+              </div>
+              <div className="info-card">
+                <span>내 제시어</span>
+                <strong>{liarGameState.myKeyword}</strong>
+              </div>
+            </section>
+          )}          
 
           <section className="player-panel">
             <div className="panel-header">

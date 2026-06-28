@@ -33,7 +33,9 @@ io.on("connection", (socket) => {
   registerRoomSocket(io, socket);
   registerGameSocket(io, socket);
 
-socket.on("disconnect", () => {
+socket.on("disconnect", (reason) => {
+  console.log("disconnect reason:", socket.id, reason);
+
   const player = playerManager.getPlayer(socket.id);
 
   if (player?.roomId) {

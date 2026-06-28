@@ -4,7 +4,7 @@ import {
   LiarGameState,
   LiarPlayerState,
 } from "../../../shared/types/liar/liarGame.js";
-import { LIAR_KEYWORDS } from "../../../shared/keywords/liarKeywords.js";
+import { LIAR_KEYWORDS } from "../../../shared/keywords/liarKeywords";
 
 type LiarGamePlayerInput = {
   id: string;
@@ -97,7 +97,7 @@ class LiarGameManager {
       throw new Error("라이어게임이 생성되지 않았습니다.");
     }
 
-    if (game.players.length < 3) {
+    if (game.players.length < 2) {
       throw new Error("라이어게임은 최소 3명 이상 필요합니다.");
     }
 

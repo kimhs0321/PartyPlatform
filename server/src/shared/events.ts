@@ -30,4 +30,17 @@ export const EVENTS = {
   
   GET_GAME_STATE: "get-game-state",
   GAME_STATE: "game-state",
+
+  LIAR_GAME_STATE: "liar:game-state",
+  LIAR_SUBMIT_DESCRIPTION: "liar:submit-description",
+  LIAR_REACT_DESCRIPTION: "liar:react-description",
+  LIAR_SEND_CHAT: "liar:send-chat",
+  LIAR_SUBMIT_VOTE: "liar:submit-vote",
+  LIAR_REQUEST_PAUSE: "liar:request-pause",
+  LIAR_RESUME_GAME: "liar:resume-game",
+  LIAR_SUBMIT_LAST_SPEECH: "liar:submit-last-speech",
+  LIAR_NEXT_ROUND: "liar:next-round",
 } as const;
+
+  console.log("events.ts loaded:", EVENTS);
+  console.log("events.ts LIAR_GAME_STATE:", EVENTS.LIAR_GAME_STATE);
