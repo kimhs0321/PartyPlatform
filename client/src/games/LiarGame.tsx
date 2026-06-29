@@ -58,7 +58,39 @@ export default function LiarGame({ state }: LiarGameProps) {
     );
   }
 
-  const handleSubmitGuess = () => {
+  const currentPlayerId = state.descriptionOrder[state.currentDescriptionIndex];
+  const currentPlayer = state.players.find(
+    (player) => player.playerId === currentPlayerId
+  );
+
+  const isMyTurn = currentPlayerId === socket.id;
+  const canSubmitDescription = state.phase === "DESCRIPTION" && isMyTurn;
+
+  const handleSubmitDescription = () => {
+    if (!canSubmitDescription) return;
+
+    socket.emit(EVENTS.LIAR_SUBMIT_DESCRIPTION, {
+      roomId: state.roomId,
+      text: descriptionText,
+    });
+
+    setDescriptionText("");
+  };
+
+  const canSendChat = state.phase === "DISCUSSION";
+
+  const handleSendChat = () => {
+    if (!canSendChat) return;
+
+    socket.emit(EVENTS.LIAR_SEND_CHAT, {
+      roomId: state.roomId,
+      text: chatText,
+    });
+
+    setChatText("");
+  };
+
+    const handleSubmitGuess = () => {
     if (!guessText.trim()) return;
 
     socket.emit(EVENTS.LIAR_SUBMIT_GUESS, {
@@ -68,6 +100,9 @@ export default function LiarGame({ state }: LiarGameProps) {
 
     setGuessText("");
   };
+
+
+
 
   if (state.phase === "LIAR_GUESS") {
     return (
@@ -83,15 +118,22 @@ export default function LiarGame({ state }: LiarGameProps) {
                 className="liar-guess-input"
                 value={guessText}
                 onChange={(e) => setGuessText(e.target.value)}
+                onKeyDown={(e)=>{
+                  if (e.key === "Enter" && guessText.trim()) {
+                              handleSubmitGuess();
+                    }
+                }}
                 placeholder="제시어 입력"
               />
 
               <button
-                className="liar-guess-button"
-                onClick={handleSubmitGuess}
+                  className="liar-guess-button"
+                  disabled={!guessText.trim()}
+                  onClick={handleSubmitGuess}
               >
-                확인
+                  확인
               </button>
+              
             </>
           ) : (
             <>
@@ -166,7 +208,16 @@ export default function LiarGame({ state }: LiarGameProps) {
           <h2>{state.resultMessage}</h2>
 
           <p>투표 결과</p>
+          <p>
+          시민 제시어 : <strong>{state.citizenKeyword}</strong>
+        </p>
 
+        {state.liarGuess && (
+          <p>
+            라이어의 추측 :
+            <strong>{state.liarGuess}</strong>
+          </p>
+        )}
           <div className="liar-result-list">
             {state.players.map((player) => {
               const voteCount = state.voteCounts[player.playerId] ?? 0;
@@ -197,37 +248,6 @@ export default function LiarGame({ state }: LiarGameProps) {
     );
   }
 
-  const currentPlayerId = state.descriptionOrder[state.currentDescriptionIndex];
-  const currentPlayer = state.players.find(
-    (player) => player.playerId === currentPlayerId
-  );
-
-  const isMyTurn = currentPlayerId === socket.id;
-  const canSubmitDescription = state.phase === "DESCRIPTION" && isMyTurn;
-
-  const handleSubmitDescription = () => {
-    if (!canSubmitDescription) return;
-
-    socket.emit(EVENTS.LIAR_SUBMIT_DESCRIPTION, {
-      roomId: state.roomId,
-      text: descriptionText,
-    });
-
-    setDescriptionText("");
-  };
-
-  const canSendChat = state.phase === "DISCUSSION";
-
-  const handleSendChat = () => {
-    if (!canSendChat) return;
-
-    socket.emit(EVENTS.LIAR_SEND_CHAT, {
-      roomId: state.roomId,
-      text: chatText,
-    });
-
-    setChatText("");
-  };
 
   return (
     <div className="liar-layout">

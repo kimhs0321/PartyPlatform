@@ -357,6 +357,7 @@ class LiarGameManager {
 
   game.phase = "VOTING";
   game.votes = {};
+  game.tieCandidates = []; 
   game.timerEndsAt = Date.now() + game.settings.voteTime * 1000;
 
   this.games.set(roomId, game);
@@ -370,7 +371,10 @@ class LiarGameManager {
       throw new Error("라이어게임이 생성되지 않았습니다.");
     }
 
-    if (game.phase !== "VOTING") {
+    if (
+      game.phase !== "VOTING" &&
+      game.phase !== "REVOTE"
+    ) {
       throw new Error("지금은 투표 단계가 아닙니다.");
     }
 
@@ -382,10 +386,19 @@ class LiarGameManager {
       throw new Error("이미 투표했습니다.");
     }
 
-    const target = game.players.find(
-      (player) => player.playerId === targetId && player.status !== "LEFT"
-    );
+    const target = game.players.find((player) => {
+      if (player.playerId !== targetId) return false;
+      if (player.status === "LEFT") return false;
 
+      if (
+        game.phase === "REVOTE" &&
+        !game.tieCandidates.includes(player.playerId)
+      ) {
+        return false;
+      }
+
+      return true;
+    });
     if (!target) {
       throw new Error("투표 대상을 찾을 수 없습니다.");
     }
@@ -404,7 +417,7 @@ class LiarGameManager {
     return game;
   }
 
-  startResultPhase(roomId: string): LiarGameState {
+  startTieSpeechPhase(roomId: string): LiarGameState {
     const game = this.games.get(roomId);
 
     if (!game) {
@@ -412,11 +425,70 @@ class LiarGameManager {
     }
 
     if (game.phase !== "VOTING") {
+      throw new Error("최후 변론 단계로 넘어갈 수 없습니다.");
+    }
+
+    const voteCounts = this.getVoteCounts(game);
+    const topVotedPlayerIds = this.getTopVotedPlayerIds(voteCounts);
+
+    if (topVotedPlayerIds.length <= 1) {
+      throw new Error("동점 상황이 아닙니다.");
+    }
+
+    game.phase = "TIE_SPEECH";
+    game.tieCandidates = topVotedPlayerIds;
+    game.timerEndsAt = Date.now() + game.settings.tieSpeechTime * 1000;
+
+    this.games.set(roomId, game);
+    return game;
+  }
+
+  startRevotePhase(roomId: string): LiarGameState {
+    const game = this.games.get(roomId);
+
+    if (!game) {
+      throw new Error("라이어게임이 생성되지 않았습니다.");
+    }
+
+    if (game.phase !== "TIE_SPEECH") {
+      throw new Error("재투표 단계로 넘어갈 수 없습니다.");
+    }
+
+    game.phase = "REVOTE";
+    game.votes = {};
+    game.timerEndsAt = Date.now() + game.settings.voteTime * 1000;
+
+    this.games.set(roomId, game);
+    return game;
+  }
+
+  startResultPhase(roomId: string): LiarGameState {
+    const game = this.games.get(roomId);
+
+    if (!game) {
+      throw new Error("라이어게임이 생성되지 않았습니다.");
+    }
+
+    if (
+      game.phase !== "VOTING" &&
+      game.phase !== "REVOTE"
+    ) {
       throw new Error("결과 단계로 넘어갈 수 없습니다.");
     }
 
     const voteCounts = this.getVoteCounts(game);
     const topVotedPlayerIds = this.getTopVotedPlayerIds(voteCounts);
+
+    if (topVotedPlayerIds.length > 1) {
+
+      // 첫 투표 동점 → 최후변론
+      if (game.phase === "VOTING") {
+        return this.startTieSpeechPhase(roomId);
+      }
+
+      // 재투표도 동점이면 첫 번째 후보 선택
+      topVotedPlayerIds.splice(1);
+    }
 
     const liarCaught = topVotedPlayerIds.some(playerId =>
       game.players.some(
