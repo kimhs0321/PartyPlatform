@@ -37,6 +37,7 @@ export const EVENTS = {
   LIAR_REACT_DESCRIPTION: "liar:react-description",
   LIAR_SEND_CHAT: "liar:send-chat",
   LIAR_SUBMIT_VOTE: "liar:submit-vote",
+  LIAR_SUBMIT_GUESS: "liar:submit-guess",
   LIAR_REQUEST_PAUSE: "liar:request-pause",
   LIAR_RESUME_GAME: "liar:resume-game",
   LIAR_SUBMIT_LAST_SPEECH: "liar:submit-last-speech",

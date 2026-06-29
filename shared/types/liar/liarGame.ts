@@ -5,9 +5,11 @@ export type LiarPhase =
   | "REACTION"
   | "DISCUSSION"
   | "VOTING"
+  | "LIAR_GUESS"
   | "TIE_SPEECH"
   | "REVOTE"
-  | "RESULT";
+  | "RESULT"
+  | "GAME_END";
 
 export type LiarPlayerStatus =
   | "WAITING"
@@ -52,6 +54,10 @@ export interface LiarGameState {
 
   players: LiarPlayerState[];
 
+  citizenKeyword: string;
+  liarKeyword: string;
+  liarGuess: string | null;
+
   descriptionOrder: string[];
   currentDescriptionIndex: number;
 
@@ -86,6 +92,10 @@ export interface ClientLiarGameState {
 
   myKeyword: string | null;
 
+  citizenKeyword: string | null;
+  liarGuess: string | null;
+  guesserPlayerId: string | null;
+
   descriptionOrder: string[];
   currentDescriptionIndex: number;
 
@@ -103,6 +113,11 @@ export interface ClientLiarGameState {
   voteCounts: Record<string, number>;
   topVotedPlayerIds: string[];
   liarPlayerIds: string[];
+
+  votedOutPlayerIds: string[];
+  citizensWin: boolean | null;
+  resultMessage: string | null;
+
 
   timerEndsAt: number | null;
   paused: boolean;

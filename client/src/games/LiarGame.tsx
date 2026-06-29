@@ -11,6 +11,7 @@ type LiarGameProps = {
 export default function LiarGame({ state }: LiarGameProps) {
   const [descriptionText, setDescriptionText] = useState("");
   const [chatText, setChatText] = useState("");
+  const [guessText, setGuessText] = useState("");
   const [now, setNow] = useState(Date.now());
 
   useEffect(() => {
@@ -35,6 +36,11 @@ export default function LiarGame({ state }: LiarGameProps) {
     ? Math.max(0, Math.ceil((state.timerEndsAt - now) / 1000))
     : 0;
 
+  
+
+  const isLiar =
+    state.liarPlayerIds?.includes(socket.id ?? "") ?? false;
+
   if (state.phase === "READY_CHECK") {
     return (
       <div className="liar-layout">
@@ -47,6 +53,52 @@ export default function LiarGame({ state }: LiarGameProps) {
           </div>
           <p>잠시 후 설명 단계가 시작됩니다.</p>
           <div className="liar-countdown">{remainingSeconds}</div>
+        </section>
+      </div>
+    );
+  }
+
+  const handleSubmitGuess = () => {
+    if (!guessText.trim()) return;
+
+    socket.emit(EVENTS.LIAR_SUBMIT_GUESS, {
+      roomId: state.roomId,
+      guess: guessText,
+    });
+
+    setGuessText("");
+  };
+
+  if (state.phase === "LIAR_GUESS") {
+    return (
+      <div className="liar-layout">
+        <section className="liar-ready-card">
+          <span className="liar-muted">라이어 추측</span>
+
+          {isLiar ? (
+            <>
+              <h2>시민의 제시어를 맞혀보세요.</h2>
+
+              <input
+                className="liar-guess-input"
+                value={guessText}
+                onChange={(e) => setGuessText(e.target.value)}
+                placeholder="제시어 입력"
+              />
+
+              <button
+                className="liar-guess-button"
+                onClick={handleSubmitGuess}
+              >
+                확인
+              </button>
+            </>
+          ) : (
+            <>
+              <h2>라이어가 제시어를 추측하고 있습니다.</h2>
+              <p>잠시 기다려 주세요.</p>
+            </>
+          )}
         </section>
       </div>
     );
@@ -109,36 +161,37 @@ export default function LiarGame({ state }: LiarGameProps) {
     return (
       <div className="liar-layout">
         <section className="liar-ready-card">
-          <span className="liar-muted">결과</span>
+          <span className="liar-muted">라운드 결과</span>
 
-          <h2>투표 결과</h2>
+          <h2>{state.resultMessage}</h2>
+
+          <p>투표 결과</p>
 
           <div className="liar-result-list">
             {state.players.map((player) => {
               const voteCount = state.voteCounts[player.playerId] ?? 0;
-
-              const isTop =
-                state.topVotedPlayerIds.includes(player.playerId);
-
-              const isLiar =
-                state.liarPlayerIds.includes(player.playerId);
+              const isTop = state.topVotedPlayerIds.includes(player.playerId);
+              const isLiar = state.liarPlayerIds.includes(player.playerId);
 
               return (
                 <div
                   key={player.playerId}
-                  className={`liar-result-row ${
-                    isTop ? "selected" : ""
-                  } ${isLiar ? "liar" : ""}`}
+                  className={`liar-result-row ${isTop ? "selected" : ""} ${
+                    isLiar ? "liar" : ""
+                  }`}
                 >
                   <strong>{player.name}</strong>
 
                   <span>{voteCount}표</span>
 
+                  {isTop && <span>🎯 최다 득표</span>}
                   {isLiar && <span>🕵️ 라이어</span>}
                 </div>
               );
             })}
           </div>
+
+          <div className="liar-countdown">{remainingSeconds}</div>
         </section>
       </div>
     );
@@ -175,8 +228,6 @@ export default function LiarGame({ state }: LiarGameProps) {
 
     setChatText("");
   };
-
-  
 
   return (
     <div className="liar-layout">
@@ -361,6 +412,8 @@ function phaseLabel(phase: string) {
       return "토론";
     case "VOTING":
       return "투표";
+    case "LIAR_GUESS":
+      return "라이어 추측";  
     case "RESULT":
       return "결과";
     default:

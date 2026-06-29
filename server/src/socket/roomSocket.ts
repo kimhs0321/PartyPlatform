@@ -5,8 +5,116 @@ import { roomManager } from "../managers/RoomManager";
 import { gameManager } from "../managers/GameManager";
 import { liarGameManager } from "../managers/LiarGameManager";
 
-
 export function registerRoomSocket(io: Server, socket: Socket) {
+  const emitRoomInfo = (roomId: string) => {
+    const room = roomManager.getRoom(roomId);
+    if (!room) return;
+
+    const roomDto = roomManager.toRoomDto(room.id, (playerId) =>
+      playerManager.getPlayer(playerId)
+    );
+
+    if (!roomDto) return;
+
+    room.playerIds.forEach((playerId) => {
+      io.to(playerId).emit(EVENTS.ROOM_INFO, roomDto);
+    });
+  };
+
+  const emitLiarState = (roomId: string) => {
+    const room = roomManager.getRoom(roomId);
+    if (!room) return;
+
+    room.playerIds.forEach((playerId) => {
+      const state = liarGameManager.toClientState(roomId, playerId);
+      io.to(playerId).emit(EVENTS.LIAR_GAME_STATE, state);
+    });
+  };
+
+  const endRoomGame = (roomId: string) => {
+    const room = roomManager.getRoom(roomId);
+    if (!room) return;
+
+    const endedRoom = roomManager.endGame(roomId);
+    if (!endedRoom) return;
+
+    gameManager.endGame(roomId);
+    liarGameManager.deleteGame(roomId);
+
+    const roomDto = roomManager.toRoomDto(endedRoom.id, (playerId) =>
+      playerManager.getPlayer(playerId)
+    );
+
+    if (!roomDto) return;
+
+    endedRoom.playerIds.forEach((playerId) => {
+      io.to(playerId).emit(EVENTS.GAME_ENDED, roomDto);
+      io.to(playerId).emit(EVENTS.ROOM_INFO, roomDto);
+    });
+
+    io.emit(EVENTS.ROOMS, roomManager.getAllRooms());
+  };
+
+  const scheduleDescriptionPhase = (roomId: string) => {
+    setTimeout(() => {
+      try {
+        liarGameManager.startDescriptionPhase(roomId);
+        emitLiarState(roomId);
+      } catch {
+        // 상태가 이미 바뀐 경우 무시
+      }
+    }, 5000);
+  };
+
+  const scheduleDiscussionPhase = (roomId: string) => {
+    setTimeout(() => {
+      try {
+        liarGameManager.startDiscussionPhase(roomId);
+        emitLiarState(roomId);
+
+        const game = liarGameManager.getGame(roomId);
+        const discussionTime = game?.settings.discussionTime ?? 120;
+
+        scheduleVotingPhase(roomId, discussionTime);
+      } catch {
+        // 상태가 이미 바뀐 경우 무시
+      }
+    }, 5000);
+  };
+
+  const scheduleVotingPhase = (roomId: string, delaySeconds: number) => {
+    setTimeout(() => {
+      try {
+        liarGameManager.startVotingPhase(roomId);
+        emitLiarState(roomId);
+      } catch {
+        // 상태가 이미 바뀐 경우 무시
+      }
+    }, delaySeconds * 1000);
+  };
+
+  const scheduleNextRoundOrEnd = (roomId: string) => {
+    setTimeout(() => {
+      try {
+        liarGameManager.nextRound(roomId);
+        emitLiarState(roomId);
+
+        const game = liarGameManager.getGame(roomId);
+
+        if (game?.phase === "READY_CHECK") {
+          scheduleDescriptionPhase(roomId);
+          return;
+        }
+
+        if (game?.phase === "GAME_END") {
+          endRoomGame(roomId);
+        }
+      } catch {
+        // 상태 변경 실패 무시
+      }
+    }, 5000);
+  };
+
   socket.on(
     EVENTS.CREATE_ROOM,
     (data: {
@@ -51,15 +159,7 @@ export function registerRoomSocket(io: Server, socket: Socket) {
     socket.emit(EVENTS.JOIN_ROOM_SUCCESS, room);
     io.emit(EVENTS.ROOMS, roomManager.getAllRooms());
 
-    const roomDto = roomManager.toRoomDto(room.id, (playerId) =>
-      playerManager.getPlayer(playerId)
-    );
-
-    if (roomDto) {
-      room.playerIds.forEach((playerId) => {
-        io.to(playerId).emit(EVENTS.ROOM_INFO, roomDto);
-      });
-    }
+    emitRoomInfo(room.id);
 
     console.log(`${player.nickname}님이 ${room.title} 방에 입장`);
   });
@@ -76,27 +176,18 @@ export function registerRoomSocket(io: Server, socket: Socket) {
 
   socket.on(EVENTS.TOGGLE_READY, () => {
     const player = playerManager.getPlayer(socket.id);
-    if (!player || !player.roomId) return;
+    if (!player?.roomId) return;
 
     const updatedRoom = roomManager.toggleReady(player.roomId, player.id);
     if (!updatedRoom) return;
 
-    const roomDto = roomManager.toRoomDto(updatedRoom.id, (playerId) =>
-      playerManager.getPlayer(playerId)
-    );
-
-    if (roomDto) {
-      updatedRoom.playerIds.forEach((playerId) => {
-        io.to(playerId).emit(EVENTS.ROOM_INFO, roomDto);
-      });
-    }
-
+    emitRoomInfo(updatedRoom.id);
     io.emit(EVENTS.ROOMS, roomManager.getAllRooms());
   });
 
   socket.on(EVENTS.START_GAME, () => {
     const player = playerManager.getPlayer(socket.id);
-    if (!player || !player.roomId) return;
+    if (!player?.roomId) return;
 
     const canStart = roomManager.canStartGame(player.roomId, player.id);
 
@@ -121,7 +212,7 @@ export function registerRoomSocket(io: Server, socket: Socket) {
           name: player.nickname,
         }));
 
-      const settings = {
+      liarGameManager.createGame(startedRoom.id, players, {
         liarCount: 1,
         roundCount: 5,
         descriptionTime: 20,
@@ -130,28 +221,11 @@ export function registerRoomSocket(io: Server, socket: Socket) {
         tieSpeechTime: 20,
         minDescriptionLength: 2,
         maxDescriptionLength: 30,
-      };
-
-      liarGameManager.createGame(startedRoom.id, players, settings);
-      liarGameManager.startRound(startedRoom.id);
-
-      setTimeout(() => {
-        try {
-          liarGameManager.startDescriptionPhase(startedRoom.id);
-
-          startedRoom.playerIds.forEach((playerId) => {
-            const state = liarGameManager.toClientState(startedRoom.id, playerId);
-            io.to(playerId).emit(EVENTS.LIAR_GAME_STATE, state);
-          });
-        } catch {
-          // 이미 게임이 종료됐거나 상태가 바뀐 경우 무시
-        }
-      }, 5000);
-
-      startedRoom.playerIds.forEach((playerId) => {
-        const state = liarGameManager.toClientState(startedRoom.id, playerId);
-        io.to(playerId).emit(EVENTS.LIAR_GAME_STATE, state);
       });
+
+      liarGameManager.startRound(startedRoom.id);
+      emitLiarState(startedRoom.id);
+      scheduleDescriptionPhase(startedRoom.id);
     }
 
     const roomDto = roomManager.toRoomDto(startedRoom.id, (playerId) =>
@@ -161,7 +235,6 @@ export function registerRoomSocket(io: Server, socket: Socket) {
     if (!roomDto) return;
 
     startedRoom.playerIds.forEach((playerId) => {
-      // GamePage 구현 전까지 이동은 막아둠
       io.to(playerId).emit(EVENTS.GAME_STARTED, roomDto);
       io.to(playerId).emit(EVENTS.ROOM_INFO, roomDto);
     });
@@ -175,54 +248,22 @@ export function registerRoomSocket(io: Server, socket: Socket) {
     EVENTS.LIAR_SUBMIT_DESCRIPTION,
     (data: { roomId: string; text: string }) => {
       const player = playerManager.getPlayer(socket.id);
-
       if (!player) return;
 
       try {
         liarGameManager.submitDescription(data.roomId, player.id, data.text);
-
-        const room = roomManager.getRoom(data.roomId);
-        if (!room) return;
-
-        room.playerIds.forEach((playerId) => {
-          const state = liarGameManager.toClientState(data.roomId, playerId);
-          io.to(playerId).emit(EVENTS.LIAR_GAME_STATE, state);
-        });
+        emitLiarState(data.roomId);
 
         const game = liarGameManager.getGame(data.roomId);
 
         if (game?.phase === "REACTION") {
-          setTimeout(() => {
-            try {
-              liarGameManager.startDiscussionPhase(data.roomId);
-
-              room.playerIds.forEach((playerId) => {
-                const state = liarGameManager.toClientState(data.roomId, playerId);
-                io.to(playerId).emit(EVENTS.LIAR_GAME_STATE, state);
-              });
-
-              setTimeout(() => {
-                try {
-                  liarGameManager.startVotingPhase(data.roomId);
-
-                  room.playerIds.forEach((playerId) => {
-                    const state = liarGameManager.toClientState(data.roomId, playerId);
-                    io.to(playerId).emit(EVENTS.LIAR_GAME_STATE, state);
-                  });
-                } catch {
-                  // 상태가 이미 바뀌었으면 무시
-                }
-              }, 120000);
-
-            } catch {
-              // 상태가 이미 바뀌었으면 무시
-            }
-          }, 5000);
+          scheduleDiscussionPhase(data.roomId);
         }
-
       } catch (error) {
         const message =
-          error instanceof Error ? error.message : "설명 제출 중 오류가 발생했습니다.";
+          error instanceof Error
+            ? error.message
+            : "설명 제출 중 오류가 발생했습니다.";
 
         socket.emit(EVENTS.START_GAME_FAILED, message);
       }
@@ -237,17 +278,12 @@ export function registerRoomSocket(io: Server, socket: Socket) {
 
       try {
         liarGameManager.sendChat(data.roomId, player.id, data.text);
-
-        const room = roomManager.getRoom(data.roomId);
-        if (!room) return;
-
-        room.playerIds.forEach((playerId) => {
-          const state = liarGameManager.toClientState(data.roomId, playerId);
-          io.to(playerId).emit(EVENTS.LIAR_GAME_STATE, state);
-        });
+        emitLiarState(data.roomId);
       } catch (error) {
         const message =
-          error instanceof Error ? error.message : "채팅 전송 중 오류가 발생했습니다.";
+          error instanceof Error
+            ? error.message
+            : "채팅 전송 중 오류가 발생했습니다.";
 
         socket.emit(EVENTS.START_GAME_FAILED, message);
       }
@@ -262,17 +298,37 @@ export function registerRoomSocket(io: Server, socket: Socket) {
 
       try {
         liarGameManager.submitVote(data.roomId, player.id, data.targetId);
+        emitLiarState(data.roomId);
 
-        const room = roomManager.getRoom(data.roomId);
-        if (!room) return;
+        const game = liarGameManager.getGame(data.roomId);
 
-        room.playerIds.forEach((playerId) => {
-          const state = liarGameManager.toClientState(data.roomId, playerId);
-          io.to(playerId).emit(EVENTS.LIAR_GAME_STATE, state);
-        });
+        if (game?.phase === "RESULT") {
+          scheduleNextRoundOrEnd(data.roomId);
+        }
       } catch (error) {
         const message =
           error instanceof Error ? error.message : "투표 중 오류가 발생했습니다.";
+
+        socket.emit(EVENTS.START_GAME_FAILED, message);
+      }
+    }
+  );
+
+  socket.on(
+    EVENTS.LIAR_SUBMIT_GUESS,
+    (data: { roomId: string; guess: string }) => {
+      const player = playerManager.getPlayer(socket.id);
+      if (!player) return;
+
+      try {
+        liarGameManager.submitLiarGuess(data.roomId, player.id, data.guess);
+        emitLiarState(data.roomId);
+        scheduleNextRoundOrEnd(data.roomId);
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : "제시어 추측 중 오류가 발생했습니다.";
 
         socket.emit(EVENTS.START_GAME_FAILED, message);
       }
@@ -293,51 +349,27 @@ export function registerRoomSocket(io: Server, socket: Socket) {
 
   socket.on(EVENTS.END_GAME, () => {
     const player = playerManager.getPlayer(socket.id);
-    if (!player || !player.roomId) return;
+    if (!player?.roomId) return;
 
     const room = roomManager.getRoom(player.roomId);
-
     if (!room || room.hostId !== player.id) return;
 
-    const endedRoom = roomManager.endGame(player.roomId);
-    if (!endedRoom) return;
+    endRoomGame(player.roomId);
 
-    gameManager.endGame(player.roomId);
-
-    const roomDto = roomManager.toRoomDto(endedRoom.id, (playerId) =>
-      playerManager.getPlayer(playerId)
-    );
-
-    if (!roomDto) return;
-
-    endedRoom.playerIds.forEach((playerId) => {
-      io.to(playerId).emit(EVENTS.GAME_ENDED, roomDto);
-      io.to(playerId).emit(EVENTS.ROOM_INFO, roomDto);
-    });
-
-    io.emit(EVENTS.ROOMS, roomManager.getAllRooms());
-
-    console.log(`${endedRoom.title} 게임 종료`);
+    console.log(`${room.title} 게임 종료`);
   });
 
   socket.on(EVENTS.LEAVE_ROOM, () => {
     const player = playerManager.getPlayer(socket.id);
-    if (!player || !player.roomId) return;
+    if (!player?.roomId) return;
 
-    const updatedRoom = roomManager.leaveRoom(player.roomId, player.id);
+    const roomId = player.roomId;
+    const updatedRoom = roomManager.leaveRoom(roomId, player.id);
 
     playerManager.setPlayerRoom(socket.id, "");
 
     if (updatedRoom) {
-      const roomDto = roomManager.toRoomDto(updatedRoom.id, (playerId) =>
-        playerManager.getPlayer(playerId)
-      );
-
-      if (roomDto) {
-        updatedRoom.playerIds.forEach((playerId) => {
-          io.to(playerId).emit(EVENTS.ROOM_INFO, roomDto);
-        });
-      }
+      emitRoomInfo(updatedRoom.id);
     }
 
     io.emit(EVENTS.ROOMS, roomManager.getAllRooms());

@@ -34,6 +34,9 @@ class LiarGameManager {
       round: 0,
       settings,
       players: liarPlayers,
+      citizenKeyword: "",
+      liarKeyword: "",
+      liarGuess: null,
       descriptionOrder: [],
       currentDescriptionIndex: 0,
       descriptions: [],
@@ -61,17 +64,56 @@ class LiarGameManager {
 
     const me = game.players.find((player) => player.playerId === playerId);
     const voteCounts = this.getVoteCounts(game);
-    const topVotedPlayerIds = this.getTopVotedPlayerIds(voteCounts);
+
+    const topVotedPlayerIds =
+      this.getTopVotedPlayerIds(voteCounts);
+
     const liarPlayerIds =
+      game.phase === "RESULT" || game.phase === "LIAR_GUESS"
+        ? game.players
+            .filter(player => player.isLiar)
+            .map(player => player.playerId)
+        : [];
+      
+
+    const guesserPlayerId =
+      game.phase === "LIAR_GUESS"
+        ? game.players.find((player) => player.isLiar)?.playerId ?? null
+        : null;
+
+    const citizenKeywordForClient =
+      game.phase === "LIAR_GUESS" || game.phase === "RESULT"
+        ? game.citizenKeyword
+        : null;    
+
+    const votedOutPlayerIds =
       game.phase === "RESULT"
-        ? game.players.filter((player) => player.isLiar).map((player) => player.playerId)
+        ? topVotedPlayerIds
         : [];
 
+    const citizensWin =
+      game.phase === "RESULT"
+        ? game.liarGuess !== game.citizenKeyword       
+        : null;
+
+    const resultMessage =
+      game.phase === "RESULT"
+        ? citizensWin
+          ? "시민 팀 승리"
+          : "라이어 팀 승리"
+        : null;
+        
     return {
       roomId: game.roomId,
       phase: game.phase,
       round: game.round,
       settings: game.settings,
+      votedOutPlayerIds,
+      citizensWin,
+      resultMessage,
+      citizenKeyword: citizenKeywordForClient,
+      liarGuess: game.phase === "RESULT" ? game.liarGuess : null,
+      guesserPlayerId,
 
       players: game.players.map((player) => ({
         playerId: player.playerId,
@@ -133,6 +175,10 @@ class LiarGameManager {
     );
 
     const [citizenKeyword, liarKeyword] = this.pickTwoDifferentKeywords();
+
+    game.citizenKeyword = citizenKeyword;
+    game.liarKeyword = liarKeyword;
+    game.liarGuess = null;
 
     game.players = game.players.map((player) => {
       const isLiar = liarIds.includes(player.playerId);
@@ -352,9 +398,8 @@ class LiarGameManager {
     );
 
     if (Object.keys(game.votes).length === activePlayers.length) {
-        game.phase = "VOTING";
+        return this.startResultPhase(roomId);
     }
-
     this.games.set(roomId, game);
     return game;
   }
@@ -370,12 +415,69 @@ class LiarGameManager {
       throw new Error("결과 단계로 넘어갈 수 없습니다.");
     }
 
+    const voteCounts = this.getVoteCounts(game);
+    const topVotedPlayerIds = this.getTopVotedPlayerIds(voteCounts);
+
+    const liarCaught = topVotedPlayerIds.some(playerId =>
+      game.players.some(
+        player =>
+          player.playerId === playerId &&
+          player.isLiar
+      )
+    );
+
+    if (liarCaught) {
+      game.phase = "LIAR_GUESS";
+    } else {
+        game.liarGuess = game.citizenKeyword;
+        game.phase = "RESULT";
+      }
+    game.timerEndsAt = Date.now() + 5000;
+
+    this.games.set(roomId, game);
+    return game;
+  }
+
+  submitLiarGuess(
+    roomId: string,
+    playerId: string,
+    guess: string
+  ): LiarGameState {
+    const game = this.games.get(roomId);
+
+    if (!game) {
+      throw new Error("라이어게임이 생성되지 않았습니다.");
+    }
+
+    if (game.phase !== "LIAR_GUESS") {
+      throw new Error("지금은 라이어 추측 단계가 아닙니다.");
+    }
+
+    const liar = game.players.find((player) => player.isLiar);
+
+    if (!liar) {
+      throw new Error("라이어를 찾을 수 없습니다.");
+    }
+
+    if (liar.playerId !== playerId) {
+      throw new Error("라이어만 제시어를 추측할 수 있습니다.");
+    }
+
+    const trimmedGuess = guess.trim();
+
+    if (!trimmedGuess) {
+      throw new Error("제시어를 입력하세요.");
+    }
+
+    game.liarGuess = trimmedGuess;
     game.phase = "RESULT";
     game.timerEndsAt = Date.now() + 5000;
 
     this.games.set(roomId, game);
     return game;
   }
+
+  
 
   private getVoteCounts(game: LiarGameState): Record<string, number> {
     const counts: Record<string, number> = {};
@@ -419,6 +521,24 @@ class LiarGameManager {
     const shuffled = this.shuffle([...LIAR_KEYWORDS]);
     return [shuffled[0], shuffled[1]];
   }  
+
+  nextRound(roomId: string): LiarGameState {
+    const game = this.games.get(roomId);
+
+    if (!game) {
+      throw new Error("라이어게임이 생성되지 않았습니다.");
+    }
+
+    if (game.round >= game.settings.roundCount) {
+      game.phase = "GAME_END";
+      game.timerEndsAt = null;
+
+      this.games.set(roomId, game);
+      return game;
+    }
+
+    return this.startRound(roomId);
+  }
 
   deleteGame(roomId: string) {
     this.games.delete(roomId);
