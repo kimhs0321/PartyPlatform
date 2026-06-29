@@ -41,4 +41,5 @@ export const EVENTS = {
   LIAR_RESUME_GAME: "liar:resume-game",
   LIAR_SUBMIT_LAST_SPEECH: "liar:submit-last-speech",
   LIAR_NEXT_ROUND: "liar:next-round",
+  LIAR_SUBMIT_REACTION: "liar:submitReaction",
 } as const;

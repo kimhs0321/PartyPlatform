@@ -41,6 +41,8 @@ export interface LiarPlayerState {
   playerId: string;
   name: string;
   score: number;
+  scoreDelta: number;
+  scoreReasons: string[];
   keyword?: string;
   isLiar?: boolean;
   status: LiarPlayerStatus;
@@ -72,6 +74,7 @@ export interface LiarGameState {
   votes: Record<string, string>;
   tieCandidates: string[];
   timerEndsAt: number | null;
+  remainingTimeMs: number | null;
   paused: boolean;
 }
 
@@ -79,6 +82,8 @@ export interface ClientLiarPlayerState {
   playerId: string;
   name: string;
   score: number;
+  scoreDelta: number;
+  scoreReasons: string[];
   status: LiarPlayerStatus;
 }
 
@@ -120,5 +125,6 @@ export interface ClientLiarGameState {
 
 
   timerEndsAt: number | null;
+  remainingTimeMs: number | null;
   paused: boolean;
 }

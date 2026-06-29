@@ -23,6 +23,8 @@ class LiarGameManager {
       playerId: player.id,
       name: player.name,
       score: 0,
+      scoreDelta: 0,
+      scoreReasons: [],
       keyword: "",
       isLiar: false,
       status: "WAITING",
@@ -44,6 +46,7 @@ class LiarGameManager {
       votes: {},
       tieCandidates: [],
       timerEndsAt: null,
+      remainingTimeMs: null,
       paused: false,
     };
 
@@ -119,6 +122,8 @@ class LiarGameManager {
         playerId: player.playerId,
         name: player.name,
         score: player.score,
+        scoreDelta: player.scoreDelta,
+        scoreReasons: player.scoreReasons,
         status: player.status,
       })),
 
@@ -134,6 +139,7 @@ class LiarGameManager {
       tieCandidates: game.tieCandidates,
 
       timerEndsAt: game.timerEndsAt,
+      remainingTimeMs: game.remainingTimeMs,
       paused: game.paused,
 
       voteCounts,
@@ -187,6 +193,9 @@ class LiarGameManager {
         ...player,
         keyword: isLiar ? liarKeyword : citizenKeyword,
         isLiar,
+        scoreDelta: 0,
+        scoreReasons: [],
+
         status:
           player.playerId === game.descriptionOrder[0]
             ? "ACTIVE"
@@ -288,6 +297,64 @@ class LiarGameManager {
     } else {
       game.timerEndsAt = Date.now() + game.settings.descriptionTime * 1000;
     }
+    this.games.set(roomId, game);
+    return game;
+  }
+
+  submitReaction(
+    roomId: string,
+    playerId: string,
+    targetPlayerId: string,
+    reaction: "LIKE" | "DISLIKE"
+  ): LiarGameState {
+    const game = this.games.get(roomId);
+
+    if (!game) {
+      throw new Error("라이어게임이 생성되지 않았습니다.");
+    }
+
+    if (game.phase !== "REACTION") {
+      throw new Error("설명 평가 단계가 아닙니다.");
+    }
+
+    if (playerId === targetPlayerId) {
+      throw new Error("자기 설명에는 평가할 수 없습니다.");
+    }
+
+    const targetDescription = game.descriptions.find(
+      (description) => description.playerId === targetPlayerId
+    );
+
+    if (!targetDescription) {
+      throw new Error("평가할 설명을 찾을 수 없습니다.");
+    }
+
+    if (reaction === "LIKE") {
+      game.descriptions = game.descriptions.map((description) => ({
+        ...description,
+        likes: description.likes.filter((id) => id !== playerId),
+      }));
+
+      const nextTargetDescription = game.descriptions.find(
+        (description) => description.playerId === targetPlayerId
+      );
+
+      nextTargetDescription?.likes.push(playerId);
+    }
+
+    if (reaction === "DISLIKE") {
+      game.descriptions = game.descriptions.map((description) => ({
+        ...description,
+        dislikes: description.dislikes.filter((id) => id !== playerId),
+      }));
+
+      const nextTargetDescription = game.descriptions.find(
+        (description) => description.playerId === targetPlayerId
+      );
+
+      nextTargetDescription?.dislikes.push(playerId);
+    }
+
     this.games.set(roomId, game);
     return game;
   }
@@ -501,9 +568,13 @@ class LiarGameManager {
     if (liarCaught) {
       game.phase = "LIAR_GUESS";
     } else {
-        game.liarGuess = game.citizenKeyword;
-        game.phase = "RESULT";
-      }
+      game.liarGuess = game.citizenKeyword;
+
+      this.applyRoundScore(game, false);
+
+      game.phase = "RESULT";
+    }
+
     game.timerEndsAt = Date.now() + 5000;
 
     this.games.set(roomId, game);
@@ -542,6 +613,7 @@ class LiarGameManager {
     }
 
     game.liarGuess = trimmedGuess;
+    this.applyRoundScore(game, true);
     game.phase = "RESULT";
     game.timerEndsAt = Date.now() + 5000;
 
@@ -549,7 +621,98 @@ class LiarGameManager {
     return game;
   }
 
-  
+  private addScore(
+    player: LiarPlayerState,
+    delta: number,
+    reason: string
+  ): LiarPlayerState {
+    return {
+      ...player,
+      score: player.score + delta,
+      scoreDelta: player.scoreDelta + delta,
+      scoreReasons: [...player.scoreReasons, reason],
+    };
+  }
+
+  private applyRoundScore(
+    game: LiarGameState,
+    liarWasCaught: boolean
+  ): void {
+    const liarWon =
+      !liarWasCaught ||
+      game.liarGuess === game.citizenKeyword;
+
+    const citizensWin = !liarWon;
+
+    const likeCounts: Record<string, number> = {};
+    const dislikeCounts: Record<string, number> = {};
+
+    game.descriptions.forEach((description) => {
+      likeCounts[description.playerId] = description.likes.length;
+      dislikeCounts[description.playerId] = description.dislikes.length;
+    });
+
+    const maxLike = Math.max(0, ...Object.values(likeCounts));
+    const maxDislike = Math.max(0, ...Object.values(dislikeCounts));
+
+    const mostLikedPlayerIds =
+      maxLike > 0
+        ? Object.entries(likeCounts)
+            .filter(([, count]) => count === maxLike)
+            .map(([playerId]) => playerId)
+        : [];
+
+    const mostDislikedPlayerIds =
+      maxDislike > 0
+        ? Object.entries(dislikeCounts)
+            .filter(([, count]) => count === maxDislike)
+            .map(([playerId]) => playerId)
+        : [];
+
+    game.players = game.players.map((player) => {
+      if (player.status === "LEFT") return player;
+
+      let updatedPlayer = {
+        ...player,
+      };
+
+      if (citizensWin && !player.isLiar) {
+        updatedPlayer = this.addScore(
+          updatedPlayer,
+          1,
+          "시민 승리 +1"
+        );
+      }
+
+      if (!citizensWin && player.isLiar) {
+        updatedPlayer = this.addScore(
+          updatedPlayer,
+          liarWasCaught ? 2 : 3,
+          liarWasCaught
+            ? "제시어 추측 성공 +2"
+            : "라이어 생존 승리 +3"
+        );
+      }
+
+      if (mostLikedPlayerIds.includes(player.playerId)) {
+        updatedPlayer = this.addScore(
+          updatedPlayer,
+          1,
+          "최다 좋아요 +1"
+        );
+      }
+
+      if (mostDislikedPlayerIds.includes(player.playerId)) {
+        updatedPlayer = this.addScore(
+          updatedPlayer,
+          -0.5,
+          "최다 싫어요 -0.5"
+        );
+      }
+
+      return updatedPlayer;
+    });
+  }
 
   private getVoteCounts(game: LiarGameState): Record<string, number> {
     const counts: Record<string, number> = {};
@@ -593,6 +756,56 @@ class LiarGameManager {
     const shuffled = this.shuffle([...LIAR_KEYWORDS]);
     return [shuffled[0], shuffled[1]];
   }  
+
+  pauseGame(roomId: string): LiarGameState {
+    const game = this.games.get(roomId);
+
+    if (!game) {
+      throw new Error("라이어게임이 생성되지 않았습니다.");
+    }
+
+    if (game.paused) {
+      return game;
+    }
+
+    game.paused = true;
+
+    if (game.timerEndsAt) {
+      game.remainingTimeMs = Math.max(
+        0,
+        game.timerEndsAt - Date.now()
+      );
+
+      game.timerEndsAt = null;
+    }
+
+    this.games.set(roomId, game);
+    return game;
+  }
+
+  resumeGame(roomId: string): LiarGameState {
+    const game = this.games.get(roomId);
+
+    if (!game) {
+      throw new Error("라이어게임이 생성되지 않았습니다.");
+    }
+
+    if (!game.paused) {
+      return game;
+    }
+
+    game.paused = false;
+
+    if (game.remainingTimeMs !== null) {
+      game.timerEndsAt =
+        Date.now() + game.remainingTimeMs;
+
+      game.remainingTimeMs = null;
+    }
+
+    this.games.set(roomId, game);
+    return game;
+  }
 
   nextRound(roomId: string): LiarGameState {
     const game = this.games.get(roomId);

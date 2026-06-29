@@ -93,6 +93,20 @@ export function registerRoomSocket(io: Server, socket: Socket) {
     }, delaySeconds * 1000);
   };
 
+  const scheduleRevotePhase = (roomId: string) => {
+    const game = liarGameManager.getGame(roomId);
+    const tieSpeechTime = game?.settings.tieSpeechTime ?? 20;
+
+    setTimeout(() => {
+      try {
+        liarGameManager.startRevotePhase(roomId);
+        emitLiarState(roomId);
+      } catch {
+        // 상태가 이미 바뀐 경우 무시
+      }
+    }, tieSpeechTime * 1000);
+  };
+
   const scheduleNextRoundOrEnd = (roomId: string) => {
     setTimeout(() => {
       try {
@@ -107,12 +121,40 @@ export function registerRoomSocket(io: Server, socket: Socket) {
         }
 
         if (game?.phase === "GAME_END") {
-          endRoomGame(roomId);
+
+            emitLiarState(roomId);
+
+            setTimeout(()=>{
+                endRoomGame(roomId);
+            },5000);
+
+            return;
         }
       } catch {
         // 상태 변경 실패 무시
       }
     }, 5000);
+  };
+
+  const handleAfterVoteResolved = (roomId: string) => {
+    const game = liarGameManager.getGame(roomId);
+    if (!game) return;
+
+    if (game.phase === "TIE_SPEECH") {
+      emitLiarState(roomId);
+      scheduleRevotePhase(roomId);
+      return;
+    }
+
+    if (game.phase === "LIAR_GUESS") {
+      emitLiarState(roomId);
+      return;
+    }
+
+    if (game.phase === "RESULT") {
+      emitLiarState(roomId);
+      scheduleNextRoundOrEnd(roomId);
+    }
   };
 
   socket.on(
@@ -299,12 +341,7 @@ export function registerRoomSocket(io: Server, socket: Socket) {
       try {
         liarGameManager.submitVote(data.roomId, player.id, data.targetId);
         emitLiarState(data.roomId);
-
-        const game = liarGameManager.getGame(data.roomId);
-
-        if (game?.phase === "RESULT") {
-          scheduleNextRoundOrEnd(data.roomId);
-        }
+        handleAfterVoteResolved(data.roomId);
       } catch (error) {
         const message =
           error instanceof Error ? error.message : "투표 중 오류가 발생했습니다.";
@@ -334,6 +371,48 @@ export function registerRoomSocket(io: Server, socket: Socket) {
       }
     }
   );
+
+  socket.on(
+    EVENTS.LIAR_SUBMIT_REACTION,
+    (
+      data: {
+        roomId: string;
+        targetPlayerId: string;
+        reaction: "LIKE" | "DISLIKE";
+      }
+    ) => {
+      const player = playerManager.getPlayer(socket.id);
+      if (!player) return;
+
+      try {
+        liarGameManager.submitReaction(
+          data.roomId,
+          player.id,
+          data.targetPlayerId,
+          data.reaction
+        );
+
+        const room = roomManager.getRoom(data.roomId);
+        if (!room) return;
+
+        room.playerIds.forEach((playerId) => {
+          const state = liarGameManager.toClientState(
+            data.roomId,
+            playerId
+          );
+
+          io.to(playerId).emit(EVENTS.LIAR_GAME_STATE, state);
+        });
+      } catch (error) {
+        socket.emit(
+          EVENTS.START_GAME_FAILED,
+          error instanceof Error
+            ? error.message
+            : "설명 평가에 실패했습니다."
+        );
+      }
+    }
+  );  
 
   socket.on(EVENTS.GET_GAME_STATE, (roomId: string) => {
     const player = playerManager.getPlayer(socket.id);

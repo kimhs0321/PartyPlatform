@@ -38,7 +38,7 @@ export default function LiarGame({ state }: LiarGameProps) {
 
   
 
-  const isLiar =
+  const amILiar =
     state.liarPlayerIds?.includes(socket.id ?? "") ?? false;
 
   if (state.phase === "READY_CHECK") {
@@ -57,14 +57,6 @@ export default function LiarGame({ state }: LiarGameProps) {
       </div>
     );
   }
-
-  const currentPlayerId = state.descriptionOrder[state.currentDescriptionIndex];
-  const currentPlayer = state.players.find(
-    (player) => player.playerId === currentPlayerId
-  );
-
-  const isMyTurn = currentPlayerId === socket.id;
-  const canSubmitDescription = state.phase === "DESCRIPTION" && isMyTurn;
 
   const handleSubmitDescription = () => {
     if (!canSubmitDescription) return;
@@ -90,6 +82,17 @@ export default function LiarGame({ state }: LiarGameProps) {
     setChatText("");
   };
 
+  const handleSubmitReaction = (
+    targetPlayerId: string,
+    reaction: "LIKE" | "DISLIKE"
+  ) => {
+    socket.emit(EVENTS.LIAR_SUBMIT_REACTION, {
+      roomId: state.roomId,
+      targetPlayerId,
+      reaction,
+    });
+  }; 
+  
     const handleSubmitGuess = () => {
     if (!guessText.trim()) return;
 
@@ -110,7 +113,7 @@ export default function LiarGame({ state }: LiarGameProps) {
         <section className="liar-ready-card">
           <span className="liar-muted">라이어 추측</span>
 
-          {isLiar ? (
+          {amILiar ? (
             <>
               <h2>시민의 제시어를 맞혀보세요.</h2>
 
@@ -151,28 +154,121 @@ export default function LiarGame({ state }: LiarGameProps) {
       <div className="liar-layout">
         <section className="liar-ready-card">
           <span className="liar-muted">설명 완료</span>
+
           <h2>설명 평가 단계입니다</h2>
-          <p>잠시 후 토론이 시작됩니다.</p>
+
+          <p>가장 좋은 설명과 가장 수상한 설명을 선택하세요.</p>
+
           <div className="liar-countdown">{remainingSeconds}</div>
+
+          <div className="liar-reaction-list">
+            {state.descriptions.map((description) => {
+              const isMine = description.playerId === socket.id;
+              const liked = description.likes.includes(socket.id ?? "");
+              const disliked = description.dislikes.includes(socket.id ?? "");
+
+              return (
+                <div
+                  className={`liar-reaction-item
+                      ${isMine ? "mine" : ""}
+                      ${liked ? "liked" : ""}
+                      ${disliked ? "disliked" : ""}
+                  `}
+                  key={`${description.playerId}-${description.createdAt}`}
+                >
+                  <strong>{description.playerName}</strong>
+
+                  <p>{description.text}</p>
+
+                  <div className="liar-reaction-actions">
+                    <button
+                      disabled={isMine}
+                      className={liked ? "active" : ""}
+                      onClick={() =>
+                        handleSubmitReaction(description.playerId, "LIKE")
+                      }
+                    >
+                      👍 {description.likes.length}
+                    </button>
+
+                    <button
+                      disabled={isMine}
+                      className={disliked ? "active danger" : "danger"}
+                      onClick={() =>
+                        handleSubmitReaction(description.playerId, "DISLIKE")
+                      }
+                    >
+                      👎 {description.dislikes.length}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </section>
       </div>
     );
   }
 
-  if (state.phase === "VOTING") {
+  if (state.phase === "TIE_SPEECH") {
+    const tiePlayers = state.players.filter((player) =>
+      state.tieCandidates.includes(player.playerId)
+    );
+
     return (
       <div className="liar-layout">
         <section className="liar-ready-card">
-          <span className="liar-muted">투표</span>
+          <span className="liar-muted">동점 발생</span>
 
-          <h2>라이어를 지목하세요</h2>
+          <h2>최후 변론 시간입니다</h2>
 
-          <p>가장 수상한 플레이어를 선택하세요.</p>
+          <p>동점 후보들은 자신이 라이어가 아님을 설명하세요.</p>
 
           <div className="liar-countdown">{remainingSeconds}</div>
 
           <div className="liar-vote-list">
-            {state.players
+            {tiePlayers.map((player) => (
+              <div className="liar-result-row selected" key={player.playerId}>
+                <strong>{player.name}</strong>
+                <span>동점 후보</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+    );
+  }
+
+  if (state.phase === "VOTING" || state.phase === "REVOTE") {
+    const isRevote = state.phase === "REVOTE";
+
+    const votePlayers = isRevote
+      ? state.players.filter((player) =>
+          state.tieCandidates.includes(player.playerId)
+        )
+      : state.players;
+
+    return (
+      <div className="liar-layout">
+        <section className="liar-ready-card">
+          <span className="liar-muted">{isRevote ? "재투표" : "투표"}</span>
+
+          <h2>
+            {isRevote
+              ? "동점 후보 중 다시 지목하세요"
+              : "라이어를 지목하세요"}
+          </h2>
+
+          <p>
+            {isRevote
+              ? "최후 변론을 듣고 다시 투표하세요."
+              : "가장 수상한 플레이어를 선택하세요."}
+          </p>
+
+          <div className="liar-countdown">{remainingSeconds}</div>
+
+          <div className="liar-vote-list">
+            {votePlayers
               .filter((player) => player.playerId !== socket.id)
               .map((player) => (
                 <button
@@ -192,34 +288,69 @@ export default function LiarGame({ state }: LiarGameProps) {
           </div>
 
           {state.votes[socket.id ?? ""] && (
-            <p>투표를 완료했습니다.</p>
+            <p>{isRevote ? "재투표를 완료했습니다." : "투표를 완료했습니다."}</p>
           )}
         </section>
       </div>
     );
-  }  
+  } 
 
   if (state.phase === "RESULT") {
+    const liarPlayer = state.players.find(player =>
+      state.liarPlayerIds.includes(player.playerId)
+    );  
+
+      const sortedPlayers = [...state.players].sort(
+      (a, b) =>
+        (state.voteCounts[b.playerId] ?? 0) -
+        (state.voteCounts[a.playerId] ?? 0)    
+    );
+
+      const scoreChangedPlayers = [...state.players]
+        .filter((player) => player.scoreDelta !== 0)
+        .sort((a, b) => b.scoreDelta - a.scoreDelta);    
+
     return (
       <div className="liar-layout">
         <section className="liar-ready-card">
-          <span className="liar-muted">라운드 결과</span>
+          <span className="liar-muted">
+            Round {state.round} Result
+          </span>
 
-          <h2>{state.resultMessage}</h2>
+          <h1 className="liar-result-title">
+            {state.resultMessage}
+          </h1>
 
-          <p>투표 결과</p>
-          <p>
-          시민 제시어 : <strong>{state.citizenKeyword}</strong>
-        </p>
+          <div className="liar-result-info">
 
-        {state.liarGuess && (
-          <p>
-            라이어의 추측 :
-            <strong>{state.liarGuess}</strong>
-          </p>
-        )}
+            <div className="liar-result-card">
+              <span>🕵️ 라이어</span>
+
+              <strong className="liar-name">
+                    {liarPlayer?.name}
+              </strong>
+            </div>
+
+            <div className="liar-result-card">
+              <span>📝 시민 제시어</span>
+
+              <strong>{state.citizenKeyword}</strong>
+            </div>
+
+            <div className="liar-result-card">
+              <span>❓ 라이어 추측</span>
+
+              <strong>{state.liarGuess ?? "-"}</strong>
+            </div>
+
+          </div>
+
+          <div className="liar-panel-title">
+              득표 결과
+          </div>
+    
           <div className="liar-result-list">
-            {state.players.map((player) => {
+              {sortedPlayers.map((player) => {
               const voteCount = state.voteCounts[player.playerId] ?? 0;
               const isTop = state.topVotedPlayerIds.includes(player.playerId);
               const isLiar = state.liarPlayerIds.includes(player.playerId);
@@ -242,12 +373,106 @@ export default function LiarGame({ state }: LiarGameProps) {
             })}
           </div>
 
-          <div className="liar-countdown">{remainingSeconds}</div>
+          <div className="liar-panel-title">
+            점수 변화
+          </div>
+
+          <div className="liar-score-change-list">
+            {scoreChangedPlayers.length === 0 ? (
+              <p className="liar-empty">점수 변화가 없습니다.</p>
+            ) : (
+              scoreChangedPlayers.map((player) => (
+                <div className="liar-score-change-item" key={player.playerId}>
+                  <div>
+                    <strong>{player.name}</strong>
+                    <span>
+                      {player.scoreDelta > 0 ? "+" : ""}
+                      {formatScore(player.scoreDelta)}점
+                    </span>
+                  </div>
+
+                  <ul>
+                    {player.scoreReasons.map((reason) => (
+                      <li key={reason}>{reason}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))
+            )}
+          </div>
+
+          <p className="liar-next-round">
+          다음 라운드 시작까지
+          </p>
+          <div className="liar-countdown">
+            {remainingSeconds}
+          </div>
         </section>
       </div>
     );
   }
 
+  if (state.phase === "GAME_END") {
+    const rankedPlayers = [...state.players].sort(
+      (a, b) => b.score - a.score
+    );
+
+    const winner = rankedPlayers[0];
+
+    return (
+      <div className="liar-layout">
+        <section className="liar-ready-card">
+          <span className="liar-muted">Game End</span>
+
+          <h1 className="liar-result-title">🏆 게임 종료</h1>
+
+          <div className="liar-result-card">
+            <span>최종 우승자</span>
+            <strong className="liar-name">{winner?.name}</strong>
+          </div>
+
+          <div className="liar-panel-title">최종 순위</div>
+
+          <div className="liar-result-list">
+            {rankedPlayers.map((player, index) => (
+              <div
+                className={`liar-result-row ${index === 0 ? "selected" : ""}`}
+                key={player.playerId}
+              >
+                <strong>
+                  {index === 0
+                    ? "🥇"
+                    : index === 1
+                    ? "🥈"
+                    : index === 2
+                    ? "🥉"
+                    : `${index + 1}위`}{" "}
+                  {player.name}
+                </strong>
+
+                 <span>{formatScore(player.score)}점</span>
+              </div>
+            ))}
+          </div>
+
+          <p className="liar-next-round">
+            방장이 게임 종료 버튼을 누르면 대기실로 돌아갑니다.
+          </p>
+        </section>
+      </div>
+    );
+  }  
+  
+  const currentPlayerId = state.descriptionOrder[state.currentDescriptionIndex];
+  const currentPlayer = state.players.find(
+    (player) => player.playerId === currentPlayerId
+  );
+
+  const isMyTurn = currentPlayerId === socket.id;
+  const canSubmitDescription = state.phase === "DESCRIPTION" && isMyTurn;
+  const scorePlayers = [...state.players].sort(
+    (a, b) => b.score - a.score
+  );
 
   return (
     <div className="liar-layout">
@@ -364,10 +589,10 @@ export default function LiarGame({ state }: LiarGameProps) {
           <div className="liar-panel-title">점수판</div>
 
           <div className="liar-score-list">
-            {state.players.map((player) => (
+            {scorePlayers.map((player) => (
               <div className="liar-score-row" key={player.playerId}>
                 <span>{player.name}</span>
-                <strong>{player.score}</strong>
+                <strong>{formatScore(player.score)}</strong>
               </div>
             ))}
           </div>
@@ -405,7 +630,7 @@ export default function LiarGame({ state }: LiarGameProps) {
                   : "토론 단계에서만 채팅할 수 있습니다."
               }
               onKeyDown={(event) => {
-                if (event.key === "Enter") {
+                if (event.key === "Enter" && chatText.trim()) {
                   handleSendChat();
                 }
               }}
@@ -419,6 +644,8 @@ export default function LiarGame({ state }: LiarGameProps) {
     </div>
   );
 }
+
+
 
 function phaseLabel(phase: string) {
   switch (phase) {
@@ -436,6 +663,12 @@ function phaseLabel(phase: string) {
       return "라이어 추측";  
     case "RESULT":
       return "결과";
+    case "TIE_SPEECH":
+      return "최후 변론";
+    case "REVOTE":
+      return "재투표";
+    case "GAME_END":
+      return "게임 종료";   
     default:
       return phase;
   }
@@ -454,4 +687,10 @@ function statusLabel(status?: string) {
     default:
       return "-";
   }
+}
+
+function formatScore(score: number) {
+  return Number.isInteger(score)
+    ? score.toString()
+    : score.toFixed(1);
 }
