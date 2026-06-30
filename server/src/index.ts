@@ -8,6 +8,7 @@ import { EVENTS } from "./shared/events";
 import { registerRoomSocket } from "./socket/roomSocket";
 import { roomManager } from "./managers/RoomManager";
 import { registerGameSocket } from "./socket/gameSocket";
+import { registerLiarSocket } from "./socket/liar/liarSocket";
 
 const app = express();
 
@@ -32,6 +33,7 @@ io.on("connection", (socket) => {
   registerLobbySocket(io, socket);
   registerRoomSocket(io, socket);
   registerGameSocket(io, socket);
+  registerLiarSocket(io, socket);
 
 socket.on("disconnect", (reason) => {
   console.log("disconnect reason:", socket.id, reason);

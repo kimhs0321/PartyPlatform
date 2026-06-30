@@ -53,16 +53,30 @@ export default function LiarGame({ state }: LiarGameProps) {
           </div>
           <p>잠시 후 설명 단계가 시작됩니다.</p>
           <div className="liar-countdown">{remainingSeconds}</div>
-          <PauseButton
-              paused={state.paused}
-              onClick={handleTogglePause}
-          />
         </section>
       </div>
     );
   }
 
+  const currentPlayerId = state.descriptionOrder[state.currentDescriptionIndex];
+  const currentPlayer = state.players.find(
+    (player) => player.playerId === currentPlayerId
+  );
+
+  const isMyTurn = currentPlayerId === socket.id;
+  const canSubmitDescription = state.phase === "DESCRIPTION" && isMyTurn;
+  const scorePlayers = [...state.players].sort(
+    (a, b) => b.score - a.score
+
+  );
   const handleSubmitDescription = () => {
+    console.log("설명 제출 클릭", {
+      phase: state.phase,
+      isMyTurn,
+      canSubmitDescription,
+      text: descriptionText,
+    });
+
     if (!canSubmitDescription) return;
 
     socket.emit(EVENTS.LIAR_SUBMIT_DESCRIPTION, {
@@ -70,9 +84,11 @@ export default function LiarGame({ state }: LiarGameProps) {
       text: descriptionText,
     });
 
+    console.log("LIAR_SUBMIT_DESCRIPTION emit");
+
     setDescriptionText("");
   };
-
+  
   const canSendChat = state.phase === "DISCUSSION";
 
   const handleSendChat = () => {
@@ -95,21 +111,15 @@ export default function LiarGame({ state }: LiarGameProps) {
       targetPlayerId,
       reaction,
     });
-  };
+  }; 
   
-  const handleTogglePause = () => {
-    socket.emit(EVENTS.LIAR_TOGGLE_PAUSE, {
-      roomId: state.roomId,
-    });
-  };  
-  
-  const handleSubmitGuess = () => {
-  if (!guessText.trim()) return;
+    const handleSubmitGuess = () => {
+    if (!guessText.trim()) return;
 
-  socket.emit(EVENTS.LIAR_SUBMIT_GUESS, {
-    roomId: state.roomId,
-    guess: guessText,
-  });
+    socket.emit(EVENTS.LIAR_SUBMIT_GUESS, {
+      roomId: state.roomId,
+      guess: guessText,
+    });
 
     setGuessText("");
   };
@@ -154,11 +164,6 @@ export default function LiarGame({ state }: LiarGameProps) {
               <p>잠시 기다려 주세요.</p>
             </>
           )}
-        <PauseButton
-          paused={state.paused}
-          onClick={handleTogglePause}
-        />
-
         </section>
       </div>
     );
@@ -175,10 +180,6 @@ export default function LiarGame({ state }: LiarGameProps) {
           <p>가장 좋은 설명과 가장 수상한 설명을 선택하세요.</p>
 
           <div className="liar-countdown">{remainingSeconds}</div>
-          <PauseButton
-              paused={state.paused}
-              onClick={handleTogglePause}
-          />
 
           <div className="liar-reaction-list">
             {state.descriptions.map((description) => {
@@ -244,10 +245,6 @@ export default function LiarGame({ state }: LiarGameProps) {
           <p>동점 후보들은 자신이 라이어가 아님을 설명하세요.</p>
 
           <div className="liar-countdown">{remainingSeconds}</div>
-          <PauseButton
-            paused={state.paused}
-            onClick={handleTogglePause}
-          />
 
           <div className="liar-vote-list">
             {tiePlayers.map((player) => (
@@ -289,11 +286,6 @@ export default function LiarGame({ state }: LiarGameProps) {
           </p>
 
           <div className="liar-countdown">{remainingSeconds}</div>
-          <PauseButton
-              paused={state.paused}
-              onClick={handleTogglePause}
-          />    
-
 
           <div className="liar-vote-list">
             {votePlayers
@@ -441,10 +433,6 @@ export default function LiarGame({ state }: LiarGameProps) {
           <div className="liar-countdown">
             {remainingSeconds}
           </div>
-          <PauseButton
-              paused={state.paused}
-              onClick={handleTogglePause}
-          />
         </section>
       </div>
     );
@@ -501,16 +489,7 @@ export default function LiarGame({ state }: LiarGameProps) {
     );
   }  
   
-  const currentPlayerId = state.descriptionOrder[state.currentDescriptionIndex];
-  const currentPlayer = state.players.find(
-    (player) => player.playerId === currentPlayerId
-  );
 
-  const isMyTurn = currentPlayerId === socket.id;
-  const canSubmitDescription = state.phase === "DESCRIPTION" && isMyTurn;
-  const scorePlayers = [...state.players].sort(
-    (a, b) => b.score - a.score
-  );
 
   return (
     <div className="liar-layout">
@@ -534,29 +513,7 @@ export default function LiarGame({ state }: LiarGameProps) {
           <span className="liar-muted">내 제시어</span>
           <strong>{state.myKeyword}</strong>
         </div>
-
-        <PauseButton
-            paused={state.paused}
-            onClick={handleTogglePause}
-        />
       </section>
-
-      {state.paused && (
-        <div className="liar-pause-overlay">
-          <div className="liar-pause-dialog">
-            <h2>⏸ 게임 일시정지</h2>
-
-            <p>
-              누군가 게임을 일시정지했습니다.
-            </p>
-
-            <PauseButton
-              paused={true}
-              onClick={handleTogglePause}
-            />
-          </div>
-        </div>
-      )}
 
       <section className="liar-main-grid">
         <aside className="liar-side-panel">
@@ -753,21 +710,4 @@ function formatScore(score: number) {
   return Number.isInteger(score)
     ? score.toString()
     : score.toFixed(1);
-}
-
-function PauseButton({
-  paused,
-  onClick,
-}: {
-  paused: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      className="liar-pause-button"
-      onClick={onClick}
-    >
-      {paused ? "▶ 계속하기" : "⏸ 일시정지"}
-    </button>
-  );
 }

@@ -1,3 +1,5 @@
+import type { LiarGameSettings } from "./liarGame";
+
 export type RoomStatus = "waiting" | "playing" | "paused";
 
 export type Room = {
@@ -10,4 +12,8 @@ export type Room = {
   password: string;
   status: RoomStatus;
   game: string;
+
+  gameSettings: {
+    liar: LiarGameSettings;
+  };
 };

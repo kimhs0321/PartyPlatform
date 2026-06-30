@@ -3,12 +3,13 @@ import { EVENTS } from "../../shared/events";
 import { sendChat } from "./handlers/sendChat";
 import { submitHint } from "./handlers/submitHint";
 import { vote } from "./handlers/vote";
-import { reveal } from "./reveal";
+import { reveal } from "./handlers/reveal";
 import { submitReaction } from "./handlers/submitReaction";
 import { togglePause } from "./handlers/togglePause";
 import { getGameState } from "./handlers/getGameState";
 
 export function registerLiarSocket(io: Server, socket: Socket) {
+ 
   socket.on(EVENTS.LIAR_SEND_CHAT, sendChat(io, socket));
   socket.on(EVENTS.LIAR_SUBMIT_DESCRIPTION, submitHint(io, socket));
   socket.on(EVENTS.LIAR_SUBMIT_VOTE, vote(io, socket));

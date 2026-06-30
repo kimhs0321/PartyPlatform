@@ -1,5 +1,5 @@
-import type { GameState } from "../types/GameState";
-import type { Room } from "../types/Room";
+import type { GameState } from "../shared/types/GameState";
+import type { Room } from "../shared/types/Room";
 
 class GameManager {
   private games = new Map<string, GameState>();

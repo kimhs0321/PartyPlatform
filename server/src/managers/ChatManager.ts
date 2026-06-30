@@ -1,4 +1,4 @@
-import type { ChatMessage } from "../types/ChatMessage";
+import type { ChatMessage } from "../shared/types/ChatMessage";
 
 class ChatManager {
   private messages = new Map<string, ChatMessage[]>();

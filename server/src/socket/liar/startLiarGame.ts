@@ -3,10 +3,14 @@ import { playerManager } from "../../managers/PlayerManager";
 import { liarGameManager } from "../../managers/LiarGameManager";
 import { emitLiarState } from "./liarEmitter";
 import { scheduleDescriptionPhase } from "./liarScheduler";
+import type { LiarGameSettings } from "../../shared/types/liarGame";
 
 type StartedRoom = {
   id: string;
   playerIds: string[];
+  gameSettings: {
+    liar: LiarGameSettings;
+  };
 };
 
 export function startLiarGame(io: Server, startedRoom: StartedRoom) {
@@ -20,16 +24,11 @@ export function startLiarGame(io: Server, startedRoom: StartedRoom) {
       name: player.nickname,
     }));
 
-  liarGameManager.createGame(startedRoom.id, players, {
-    liarCount: 1,
-    roundCount: 5,
-    descriptionTime: 20,
-    discussionTime: 120,
-    voteTime: 30,
-    tieSpeechTime: 20,
-    minDescriptionLength: 2,
-    maxDescriptionLength: 30,
-  });
+  liarGameManager.createGame(
+    startedRoom.id,
+    players,
+    startedRoom.gameSettings.liar
+  );
 
   liarGameManager.startRound(startedRoom.id);
   emitLiarState(io, startedRoom.id);

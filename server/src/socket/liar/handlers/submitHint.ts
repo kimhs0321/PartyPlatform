@@ -10,16 +10,27 @@ export function submitHint(io: Server, socket: Socket) {
     const player = playerManager.getPlayer(socket.id);
     if (!player) return;
 
+    console.log("=== 설명 제출 이벤트 도착 ===");
+    console.log("data:", data);
+
     try {
+      const game = liarGameManager.getGame(data.roomId);
+      console.log("현재 phase:", game?.phase);
+
       liarGameManager.submitDescription(data.roomId, player.id, data.text);
+
+      console.log("submitDescription 성공");
+
       emitLiarState(io, data.roomId);
 
-      const game = liarGameManager.getGame(data.roomId);
+      const updatedGame = liarGameManager.getGame(data.roomId);
 
-      if (game?.phase === "REACTION") {
+      if (updatedGame?.phase === "REACTION") {
         scheduleDiscussionPhase(io, data.roomId);
       }
     } catch (error) {
+      console.error("submitDescription 에러:", error);
+
       const message =
         error instanceof Error
           ? error.message

@@ -1,5 +1,6 @@
-import type { Room } from "../types/Room";
-import type { Player } from "../types/Player";
+import type { Room } from "../shared/types/Room";
+import type { Player } from "../shared/types/Player";
+import { DEFAULT_LIAR_GAME_SETTINGS } from "../shared/types/liarGame";
 
 class RoomManager {
   private rooms = new Map<string, Room>();
@@ -24,6 +25,9 @@ class RoomManager {
       password,
       status: "waiting",
       game,
+      gameSettings: {
+        liar: { ...DEFAULT_LIAR_GAME_SETTINGS },
+      },
     };
 
   this.rooms.set(roomId, room);
@@ -54,6 +58,8 @@ class RoomManager {
       maxPlayers: room.maxPlayers,
       game: room.game,
       status: room.status,
+      gameSettings: room.gameSettings,
+
       players: room.playerIds
         .map((playerId) => getPlayer(playerId))
         .filter((player): player is { id: string; nickname: string } => Boolean(player))
