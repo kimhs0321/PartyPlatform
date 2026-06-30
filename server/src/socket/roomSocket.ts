@@ -242,7 +242,7 @@ export function registerRoomSocket(io: Server, socket: Socket) {
 
       try {
         liarGameManager.sendChat(data.roomId, player.id, data.text);
-        emitLiarState(data.roomId);
+        emitLiarState(io, data.roomId);
       } catch (error) {
         const message =
           error instanceof Error
@@ -262,7 +262,7 @@ export function registerRoomSocket(io: Server, socket: Socket) {
 
       try {
         liarGameManager.submitVote(data.roomId, player.id, data.targetId);
-        emitLiarState(data.roomId);
+        emitLiarState(io, data.roomId);
         handleAfterVoteResolved(data.roomId);
       } catch (error) {
         const message =
@@ -281,7 +281,7 @@ export function registerRoomSocket(io: Server, socket: Socket) {
 
       try {
         liarGameManager.submitLiarGuess(data.roomId, player.id, data.guess);
-        emitLiarState(data.roomId);
+        emitLiarState(io, data.roomId);
         scheduleNextRoundOrEnd(data.roomId);
       } catch (error) {
         const message =
@@ -352,7 +352,7 @@ export function registerRoomSocket(io: Server, socket: Socket) {
           liarGameManager.pauseGame(data.roomId);
         }
 
-        emitLiarState(data.roomId);
+        emitLiarState(io, data.roomId);
       } catch (error) {
         const message =
           error instanceof Error
