@@ -13,6 +13,17 @@ type RoomPlayerDto = {
   isReady: boolean;
 };
 
+type LiarSettings = {
+  liarCount: number;
+  roundCount: number;
+  descriptionTime: number;
+  discussionTime: number;
+  voteTime: number;
+  tieSpeechTime: number;
+  minDescriptionLength: number;
+  maxDescriptionLength: number;
+};
+
 type RoomDto = {
   id: string;
   title: string;
@@ -21,6 +32,7 @@ type RoomDto = {
   game: string;
   players: RoomPlayerDto[];
   status: "waiting" | "playing" | "paused";
+  gameSettings: {liar: LiarSettings;};
 };
 
 export default function RoomPage() {
@@ -51,6 +63,18 @@ useEffect(() => {
       game: fallbackRoom.game,
       players: [],
       status: "waiting",
+      gameSettings: {
+        liar: {
+          liarCount: 1,
+          roundCount: 5,
+          descriptionTime: 45,
+          discussionTime: 120,
+          voteTime: 30,
+          tieSpeechTime: 20,
+          minDescriptionLength: 2,
+          maxDescriptionLength: 30,
+        },
+      },
     });
   }
 
@@ -87,8 +111,7 @@ useEffect(() => {
     socket.off(EVENTS.START_GAME_FAILED, handleStartGameFailed);
     socket.off(EVENTS.LIAR_GAME_STATE, handleLiarGameState);
   };
-}, [roomId, location.state, navigate]);
-
+ }, [roomId, location.state, navigate, room]);
   const handleToggleReady = () => {
     socket.emit(EVENTS.TOGGLE_READY);
   };
@@ -103,8 +126,6 @@ useEffect(() => {
     socket.emit(EVENTS.LEAVE_ROOM);
   };
 
-
-  
   if (!room) {
     return (
       <div className="room-page">
@@ -120,6 +141,18 @@ useEffect(() => {
   const readyCount = room.players.filter((player) => player.isReady).length;
   const me = room.players.find((player) => player.id === socket.id);
   const isHost = Boolean(me?.isHost);
+
+  const handleUpdateLiarSetting = (
+    key: keyof LiarSettings,
+    value: number
+  ) => {
+    if (!room || !isHost) return;
+
+    socket.emit(EVENTS.LIAR_UPDATE_SETTINGS, {
+      [key]: value,
+    });
+  };  
+  
 
   const nonHostPlayers = room.players.filter((player) => !player.isHost);
   const allPlayersReady =
@@ -149,6 +182,82 @@ useEffect(() => {
         <main className="room-main">
           <section className="room-info-panel">
             <h2>게임 정보</h2>
+
+        {room.game === "라이어 게임" && (
+          <section className="room-info-panel">
+            <h2>라이어 게임 설정</h2>
+
+            <div className="info-card">
+              <span>라이어 수</span>
+              <input
+                type="number"
+                min={1}
+                max={Math.max(1, room.players.length - 1)}
+                value={room.gameSettings.liar.liarCount}
+                disabled={!isHost}
+                onChange={(e) =>
+                  handleUpdateLiarSetting("liarCount", Number(e.target.value))
+                }
+              />
+            </div>
+
+            <div className="info-card">
+              <span>라운드 수</span>
+              <input
+                type="number"
+                min={1}
+                max={10}
+                value={room.gameSettings.liar.roundCount}
+                disabled={!isHost}
+                onChange={(e) =>
+                  handleUpdateLiarSetting("roundCount", Number(e.target.value))
+                }
+              />
+            </div>
+
+            <div className="info-card">
+              <span>설명 시간</span>
+              <input
+                type="number"
+                min={20}
+                max={120}
+                value={room.gameSettings.liar.descriptionTime}
+                disabled={!isHost}
+                onChange={(e) =>
+                  handleUpdateLiarSetting("descriptionTime", Number(e.target.value))
+                }
+              />
+            </div>
+
+            <div className="info-card">
+              <span>토론 시간</span>
+              <input
+                type="number"
+                min={30}
+                max={300}
+                value={room.gameSettings.liar.discussionTime}
+                disabled={!isHost}
+                onChange={(e) =>
+                  handleUpdateLiarSetting("discussionTime", Number(e.target.value))
+                }
+              />
+            </div>
+
+            <div className="info-card">
+              <span>투표 시간</span>
+              <input
+                type="number"
+                min={10}
+                max={120}
+                value={room.gameSettings.liar.voteTime}
+                disabled={!isHost}
+                onChange={(e) =>
+                  handleUpdateLiarSetting("voteTime", Number(e.target.value))
+                }
+              />
+            </div>
+          </section>
+        )}
 
             <div className="info-card">
               <span>선택된 게임</span>
