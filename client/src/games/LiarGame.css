@@ -619,3 +619,30 @@
 .liar-reaction-item.disliked {
     border:2px solid #ef4444;
 }
+
+.liar-pause-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.72);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:999;
+}
+
+.liar-pause-dialog{
+    width:420px;
+    max-width:90%;
+    background:#222;
+    border-radius:16px;
+    padding:30px;
+    text-align:center;
+}
+
+.liar-pause-dialog h2{
+    margin-bottom:16px;
+}
+
+.liar-pause-dialog p{
+    margin-bottom:20px;
+}

@@ -815,8 +815,10 @@ class LiarGameManager {
     }
 
     if (game.round >= game.settings.roundCount) {
-      game.phase = "GAME_END";
-      game.timerEndsAt = null;
+        game.phase = "GAME_END";
+        game.timerEndsAt = null;
+        game.remainingTimeMs = null;
+        game.paused = false;
 
       this.games.set(roomId, game);
       return game;
