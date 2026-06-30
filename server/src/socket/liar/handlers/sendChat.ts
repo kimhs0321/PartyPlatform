@@ -3,27 +3,20 @@ import { EVENTS } from "../../../shared/events";
 import { playerManager } from "../../../managers/PlayerManager";
 import { liarGameManager } from "../../../managers/LiarGameManager";
 import { emitLiarState } from "../liarEmitter";
-import { scheduleDiscussionPhase } from "../liarScheduler";
 
-export function submitHint(io: Server, socket: Socket) {
+export function sendChat(io: Server, socket: Socket) {
   return (data: { roomId: string; text: string }) => {
     const player = playerManager.getPlayer(socket.id);
     if (!player) return;
 
     try {
-      liarGameManager.submitDescription(data.roomId, player.id, data.text);
+      liarGameManager.sendChat(data.roomId, player.id, data.text);
       emitLiarState(io, data.roomId);
-
-      const game = liarGameManager.getGame(data.roomId);
-
-      if (game?.phase === "REACTION") {
-        scheduleDiscussionPhase(io, data.roomId);
-      }
     } catch (error) {
       const message =
         error instanceof Error
           ? error.message
-          : "설명 제출 중 오류가 발생했습니다.";
+          : "채팅 전송 중 오류가 발생했습니다.";
 
       socket.emit(EVENTS.START_GAME_FAILED, message);
     }
