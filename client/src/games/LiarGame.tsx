@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { socket } from "../socket/socket";
 import { EVENTS } from "../shared/events";
 import type { ClientLiarGameState } from "../../../shared/types/liar/liarGame";
@@ -13,6 +13,18 @@ export default function LiarGame({ state }: LiarGameProps) {
   const [chatText, setChatText] = useState("");
   const [guessText, setGuessText] = useState("");
   const [now, setNow] = useState(Date.now());
+  const chatListRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      if (!chatListRef.current) return;
+
+      chatListRef.current.scrollTo({
+        top: chatListRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    });
+  }, [state?.normalChats]);
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -31,6 +43,7 @@ export default function LiarGame({ state }: LiarGameProps) {
       </div>
     );
   }
+
 
   const remainingSeconds = state.timerEndsAt
     ? Math.max(0, Math.ceil((state.timerEndsAt - now) / 1000))
@@ -576,12 +589,37 @@ export default function LiarGame({ state }: LiarGameProps) {
 
         <main className="liar-center-panel">
           <div className="liar-current-turn">
-            <span className="liar-muted">현재 차례</span>
+            <span className="liar-muted">
+              {state.phase === "DISCUSSION" ? "토론 시간" : "현재 차례"}
+            </span>
+
             <strong>
-              {isMyTurn
+              {state.phase === "DISCUSSION"
+                ? "토론 채팅으로 라이어를 찾아보세요"
+                : isMyTurn
                 ? "내 차례입니다"
                 : `${currentPlayer?.name ?? "알 수 없음"}님 설명 중`}
             </strong>
+          </div>
+
+          <div className="liar-log-panel">
+            <div className="liar-panel-title">설명 기록</div>
+
+            {state.descriptions.length === 0 ? (
+              <p className="liar-empty">아직 작성된 설명이 없습니다.</p>
+            ) : (
+              <div className="liar-description-list">
+                {state.descriptions.map((description) => (
+                  <div
+                    className="liar-description-item"
+                    key={`${description.playerId}-${description.createdAt}`}
+                  >
+                    <strong>{description.playerName}</strong>
+                    <p>{description.text}</p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="liar-description-box">
@@ -612,27 +650,9 @@ export default function LiarGame({ state }: LiarGameProps) {
               </button>
             </div>
           </div>
-
-          <div className="liar-log-panel">
-            <div className="liar-panel-title">설명 기록</div>
-
-            {state.descriptions.length === 0 ? (
-              <p className="liar-empty">아직 작성된 설명이 없습니다.</p>
-            ) : (
-              <div className="liar-description-list">
-                {state.descriptions.map((description) => (
-                  <div
-                    className="liar-description-item"
-                    key={`${description.playerId}-${description.createdAt}`}
-                  >
-                    <strong>{description.playerName}</strong>
-                    <p>{description.text}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
         </main>
+
+       
 
         <aside className="liar-side-panel">
           <div className="liar-panel-title">점수판</div>
@@ -651,7 +671,7 @@ export default function LiarGame({ state }: LiarGameProps) {
       <section className="liar-bottom-panel">
           <div className="liar-panel-title">일반 채팅</div>
 
-          <div className="liar-chat-list">
+          <div className="liar-chat-list" ref={chatListRef}>
             {state.normalChats.length === 0 ? (
               <p className="liar-empty">
                 {canSendChat

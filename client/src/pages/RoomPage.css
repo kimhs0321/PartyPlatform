@@ -1,68 +1,130 @@
 .room-page {
   min-height: 100vh;
-  background: #101114;
-  color: #f5f5f5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
+  background: #20242b;
+  color: #f3f4f6;
+  padding: 32px 24px;
   box-sizing: border-box;
 }
 
-.room-card {
-  width: 520px;
-  background: #181a20;
-  border: 1px solid #2a2d35;
+.room-shell {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+}
+
+.room-top {
+  background: #323842;
+  border: 1px solid #505966;
   border-radius: 22px;
-  padding: 28px;
+  padding: 22px 24px;
   box-sizing: border-box;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
-}
+  margin-bottom: 20px;
 
-.room-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 28px;
 }
 
 .room-label {
   margin: 0 0 6px;
-  color: #8b90a0;
+  color: #d0d6df;
   font-size: 13px;
 }
 
-.room-header h1 {
+.room-top h1 {
   margin: 0;
-  font-size: 28px;
+  color: #ffffff;
+  font-size: 30px;
 }
 
-.room-header span {
+.room-top span {
   display: block;
   margin-top: 8px;
-  color: #a8acb8;
+  color: #d0d6df;
+  font-size: 14px;
 }
 
-.leave-button {
+.room-exit-button {
   border: none;
-  border-radius: 10px;
-  background: #2a2d35;
-  color: white;
-  padding: 10px 14px;
+  border-radius: 12px;
+  background: #444d59;
+  color: #ffffff;
+  padding: 11px 15px;
   cursor: pointer;
+  font-weight: 700;
 }
 
-.room-section {
-  margin-bottom: 24px;
+.room-main {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 20px;
+  align-items: start;
 }
 
-.room-top h1 {
-  color: #f5f5f5;
+.liar-settings-panel {
+  grid-column: 1;
 }
 
-.room-section h2 {
-  margin: 0 0 12px;
-  font-size: 17px;
+.room-info-panel {
+  grid-column: 1;
+}
+
+.player-panel {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+}
+
+.room-info-panel,
+.player-panel {
+  background: #323842;
+  border: 1px solid #505966;
+  border-radius: 22px;
+  padding: 22px;
+  box-sizing: border-box;
+}
+
+.room-info-panel h2,
+.player-panel h2 {
+  margin: 0 0 16px;
+  color: #ffffff;
+  font-size: 20px;
+}
+
+.info-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background: #404854;
+  border: 1px solid #606a78;
+  border-radius: 14px;
+  padding: 13px 14px;
+  margin-bottom: 10px;
+}
+
+.info-card span {
+  color: #d0d6df;
+  font-size: 14px;
+}
+
+.info-card strong {
+  color: #ffffff;
+  font-size: 15px;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.panel-header h2 {
+  margin: 0;
+}
+
+.panel-header span {
+  color: #d0d6df;
+  font-size: 14px;
 }
 
 .player-list {
@@ -75,7 +137,9 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  background: #20232b;
+
+  background: #404854;
+  border: 1px solid #606a78;
   border-radius: 14px;
   padding: 12px;
 }
@@ -83,7 +147,8 @@
 .player-avatar {
   width: 40px;
   height: 40px;
-  background: #333846;
+  background: #596473;
+  color: #ffffff;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -97,6 +162,11 @@
   gap: 4px;
 }
 
+.player-info strong {
+  color: #ffffff;
+  font-size: 15px;
+}
+
 .player-info span {
   font-size: 13px;
 }
@@ -106,63 +176,58 @@
 }
 
 .waiting {
-  color: #a8acb8;
-}
-
-.game-select {
-  width: 100%;
-  background: #20232b;
-  border: 1px solid #303441;
-  color: white;
-  border-radius: 12px;
-  padding: 13px 14px;
-  font-size: 15px;
+  color: #d0d6df;
 }
 
 .room-actions {
-  display: grid;
-  grid-template-columns: 1fr 1.4fr;
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
   gap: 12px;
 }
 
 .room-actions button {
   border: none;
   border-radius: 14px;
-  padding: 14px;
+  padding: 14px 22px;
   color: white;
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
 }
 
-.empty-room-list {
-  background: #20232b;
-  border: 1px dashed #303441;
-  border-radius: 18px;
-  padding: 28px;
-  color: #a8acb8;
-  text-align: center;
-}
-
 .ready-button {
-  background: #2a2d35;
+  background: #444d59;
 }
 
 .start-button {
-  background: #5865f2;
-}
-
-.room-loading {
-  background: #181a20;
-  border: 1px solid #2a2d35;
-  border-radius: 22px;
-  padding: 40px;
-  color: #a8acb8;
-  text-align: center;
+  background: #6678ff;
 }
 
 .room-actions button:disabled {
   background: #3a3d46;
-  color: #7f8492;
+  color: #8b90a0;
   cursor: not-allowed;
+}
+
+.room-loading {
+  background: #323842;
+  border: 1px solid #505966;
+  border-radius: 22px;
+  padding: 40px;
+  color: #d0d6df;
+  text-align: center;
+}
+
+@media (max-width: 860px) {
+  .room-main {
+    grid-template-columns: 1fr;
+  }
+
+.liar-settings-panel,
+.room-info-panel,
+.player-panel {
+  grid-column: 1;
+  grid-row: auto;
+}
 }

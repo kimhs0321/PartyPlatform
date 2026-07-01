@@ -1,7 +1,7 @@
 .lobby-page {
   min-height: 100vh;
-  background: #101114;
-  color: #f5f5f5;
+  background: #20242b;
+  color: #f3f4f6;
   padding: 40px 24px;
   box-sizing: border-box;
 }
@@ -17,19 +17,22 @@
 
 .lobby-subtitle {
   margin: 0 0 6px;
-  color: #8b90a0;
+  color: #d0d6df;
   font-size: 14px;
 }
 
 .lobby-header h1 {
   margin: 0;
+  color: #ffffff;
   font-size: 36px;
 }
 
+
+
 .lobby-create-panel,
 .room-list-panel {
-  background: #181a20;
-  border: 1px solid #2a2d35;
+  background: #323842;
+  border: 1px solid #505966;
   border-radius: 22px;
   padding: 24px;
   box-sizing: border-box;
@@ -44,11 +47,18 @@
 .room-list-header h2 {
   margin: 0;
   font-size: 20px;
+  color: #ffffff;
 }
 
 .create-title p {
   margin: 6px 0 0;
-  color: #a8acb8;
+  color: #d0d6df;
+  font-size: 14px;
+}
+
+.room-list-header span,
+.room-main-info span {
+  color: #d0d6df;
   font-size: 14px;
 }
 
@@ -60,23 +70,39 @@
 
 .create-form input,
 .create-form select {
-  background: #20232b;
-  border: 1px solid #303441;
-  color: white;
+  background: #444d59;
+  border: 1px solid #687282;
+  color: #f3f4f6;
   border-radius: 12px;
   padding: 13px 14px;
   font-size: 15px;
 }
 
+.create-form input::placeholder {
+  color: #9ea7b5;
+}
+
+.create-form input:focus,
+.create-form select:focus {
+  border-color: #6d8cff;
+  box-shadow: 0 0 0 3px rgba(109, 140, 255, 0.18);
+}
+
+
 .create-form button,
 .room-meta button {
   border: none;
   border-radius: 12px;
-  background: #5865f2;
+   background: #6678ff;
   color: white;
   padding: 13px 16px;
   font-weight: 700;
   cursor: pointer;
+}
+
+.create-form button:hover,
+.room-meta button:hover {
+  background: #7a8aff;
 }
 
 .room-list-header {
@@ -84,11 +110,6 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 14px;
-}
-
-.room-list-header span {
-  color: #a8acb8;
-  font-size: 14px;
 }
 
 .room-list {
@@ -101,25 +122,15 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #20232b;
-  border: 1px solid #303441;
+  background: #404854;
+  border: 1px solid #606a78;
   border-radius: 18px;
   padding: 18px;
 }
 
-.room-main-info {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
 .room-main-info strong {
   font-size: 18px;
-}
-
-.room-main-info span {
-  color: #a8acb8;
-  font-size: 14px;
+  color: #ffffff;
 }
 
 .room-meta {
@@ -129,8 +140,13 @@
 }
 
 .room-meta span {
-  color: #d1d5db;
+  color: #d9dde5;
   font-size: 14px;
+}
+
+.create-form select option {
+  background: #31353d;
+  color: #f3f4f6;
 }
 
 @media (max-width: 760px) {

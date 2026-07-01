@@ -13,9 +13,16 @@ export function leaveRoom(io: Server, socket: Socket) {
     if (!player?.roomId) return;
 
     const roomId = player.roomId;
+    const room = roomManager.getRoom(roomId);
 
-    liarGameManager.markPlayerLeft(player.roomId, player.id);
-    emitLiarState(io, player.roomId);
+    if (room?.game === "라이어 게임" && room.status === "playing") {
+      try {
+        liarGameManager.markPlayerLeft(roomId, player.id);
+        emitLiarState(io, roomId);
+      } catch (error) {
+        console.warn("라이어게임 상태 전송 생략:", error);
+      }
+    }
 
     const updatedRoom = roomManager.leaveRoom(roomId, player.id);
 

@@ -72,11 +72,18 @@
 }
 
 .liar-order-list,
-.liar-score-list,
+.liar-score-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .liar-description-list {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  max-height: 280px;
+  overflow-y: auto;
 }
 
 .liar-order-row,
@@ -151,21 +158,16 @@
 .liar-description-box {
   display: flex;
   flex-direction: column;
-  gap: 9px;
+  gap: 4px;
+  margin-top: 8px;
 }
 
 .liar-description-box textarea {
   width: 100%;
-  min-height: 128px;
-  resize: vertical;
-  border-radius: 10px;
-  border: 1px solid #d4dae3;
-  padding: 12px;
-  font-size: 15px;
-  line-height: 1.5;
-  outline: none;
-  background: #f8f9fb;
-  color: #202833;
+  height: 48px;
+  min-height: 48px;
+  max-height: 48px;
+  resize: none;
 }
 
 .liar-description-box textarea:disabled {
@@ -213,24 +215,43 @@
 .liar-log-panel {
   border-top: 1px solid #444d5b;
   padding-top: 12px;
+  min-height: 320px;   /* 300~340px 정도 추천 */
 }
 
 .liar-description-item {
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+
   border-radius: 10px;
-  padding: 11px 12px;
+  padding: 10px 12px;
+
+  background: #f3f5f8;
+  border: 1px solid #dce2ea;
 }
 
 .liar-description-item strong {
-  display: block;
-  margin-bottom: 5px;
-  font-size: 13px;
+  width: 80px;
+  flex-shrink: 0;
+
+  margin: 0;
+
+  font-size: 14px;
+  font-weight: 700;
+
   color: #27303a;
 }
 
 .liar-description-item p {
   margin: 0;
+
+  flex: 1;
+
   font-size: 15px;
   color: #27303a;
+
+  word-break: break-word;
 }
 
 .liar-empty {

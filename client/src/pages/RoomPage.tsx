@@ -3,7 +3,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { socket } from "../socket/socket";
 import { EVENTS } from "../shared/events";
 import "./RoomPage.css";
-
+import LiarRoom from "../rooms/LiarRoom";
 
 
 type RoomPlayerDto = {
@@ -17,6 +17,7 @@ type LiarSettings = {
   liarCount: number;
   roundCount: number;
   descriptionTime: number;
+  descriptionCycleCount: number;
   discussionTime: number;
   voteTime: number;
   tieSpeechTime: number;
@@ -43,7 +44,6 @@ export default function RoomPage() {
   const handleStartGame = () => {
     if (!roomId) return;
     socket.emit(EVENTS.START_GAME, { roomId });};
-  const [liarGameState, setLiarGameState] = useState<any>(null);
 
 
 
@@ -68,6 +68,7 @@ useEffect(() => {
           liarCount: 1,
           roundCount: 5,
           descriptionTime: 45,
+          descriptionCycleCount: 2,
           discussionTime: 120,
           voteTime: 30,
           tieSpeechTime: 20,
@@ -92,14 +93,11 @@ useEffect(() => {
     alert(message);
   };
 
-  const handleLiarGameState = (state: any) => {
-    setLiarGameState(state);
-  };
 
   socket.on(EVENTS.ROOM_INFO, handleRoomInfo);
   socket.on(EVENTS.GAME_STARTED, handleGameStarted);
   socket.on(EVENTS.START_GAME_FAILED, handleStartGameFailed);
-  socket.on(EVENTS.LIAR_GAME_STATE, handleLiarGameState);
+
 
   if (roomId) {
     socket.emit(EVENTS.GET_ROOM, roomId);
@@ -109,7 +107,7 @@ useEffect(() => {
     socket.off(EVENTS.ROOM_INFO, handleRoomInfo);
     socket.off(EVENTS.GAME_STARTED, handleGameStarted);
     socket.off(EVENTS.START_GAME_FAILED, handleStartGameFailed);
-    socket.off(EVENTS.LIAR_GAME_STATE, handleLiarGameState);
+
   };
  }, [roomId, location.state, navigate, room]);
   const handleToggleReady = () => {
@@ -153,7 +151,6 @@ useEffect(() => {
     });
   };  
   
-
   const nonHostPlayers = room.players.filter((player) => !player.isHost);
   const allPlayersReady =
     nonHostPlayers.length > 0 &&
@@ -180,84 +177,17 @@ useEffect(() => {
         </header>
 
         <main className="room-main">
+          {room.game === "라이어 게임" && (
+            <LiarRoom
+              settings={room.gameSettings.liar}
+              playersCount={room.players.length}
+              isHost={isHost}
+              onUpdateSetting={handleUpdateLiarSetting}
+            />
+          )}
+
           <section className="room-info-panel">
             <h2>게임 정보</h2>
-
-        {room.game === "라이어 게임" && (
-          <section className="room-info-panel">
-            <h2>라이어 게임 설정</h2>
-
-            <div className="info-card">
-              <span>라이어 수</span>
-              <input
-                type="number"
-                min={1}
-                max={Math.max(1, room.players.length - 1)}
-                value={room.gameSettings.liar.liarCount}
-                disabled={!isHost}
-                onChange={(e) =>
-                  handleUpdateLiarSetting("liarCount", Number(e.target.value))
-                }
-              />
-            </div>
-
-            <div className="info-card">
-              <span>라운드 수</span>
-              <input
-                type="number"
-                min={1}
-                max={10}
-                value={room.gameSettings.liar.roundCount}
-                disabled={!isHost}
-                onChange={(e) =>
-                  handleUpdateLiarSetting("roundCount", Number(e.target.value))
-                }
-              />
-            </div>
-
-            <div className="info-card">
-              <span>설명 시간</span>
-              <input
-                type="number"
-                min={20}
-                max={120}
-                value={room.gameSettings.liar.descriptionTime}
-                disabled={!isHost}
-                onChange={(e) =>
-                  handleUpdateLiarSetting("descriptionTime", Number(e.target.value))
-                }
-              />
-            </div>
-
-            <div className="info-card">
-              <span>토론 시간</span>
-              <input
-                type="number"
-                min={30}
-                max={300}
-                value={room.gameSettings.liar.discussionTime}
-                disabled={!isHost}
-                onChange={(e) =>
-                  handleUpdateLiarSetting("discussionTime", Number(e.target.value))
-                }
-              />
-            </div>
-
-            <div className="info-card">
-              <span>투표 시간</span>
-              <input
-                type="number"
-                min={10}
-                max={120}
-                value={room.gameSettings.liar.voteTime}
-                disabled={!isHost}
-                onChange={(e) =>
-                  handleUpdateLiarSetting("voteTime", Number(e.target.value))
-                }
-              />
-            </div>
-          </section>
-        )}
 
             <div className="info-card">
               <span>선택된 게임</span>
@@ -282,24 +212,6 @@ useEffect(() => {
               </strong>
             </div>
           </section>
-          
-          {liarGameState && (
-            <section className="room-info-panel">
-              <h2>라이어게임 상태</h2>
-              <div className="info-card">
-                <span>라운드</span>
-                <strong>{liarGameState.round}</strong>
-              </div>
-              <div className="info-card">
-                <span>단계</span>
-                <strong>{liarGameState.phase}</strong>
-              </div>
-              <div className="info-card">
-                <span>내 제시어</span>
-                <strong>{liarGameState.myKeyword}</strong>
-              </div>
-            </section>
-          )}          
 
           <section className="player-panel">
             <div className="panel-header">
@@ -320,8 +232,8 @@ useEffect(() => {
                       {player.nickname}
                     </strong>
                     <span className={player.isReady ? "ready" : "waiting"}>
-                    {player.isHost ? "방장" : player.isReady ? "준비 완료" : "대기 중"}
-                  </span>
+                      {player.isHost ? "방장" : player.isReady ? "준비 완료" : "대기 중"}
+                    </span>
                   </div>
                 </div>
               ))}

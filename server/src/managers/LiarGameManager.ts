@@ -896,10 +896,6 @@ class LiarGameManager {
     this.games.set(roomId, game);
     return game;
   }
-
-  deleteGame(roomId: string) {
-    this.games.delete(roomId);
-  }
 }
 
 export const liarGameManager = new LiarGameManager();

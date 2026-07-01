@@ -1,0 +1,65 @@
+.liar-settings-panel {
+  grid-column: 1;
+  background: #323842;
+  border: 1px solid #505966;
+  border-radius: 22px;
+  padding: 22px;
+  box-sizing: border-box;
+}
+
+.liar-settings-panel h2 {
+  margin: 0 0 18px;
+  color: #ffffff;
+  font-size: 20px;
+  text-align: center;
+}
+
+.liar-setting-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 18px;
+}
+
+.liar-setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #404854;
+  border: 1px solid #606a78;
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+
+.liar-setting-row label {
+  color: #f3f4f6;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.liar-setting-control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.liar-setting-control input {
+  width: 64px;
+  background: #444d59;
+  border: 1px solid #687282;
+  color: #ffffff;
+  border-radius: 10px;
+  padding: 7px 8px;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.liar-setting-control input:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.liar-setting-control span {
+  color: #d0d6df;
+  font-size: 13px;
+}
