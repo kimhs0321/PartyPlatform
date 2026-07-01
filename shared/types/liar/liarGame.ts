@@ -20,13 +20,14 @@ export type LiarPlayerStatus =
 export interface LiarGameSettings {
   liarCount: number;
   roundCount: number;
+  descriptionCycleCount: number; // 추가
   descriptionTime: number;
   discussionTime: number;
   voteTime: number;
   tieSpeechTime: number;
   minDescriptionLength: number;
   maxDescriptionLength: number;
-}
+};
 
 export interface LiarDescription {
   playerId: string;

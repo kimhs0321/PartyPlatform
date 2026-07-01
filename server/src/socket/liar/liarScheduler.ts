@@ -9,10 +9,45 @@ export function scheduleDescriptionPhase(io: Server, roomId: string) {
     try {
       liarGameManager.startDescriptionPhase(roomId);
       emitLiarState(io, roomId);
+      scheduleDescriptionTimeout(io, roomId);
     } catch {
       // 상태가 이미 바뀐 경우 무시
     }
   }, 5000);
+}
+
+export function scheduleDescriptionTimeout(io: Server, roomId: string) {
+  const game = liarGameManager.getGame(roomId);
+  if (!game) return;
+
+  const scheduledIndex = game.currentDescriptionIndex;
+  const descriptionTime = game.settings.descriptionTime;
+
+  setTimeout(() => {
+    try {
+      const latestGame = liarGameManager.getGame(roomId);
+
+      if (!latestGame) return;
+      if (latestGame.phase !== "DESCRIPTION") return;
+      if (latestGame.currentDescriptionIndex !== scheduledIndex) return;
+
+      liarGameManager.timeoutDescription(roomId);
+      emitLiarState(io, roomId);
+
+      const updatedGame = liarGameManager.getGame(roomId);
+
+      if (updatedGame?.phase === "REACTION") {
+        scheduleDiscussionPhase(io, roomId);
+        return;
+      }
+
+      if (updatedGame?.phase === "DESCRIPTION") {
+        scheduleDescriptionTimeout(io, roomId);
+      }
+    } catch {
+      // 상태 변경 실패 무시
+    }
+  }, descriptionTime * 1000);
 }
 
 export function scheduleDiscussionPhase(io: Server, roomId: string) {

@@ -3,10 +3,8 @@ import { EVENTS } from "../../../shared/events";
 import { playerManager } from "../../../managers/PlayerManager";
 import { roomManager } from "../../../managers/RoomManager";
 import { gameManager } from "../../../managers/GameManager";
-import { liarGameManager } from "../../../managers/LiarGameManager";
 import { emitRooms } from "../../common/roomEmitter";
-import { emitLiarState } from "../../liar/liarEmitter";
-import { scheduleDescriptionPhase } from "../../liar/liarScheduler";
+import { startLiarGame } from "../../liar/startLiarGame";
 
 export function startGame(io: Server, socket: Socket) {
   return () => {
@@ -26,30 +24,7 @@ export function startGame(io: Server, socket: Socket) {
     gameManager.startGame(startedRoom);
 
     if (startedRoom.game === "라이어 게임") {
-      const players = startedRoom.playerIds
-        .map((playerId) => playerManager.getPlayer(playerId))
-        .filter((player): player is { id: string; nickname: string } =>
-          Boolean(player)
-        )
-        .map((player) => ({
-          id: player.id,
-          name: player.nickname,
-        }));
-
-      liarGameManager.createGame(startedRoom.id, players, {
-        liarCount: 1,
-        roundCount: 5,
-        descriptionTime: 20,
-        discussionTime: 120,
-        voteTime: 30,
-        tieSpeechTime: 20,
-        minDescriptionLength: 2,
-        maxDescriptionLength: 30,
-      });
-
-      liarGameManager.startRound(startedRoom.id);
-      emitLiarState(io, startedRoom.id);
-      scheduleDescriptionPhase(io, startedRoom.id);
+      startLiarGame(io, startedRoom);
     }
 
     const roomDto = roomManager.toRoomDto(startedRoom.id, (playerId) =>

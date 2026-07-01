@@ -3,6 +3,9 @@ import { EVENTS } from "../../../shared/events";
 import { playerManager } from "../../../managers/PlayerManager";
 import { roomManager } from "../../../managers/RoomManager";
 import { emitRoomInfo, emitRooms } from "../../common/roomEmitter";
+import { liarGameManager } from "../../../managers/LiarGameManager";
+import { emitLiarState } from "../../liar/liarEmitter";
+
 
 export function leaveRoom(io: Server, socket: Socket) {
   return () => {
@@ -10,6 +13,10 @@ export function leaveRoom(io: Server, socket: Socket) {
     if (!player?.roomId) return;
 
     const roomId = player.roomId;
+
+    liarGameManager.markPlayerLeft(player.roomId, player.id);
+    emitLiarState(io, player.roomId);
+
     const updatedRoom = roomManager.leaveRoom(roomId, player.id);
 
     playerManager.setPlayerRoom(socket.id, "");

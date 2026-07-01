@@ -177,6 +177,23 @@ class RoomManager {
 
     return room;
   }
+
+  updateLiarSettings(
+    roomId: string,
+    settings: Partial<Room["gameSettings"]["liar"]>
+  ) {
+    const room = this.rooms.get(roomId);
+    if (!room) return null;
+
+    room.gameSettings.liar = {
+      ...room.gameSettings.liar,
+      ...settings,
+    };
+
+    this.rooms.set(roomId, room);
+
+    return room;
+  }  
       
 }
 

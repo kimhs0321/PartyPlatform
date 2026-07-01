@@ -9,6 +9,8 @@ import { registerRoomSocket } from "./socket/roomSocket";
 import { roomManager } from "./managers/RoomManager";
 import { registerGameSocket } from "./socket/gameSocket";
 import { registerLiarSocket } from "./socket/liar/liarSocket";
+import { liarGameManager } from "./managers/LiarGameManager";
+import { emitLiarState } from "./socket/liar/liarEmitter";
 
 const app = express();
 
@@ -41,6 +43,8 @@ socket.on("disconnect", (reason) => {
   const player = playerManager.getPlayer(socket.id);
 
   if (player?.roomId) {
+    liarGameManager.markPlayerLeft(player.roomId, player.id);
+    emitLiarState(io, player.roomId);
     const updatedRoom = roomManager.leaveRoom(player.roomId, player.id);
 
     if (updatedRoom) {

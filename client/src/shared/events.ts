@@ -45,5 +45,4 @@ export const EVENTS = {
   LIAR_SUBMIT_REACTION: "liar:submitReaction",
   LIAR_TOGGLE_PAUSE: "liar:togglePause",
   LIAR_UPDATE_SETTINGS: "liar:update-settings",
-  LIAR_UPDATE_SETTINGS: "liar:update-settings",
 } as const;
