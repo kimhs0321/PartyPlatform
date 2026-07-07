@@ -32,5 +32,7 @@ export function startLiarGame(io: Server, startedRoom: StartedRoom) {
 
   liarGameManager.startRound(startedRoom.id);
   emitLiarState(io, startedRoom.id);
-  scheduleDescriptionPhase(io, startedRoom.id);
+
+ scheduleDescriptionPhase(io, startedRoom.id);
+    
 }

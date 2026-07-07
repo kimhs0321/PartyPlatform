@@ -1,65 +1,120 @@
 .liar-settings-panel {
-  grid-column: 1;
-  background: #323842;
-  border: 1px solid #505966;
-  border-radius: 22px;
-  padding: 22px;
+  grid-column: auto;
+  background: #ffffff;
+  border: 1px solid #c9d6e8;
+  border-radius: 6px;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 .liar-settings-panel h2 {
-  margin: 0 0 18px;
-  color: #ffffff;
-  font-size: 20px;
-  text-align: center;
+  min-height: 42px;
+  margin: 0;
+  padding: 0 14px;
+  border-bottom: 1px solid #c9d6e8;
+  background: #f7faff;
+  color: #1f2d3d;
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 800;
+  box-sizing: border-box;
 }
 
 .liar-setting-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px 18px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: none;
 }
 
 .liar-setting-row {
-  display: flex;
+  min-height: 48px;
+  display: grid;
+  grid-template-columns: 120px 1fr;
   align-items: center;
-  justify-content: space-between;
-  background: #404854;
-  border: 1px solid #606a78;
-  border-radius: 14px;
-  padding: 12px 14px;
+  gap: 10px;
+  padding: 8px 12px;
+  background: #ffffff;
+  border-right: 1px solid #dfe7f2;
+  border-bottom: 1px solid #dfe7f2;
+  box-sizing: border-box;
+}
+
+.liar-setting-row:nth-child(2n) {
+  border-right: none;
 }
 
 .liar-setting-row label {
-  color: #f3f4f6;
+  width: 120px;
+  color: #1f2d3d;
   font-size: 14px;
   font-weight: 700;
+  white-space: nowrap;
+  box-sizing: border-box;
 }
 
 .liar-setting-control {
-  display: flex;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 72px 18px;
+  justify-content: end;
   align-items: center;
-  gap: 6px;
+  column-gap: 6px;
 }
 
 .liar-setting-control input {
-  width: 64px;
-  background: #444d59;
-  border: 1px solid #687282;
-  color: #ffffff;
-  border-radius: 10px;
-  padding: 7px 8px;
+  width: 72px;
+  height: 30px;
+  background: #ffffff;
+  border: 1px solid #b9c8dc;
+  color: #1f2d3d;
+  border-radius: 4px;
+  padding: 0 6px;
   font-size: 14px;
   font-weight: 700;
   text-align: center;
+  box-sizing: border-box;
+}
+
+.liar-setting-control input:focus {
+  outline: none;
+  border-color: #245fa8;
+  box-shadow: 0 0 0 2px rgba(36, 95, 168, 0.12);
 }
 
 .liar-setting-control input:disabled {
-  opacity: 0.65;
+  background: #eef2f7;
+  color: #7a8798;
   cursor: not-allowed;
 }
 
 .liar-setting-control span {
-  color: #d0d6df;
+  width: 18px;
+  color: #65758b;
   font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  flex-shrink: 0;
+}
+
+@media (max-width: 720px) {
+  .liar-setting-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .liar-setting-row,
+  .liar-setting-row:nth-child(2n) {
+    border-right: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .liar-setting-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .liar-setting-row,
+  .liar-setting-row:nth-child(2n) {
+    border-right: none;
+  }
 }

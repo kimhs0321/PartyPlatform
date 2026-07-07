@@ -80,83 +80,96 @@ export default function LobbyPage() {
     socket.emit(EVENTS.JOIN_ROOM, roomId);
   };
 
+  const getStatusLabel = (status: ServerRoom["status"]) => {
+    if (status === "waiting") return "대기중";
+    if (status === "playing") return "게임중";
+    return "일시정지";
+  };
+
   return (
     <div className="lobby-page">
       <div className="lobby-shell">
-        <header className="lobby-header">
-          <div>
-            <p className="lobby-subtitle">Party Platform</p>
-            <h1>방 목록</h1>
-          </div>
-        </header>
+        <section className="onnara-window">
+          <header className="lobby-header">
+            <h1>온나라</h1>
+            <span>게임 로비</span>
+          </header>
 
-        <section className="lobby-create-panel">
-          <div className="create-title">
-            <h2>방 만들기</h2>
-            <p>게임을 선택하고 방을 생성하세요.</p>
-          </div>
+          <div className="lobby-create-row" aria-label="방 생성">
+            <label className="field field-title">
+              <span>방 이름</span>
+              <input
+                value={roomName}
+                onChange={(e) => setRoomName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleCreateRoom();
+                }}
+                placeholder="방 이름 입력"
+              />
+            </label>
 
-          <div className="create-form">
-            <input
-              value={roomName}
-              onChange={(e) => setRoomName(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleCreateRoom();
-              }}
-              placeholder="방 이름"
-            />
+            <label className="field">
+              <span>게임</span>
+              <select value={game} onChange={(e) => setGame(e.target.value)}>
+                <option>라이어 게임</option>
+                <option>모노폴리</option>
+                <option>OX 퀴즈</option>
+                <option>마피아</option>
+              </select>
+            </label>
 
-            <select value={game} onChange={(e) => setGame(e.target.value)}>
-              <option>라이어 게임</option>
-              <option>모노폴리</option>
-              <option>OX 퀴즈</option>
-              <option>마피아</option>
-            </select>
+            <label className="field">
+              <span>인원</span>
+              <select
+                value={maxPlayers}
+                onChange={(e) => setMaxPlayers(Number(e.target.value))}
+              >
+                <option value={4}>4명</option>
+                <option value={6}>6명</option>
+                <option value={8}>8명</option>
+                <option value={10}>10명</option>
+              </select>
+            </label>
 
-            <select
-              value={maxPlayers}
-              onChange={(e) => setMaxPlayers(Number(e.target.value))}
-            >
-              <option value={4}>4명</option>
-              <option value={6}>6명</option>
-              <option value={8}>8명</option>
-              <option value={10}>10명</option>
-            </select>
-
-            <button onClick={handleCreateRoom}>방 만들기</button>
-          </div>
-        </section>
-
-        <section className="room-list-panel">
-          <div className="room-list-header">
-            <h2>열린 방</h2>
-            <span>{rooms.length}개</span>
+            <button className="create-button" onClick={handleCreateRoom}>
+              방 생성
+            </button>
           </div>
 
-          <div className="room-list">
-            {rooms.length === 0 ? (
-              <div className="empty-room-list">열린 방이 없습니다.</div>
-            ) : (
-              rooms.map((room) => (
-                <article className="room-card-item" key={room.id}>
-                  <div className="room-main-info">
+          <section className="room-list-panel">
+            <div className="room-list-header">
+              <h2>열린 방</h2>
+              <span>총 {rooms.length}건</span>
+            </div>
+
+            <div className="room-table" role="table" aria-label="열린 방 목록">
+              <div className="room-table-head" role="row">
+                <span>방 이름</span>
+                <span>게임</span>
+                <span>상태</span>
+                <span>인원</span>
+                <span>입장</span>
+              </div>
+
+              {rooms.length === 0 ? (
+                <div className="empty-room-list">열린 방이 없습니다.</div>
+              ) : (
+                rooms.map((room) => (
+                  <article className="room-card-item" key={room.id} role="row">
                     <strong>{room.title}</strong>
                     <span>{room.game}</span>
-                  </div>
-
-                  <div className="room-meta">
+                    <span className={`room-status ${room.status}`}>
+                      {getStatusLabel(room.status)}
+                    </span>
                     <span>
                       {room.playerIds.length} / {room.maxPlayers}명
                     </span>
-
-                    <button onClick={() => handleJoinRoom(room.id)}>
-                      참가
-                    </button>
-                  </div>
-                </article>
-              ))
-            )}
-          </div>
+                    <button onClick={() => handleJoinRoom(room.id)}>참가</button>
+                  </article>
+                ))
+              )}
+            </div>
+          </section>
         </section>
       </div>
     </div>

@@ -124,7 +124,7 @@ function SettingRow({
           onChange={(e) => onChange(Number(e.target.value))}
         />
 
-        {suffix && <span>{suffix}</span>}
+        <span>{suffix ?? ""}</span>
       </div>
     </div>
   );

@@ -4,10 +4,10 @@ import { playerManager } from "../../../managers/PlayerManager";
 import { roomManager } from "../../../managers/RoomManager";
 import { gameManager } from "../../../managers/GameManager";
 import { emitRooms } from "../../common/roomEmitter";
-import { startLiarGame } from "../../liar/startLiarGame";
+import { findGameModuleByName } from "../../../games/common/GameRegistry";
 
 export function startGame(io: Server, socket: Socket) {
-  return () => {
+  return async () => {
     const player = playerManager.getPlayer(socket.id);
     if (!player?.roomId) return;
 
@@ -21,11 +21,16 @@ export function startGame(io: Server, socket: Socket) {
     const startedRoom = roomManager.startGame(player.roomId);
     if (!startedRoom) return;
 
+    const gameModule = findGameModuleByName(startedRoom.game);
+
+    if (!gameModule?.enabled || !gameModule.startGame) {
+      socket.emit(EVENTS.START_GAME_FAILED, "현재 실행할 수 없는 게임입니다.");
+      return;
+    }
+
     gameManager.startGame(startedRoom);
 
-    if (startedRoom.game === "라이어 게임") {
-      startLiarGame(io, startedRoom);
-    }
+    await gameModule.startGame(io, startedRoom);
 
     const roomDto = roomManager.toRoomDto(startedRoom.id, (playerId) =>
       playerManager.getPlayer(playerId)

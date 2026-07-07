@@ -69,6 +69,13 @@ class LiarGameManager {
     const voteCounts = this.getVoteCounts(game);
     const topVotedPlayerIds = this.getTopVotedPlayerIds(voteCounts);
 
+    const remainingSeconds =
+      game.paused && game.remainingTimeMs !== null
+        ? Math.max(0, Math.ceil(game.remainingTimeMs / 1000))
+        : game.timerEndsAt !== null
+        ? Math.max(0, Math.ceil((game.timerEndsAt - Date.now()) / 1000))
+        : 0;
+    
     const liarPlayerIds =
       game.phase === "RESULT" || game.phase === "LIAR_GUESS"
         ? game.players
@@ -105,6 +112,8 @@ class LiarGameManager {
       roomId: game.roomId,
       phase: game.phase,
       round: game.round,
+      remainingSeconds,
+      serverNow: Date.now(),        
       settings: game.settings,
       votedOutPlayerIds,
       citizensWin,
@@ -284,7 +293,7 @@ class LiarGameManager {
 
     if (this.isDescriptionFinished(game)) {
       game.phase = "REACTION";
-      game.timerEndsAt = Date.now() + 15000;
+      game.timerEndsAt = Date.now() + 30000;
     } else {
       game.timerEndsAt = Date.now() + game.settings.descriptionTime * 1000;
     }
@@ -331,7 +340,7 @@ class LiarGameManager {
 
     if (this.isDescriptionFinished(game)) {
       game.phase = "REACTION";
-      game.timerEndsAt = Date.now() + 15000;
+      game.timerEndsAt = Date.now() + 30000;
     } else {
       game.timerEndsAt = Date.now() + game.settings.descriptionTime * 1000;
     }
@@ -423,8 +432,8 @@ class LiarGameManager {
       throw new Error("라이어게임이 생성되지 않았습니다.");
     }
 
-    if (game.phase !== "DISCUSSION") {
-      throw new Error("토론 단계에서만 채팅할 수 있습니다.");
+    if (game.phase === "GAME_END") {
+      throw new Error("게임 종료 후에는 채팅할 수 없습니다.");
     }
 
     const player = game.players.find((p) => p.playerId === playerId);
@@ -521,6 +530,21 @@ class LiarGameManager {
     return game;
   }
 
+  timeoutVoting(roomId: string): LiarGameState {
+    const game = this.games.get(roomId);
+
+    if (!game) {
+      throw new Error("라이어게임이 생성되지 않았습니다.");
+    }
+
+    if (game.phase !== "VOTING" && game.phase !== "REVOTE") {
+      throw new Error("지금은 투표 단계가 아닙니다.");
+    }
+
+    return this.startResultPhase(roomId);
+  }
+
+  
   startTieSpeechPhase(roomId: string): LiarGameState {
     const game = this.games.get(roomId);
 
@@ -566,6 +590,26 @@ class LiarGameManager {
     return game;
   }
 
+  timeoutLiarGuess(roomId: string): LiarGameState {
+    const game = this.games.get(roomId);
+
+    if (!game) {
+      throw new Error("라이어게임이 생성되지 않았습니다.");
+    }
+
+    if (game.phase !== "LIAR_GUESS") {
+      throw new Error("지금은 라이어 추측 단계가 아닙니다.");
+    }
+
+    game.liarGuess = null;
+    this.applyRoundScore(game, true);
+    game.phase = "RESULT";
+    game.timerEndsAt = Date.now() + 15000;
+
+    this.games.set(roomId, game);
+    return game;
+  }
+      
   startResultPhase(roomId: string): LiarGameState {
     const game = this.games.get(roomId);
 
@@ -596,13 +640,14 @@ class LiarGameManager {
 
     if (liarCaught) {
       game.phase = "LIAR_GUESS";
+      game.timerEndsAt = Date.now() + 30000;
     } else {
       game.liarGuess = game.citizenKeyword;
       this.applyRoundScore(game, false);
       game.phase = "RESULT";
+      game.timerEndsAt = Date.now() + 15000;
     }
-
-    game.timerEndsAt = Date.now() + 5000;
+   
 
     this.games.set(roomId, game);
     return game;
@@ -642,7 +687,7 @@ class LiarGameManager {
     game.liarGuess = trimmedGuess;
     this.applyRoundScore(game, true);
     game.phase = "RESULT";
-    game.timerEndsAt = Date.now() + 5000;
+    game.timerEndsAt = Date.now() + 15000;
 
     this.games.set(roomId, game);
     return game;
@@ -890,7 +935,7 @@ class LiarGameManager {
         game.descriptionOrder.length * game.settings.descriptionCycleCount
     ) {
       game.phase = "REACTION";
-      game.timerEndsAt = Date.now() + 15000;
+      game.timerEndsAt = Date.now() + 30000;
     }
 
     this.games.set(roomId, game);

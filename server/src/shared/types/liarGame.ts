@@ -1,7 +1,7 @@
 export type LiarGameSettings = {
   liarCount: number;
   roundCount: number;
-  descriptionCycleCount: number; // 추가
+  descriptionCycleCount: number; 
   descriptionTime: number;
   discussionTime: number;
   voteTime: number;

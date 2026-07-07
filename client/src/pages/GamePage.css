@@ -1,59 +1,49 @@
 .game-page {
   min-height: 100vh;
-  background: #23272f;
-  color: #d9dee6;
-  padding: 24px;
+  background: #f3f6fb;
+  color: #1f2d3d;
+  padding: 16px 20px;
   box-sizing: border-box;
 }
 
 .game-shell {
-  width: 96%;
-  max-width: 1700px;
+  width: 100%;
+  max-width: 1280px;
   margin: 0 auto;
+  box-sizing: border-box;
 }
 
 .game-header {
-  background: #2d333c;
-  border: 1px solid #434b57;
-  border-radius: 14px;
-  padding: 18px 20px;
+  height: 72px;
+  background: linear-gradient(180deg, #2c68ad 0%, #245fa8 100%);
+  border: 1px solid #1d4f8f;
+  border-radius: 6px 6px 0 0;
+  padding: 0 22px;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 14px;
+  align-items: center;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 .game-header p {
-  margin: 0 0 4px;
-  color: #9ea7b5;
-  font-size: 13px;
+  display: none;
 }
 
 .game-header h1 {
   margin: 0;
-  color: #f2f4f8;
-  font-size: 26px;
+  color: #ffffff;
+  font-size: 25px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
 }
 
 .game-header span {
-  display: block;
-  margin-top: 6px;
-  color: #9ea7b5;
-  font-size: 14px;
-}
-
-.game-header button {
-  border: 1px solid #4a5360;
-  border-radius: 9px;
-  background: #39414d;
-  color: #e8edf5;
-  padding: 9px 13px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.game-header button:hover {
-  background: #4a5563;
+  display: inline-block;
+  margin-top: 4px;
+  color: #dcecff;
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .game-header-actions {
@@ -61,17 +51,34 @@
   gap: 8px;
 }
 
+.game-header button {
+  height: 36px;
+  border: 1px solid rgba(255,255,255,0.35);
+  border-radius: 4px;
+  background: rgba(255,255,255,0.12);
+  color: #ffffff;
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.game-header button:hover {
+  background: rgba(255,255,255,0.22);
+}
+
 .danger-button {
-  background: #4a3437 !important;
-  border-color: #725057 !important;
-  color: #f0c7cc !important;
+  background: rgba(164, 54, 54, 0.95) !important;
+  border-color: rgba(255,255,255,0.35) !important;
+  color: #ffffff !important;
 }
 
 .game-placeholder {
-  min-height: 520px;
-  background: #2d333c;
-  border: 1px solid #434b57;
-  border-radius: 14px;
+  min-height: 420px;
+  background: #ffffff;
+  border: 1px solid #c9d6e8;
+  border-top: none;
+  border-radius: 0 0 6px 6px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -80,10 +87,10 @@
 
 .game-placeholder h2 {
   margin: 0 0 10px;
-  font-size: 28px;
-  color: #f2f4f8;
+  font-size: 22px;
+  color: #1f2d3d;
 }
 
 .game-placeholder p {
-  color: #9ea7b5;
+  color: #65758b;
 }

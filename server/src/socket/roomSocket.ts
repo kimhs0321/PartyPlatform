@@ -9,6 +9,7 @@ import { startGame } from "./handlers/room/startGame";
 import { endGame } from "./handlers/room/endGame";
 import { getRooms } from "./handlers/room/getRooms";
 import { updateLiarSettings } from "./handlers/room/updateLiarSettings";
+import { registerRoomChat } from "./room/roomChat";
 
 
 export function registerRoomSocket(io: Server, socket: Socket) {
@@ -21,5 +22,6 @@ export function registerRoomSocket(io: Server, socket: Socket) {
   socket.on(EVENTS.END_GAME, endGame(io, socket));
   socket.on(EVENTS.LEAVE_ROOM, leaveRoom(io, socket));
   socket.on(EVENTS.LIAR_UPDATE_SETTINGS, updateLiarSettings(io, socket));
+  registerRoomChat(io, socket);
   
 }

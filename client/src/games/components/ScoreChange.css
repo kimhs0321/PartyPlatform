@@ -1,0 +1,109 @@
+.score-change-panel {
+  background: var(--onnara-panel, #ffffff);
+  border: 1px solid var(--onnara-border, #c9d6e8);
+  border-radius: 6px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.score-change-title {
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  background: var(--onnara-panel-soft, #f7faff);
+  border-bottom: 1px solid var(--onnara-border, #c9d6e8);
+  color: var(--onnara-text, #1f2d3d);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.score-change-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 64px 92px;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--onnara-panel-soft, #f7faff);
+  border-bottom: 1px solid var(--onnara-border, #c9d6e8);
+  color: var(--onnara-muted, #65758b);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.score-change-header span:nth-child(2),
+.score-change-header span:nth-child(3) {
+  text-align: right;
+}
+
+.score-change-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.score-change-row {
+  min-height: 42px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--onnara-border-soft, #dfe7f2);
+  color: var(--onnara-text, #1f2d3d);
+}
+
+.score-change-row:last-child {
+  border-bottom: none;
+}
+
+.score-change-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+.score-change-value {
+  text-align: right;
+  font-weight: 800;
+}
+
+.score-change-value.plus {
+  color: var(--onnara-success, #287d45);
+}
+
+.score-change-value.minus {
+  color: var(--onnara-danger, #b13b3b);
+}
+
+.score-change-value.zero {
+  color: var(--onnara-muted, #65758b);
+}
+
+.score-change-result {
+  text-align: right;
+  color: var(--onnara-muted, #65758b);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.score-change-empty {
+  padding: 18px 12px;
+  text-align: center;
+  color: var(--onnara-muted, #65758b);
+  font-size: 14px;
+}
+
+.score-change-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 64px 92px;
+  align-items: center;
+}
+
+.score-change-reasons {
+  margin: 8px 0 0;
+  padding-left: 22px;
+  color: var(--onnara-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.score-change-reasons li {
+  margin: 3px 0;
+}
