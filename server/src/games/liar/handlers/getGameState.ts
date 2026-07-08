@@ -1,7 +1,7 @@
 import type { Socket } from "socket.io";
 import { EVENTS } from "../../../shared/events";
 import { playerManager } from "../../../managers/PlayerManager";
-import { liarGameManager } from "../../../managers/LiarGameManager";
+import { liarGameManager } from "../LiarGameManager";
 
 export function getGameState(socket: Socket) {
   return (roomId: string) => {

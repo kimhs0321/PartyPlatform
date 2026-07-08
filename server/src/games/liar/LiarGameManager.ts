@@ -3,8 +3,8 @@ import {
   LiarGameSettings,
   LiarGameState,
   LiarPlayerState,
-} from "../../../shared/types/liar/liarGame";
-import { LIAR_WORDS } from "../../../shared/keywords/liarKeywords";
+} from "./types/liarGame";
+import { LIAR_WORDS } from "./keywords/liarKeywords";
 
 type LiarGamePlayerInput = {
   id: string;
@@ -56,6 +56,10 @@ class LiarGameManager {
 
   getGame(roomId: string): LiarGameState | undefined {
     return this.games.get(roomId);
+  }
+
+  deleteGame(roomId: string): void {
+    this.games.delete(roomId);
   }
 
   toClientState(roomId: string, playerId: string): ClientLiarGameState {

@@ -1,9 +1,9 @@
 import type { Server } from "socket.io";
-import { playerManager } from "../../managers/PlayerManager";
-import { liarGameManager } from "../../managers/LiarGameManager";
+import { playerManager } from "../../../managers/PlayerManager";
+import { liarGameManager } from "../LiarGameManager";
 import { emitLiarState } from "./liarEmitter";
 import { scheduleDescriptionPhase } from "./liarScheduler";
-import type { LiarGameSettings } from "../../shared/types/liarGame";
+import type { LiarGameSettings } from "../../../shared/types/liarGame";
 
 type StartedRoom = {
   id: string;

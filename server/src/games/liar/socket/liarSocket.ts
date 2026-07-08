@@ -1,12 +1,12 @@
 import type { Server, Socket } from "socket.io";
-import { EVENTS } from "../../shared/events";
-import { sendChat } from "./handlers/sendChat";
-import { submitHint } from "./handlers/submitHint";
-import { vote } from "./handlers/vote";
-import { reveal } from "./handlers/reveal";
-import { submitReaction } from "./handlers/submitReaction";
-import { togglePause } from "./handlers/togglePause";
-import { getGameState } from "./handlers/getGameState";
+import { EVENTS } from "../../../shared/events";
+import { sendChat } from "../handlers/sendChat";
+import { submitHint } from "../handlers/submitHint";
+import { vote } from "../handlers/vote";
+import { reveal } from "../handlers/reveal";
+import { submitReaction } from "../handlers/submitReaction";
+import { togglePause } from "../handlers/togglePause";
+import { getGameState } from "../handlers/getGameState";
 
 export function registerLiarSocket(io: Server, socket: Socket) {
  

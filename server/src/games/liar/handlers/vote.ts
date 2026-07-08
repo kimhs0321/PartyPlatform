@@ -1,10 +1,10 @@
 import type { Server, Socket } from "socket.io";
 import { EVENTS } from "../../../shared/events";
 import { playerManager } from "../../../managers/PlayerManager";
-import { liarGameManager } from "../../../managers/LiarGameManager";
-import { endRoomGame } from "../../common/endRoomGame";
-import { emitLiarState } from "../liarEmitter";
-import { handleAfterVoteResolved } from "../liarScheduler";
+import { liarGameManager } from "../LiarGameManager";
+import { endRoomGame } from "../../../socket/common/endRoomGame";
+import { emitLiarState } from "../socket/liarEmitter";
+import { handleAfterVoteResolved } from "../socket/liarScheduler";
 
 export function vote(io: Server, socket: Socket) {
   return (data: { roomId: string; targetId: string }) => {

@@ -1,8 +1,8 @@
 import type { Server, Socket } from "socket.io";
 import { EVENTS } from "../../../shared/events";
 import { playerManager } from "../../../managers/PlayerManager";
-import { liarGameManager } from "../../../managers/LiarGameManager";
-import { emitLiarState } from "../liarEmitter";
+import { liarGameManager } from "../LiarGameManager";
+import { emitLiarState } from "../socket/liarEmitter";
 
 export function sendChat(io: Server, socket: Socket) {
   return (data: { roomId: string; text: string }) => {

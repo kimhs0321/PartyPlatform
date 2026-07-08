@@ -3,7 +3,7 @@ import { EVENTS } from "../../shared/events";
 import { playerManager } from "../../managers/PlayerManager";
 import { roomManager } from "../../managers/RoomManager";
 import { gameManager } from "../../managers/GameManager";
-import { liarGameManager } from "../../managers/LiarGameManager";
+import { liarGameManager } from "../../games/liar/LiarGameManager";
 import { emitRooms } from "./roomEmitter";
 
 export function endRoomGame(io: Server, roomId: string) {

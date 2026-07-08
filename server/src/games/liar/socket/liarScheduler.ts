@@ -1,7 +1,7 @@
 import type { Server } from "socket.io";
-import { liarGameManager } from "../../managers/LiarGameManager";
+import { liarGameManager } from "../LiarGameManager";
 import { emitLiarState } from "./liarEmitter";
-import { endRoomGame } from "../common/endRoomGame";
+import { endRoomGame } from "../../../socket/common/endRoomGame";
 
 type EndRoomGameFn = (roomId: string) => void;
 

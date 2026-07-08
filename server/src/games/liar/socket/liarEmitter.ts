@@ -1,7 +1,7 @@
 import type { Server } from "socket.io";
-import { EVENTS } from "../../shared/events";
-import { roomManager } from "../../managers/RoomManager";
-import { liarGameManager } from "../../managers/LiarGameManager";
+import { EVENTS } from "../../../shared/events";
+import { roomManager } from "../../../managers/RoomManager";
+import { liarGameManager } from "../LiarGameManager";
 
 export function emitLiarState(io: Server, roomId: string) {
   const room = roomManager.getRoom(roomId);

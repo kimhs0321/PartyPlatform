@@ -3,8 +3,8 @@ import { EVENTS } from "../../../shared/events";
 import { playerManager } from "../../../managers/PlayerManager";
 import { roomManager } from "../../../managers/RoomManager";
 import { emitRoomInfo, emitRooms } from "../../common/roomEmitter";
-import { liarGameManager } from "../../../managers/LiarGameManager";
-import { emitLiarState } from "../../liar/liarEmitter";
+import { liarGameManager } from "../../../games/liar/LiarGameManager";
+import { emitLiarState } from "../../../games/liar/socket/liarEmitter";
 
 
 export function leaveRoom(io: Server, socket: Socket) {
