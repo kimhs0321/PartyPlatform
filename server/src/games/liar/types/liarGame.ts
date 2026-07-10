@@ -97,6 +97,8 @@ export interface ClientLiarGameState {
   players: ClientLiarPlayerState[];
 
   myKeyword: string | null;
+  remainingSeconds: number;
+  serverNow: number;
 
   citizenKeyword: string | null;
   liarGuess: string | null;

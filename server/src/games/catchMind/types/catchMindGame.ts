@@ -10,6 +10,7 @@ export type CatchMindGameSettings = {
   wordSelectTime: number;
   drawingTime: number;
   roundResultTime: number;
+  allowDrawerSkip: boolean;
 };
 
 export type CatchMindPlayerStatus =
