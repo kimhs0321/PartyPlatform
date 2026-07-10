@@ -1,4 +1,5 @@
 import type { LiarGameSettings } from "./liarGame";
+import type { CatchMindGameSettings } from "./catchMindGame";
 
 export type RoomStatus = "waiting" | "playing" | "paused";
 
@@ -15,5 +16,6 @@ export type Room = {
 
   gameSettings: {
     liar: LiarGameSettings;
+    catchMind: CatchMindGameSettings
   };
 };

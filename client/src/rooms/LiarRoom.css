@@ -118,3 +118,15 @@
     border-right: none;
   }
 }
+
+.liar-setting-control input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  flex: 0 0 auto;
+  cursor: pointer;
+}
+
+.liar-setting-control input[type="checkbox"]:disabled {
+  cursor: not-allowed;
+}

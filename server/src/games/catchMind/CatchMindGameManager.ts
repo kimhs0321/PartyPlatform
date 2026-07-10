@@ -4,8 +4,8 @@ import {
   CatchMindPlayerState,
   ClientCatchMindGameState,
   DrawingStroke,
-} from "../shared/types/catchMind/catchMindGame";
-import { CATCH_MIND_WORDS } from "../../../shared/keywords/catchMindKeywords";
+} from "./types/catchMindGame";
+import { CATCH_MIND_WORDS } from "./keywords/catchMindKeywords";
 
 
 type CatchMindGamePlayerInput = {
@@ -99,7 +99,7 @@ class CatchMindGameManager {
           ? game.answer
           : null,
 
-      hint: this.makeHint(game.answer),
+      hint: this.makeTimedHint(game),
 
       guessedPlayerIds: game.guessedPlayerIds,
 
@@ -225,26 +225,40 @@ class CatchMindGameManager {
     return this.selectWord(roomId, currentDrawerPlayerId, randomWord);
     }
 
-  finishRound(roomId: string): CatchMindGameState {
+  finishRound(
+    roomId: string,
+    skipped = false
+  ): CatchMindGameState {
     const game = this.games.get(roomId);
 
     if (!game) {
-        throw new Error("캐치마인드 게임이 생성되지 않았습니다.");
+      throw new Error("캐치마인드 게임이 생성되지 않았습니다.");
     }
 
     if (game.phase !== "DRAWING") {
-        throw new Error("지금은 그림 단계가 아닙니다.");
+      throw new Error("지금은 그림 단계가 아닙니다.");
+    }
+
+    if (game.guessedPlayerIds.length === 0) {
+      game.chats.push({
+        playerId: "SYSTEM",
+        playerName: "SYSTEM",
+        text: skipped
+          ? `⏭️ 출제자가 문제를 스킵했습니다. 정답은 "${game.answer}"였습니다.`
+          : `⏰ 시간 종료! 정답은 "${game.answer}"였습니다.`,
+        createdAt: Date.now(),
+      });
     }
 
     game.phase = "ROUND_RESULT";
-    game.timerEndsAt = Date.now() + game.settings.roundResultTime * 1000;
-    
+    game.timerEndsAt =
+      Date.now() + game.settings.roundResultTime * 1000;
 
     this.updatePlayerStatuses(game);
 
     this.games.set(roomId, game);
     return game;
-    }
+  }
 
   nextTurnOrRound(roomId: string): CatchMindGameState {
     const game = this.games.get(roomId);
@@ -359,6 +373,32 @@ class CatchMindGameManager {
     return game;
   }
 
+  undoStroke(roomId: string, playerId: string): CatchMindGameState {
+    const game = this.games.get(roomId);
+
+    if (!game) {
+      throw new Error("캐치마인드 게임이 생성되지 않았습니다.");
+    }
+
+    if (game.phase !== "DRAWING") {
+      throw new Error("지금은 실행할 수 없습니다.");
+    }
+
+    const currentDrawerPlayerId = this.getCurrentDrawerPlayerId(game);
+
+    if (currentDrawerPlayerId !== playerId) {
+      throw new Error("현재 출제자만 사용할 수 있습니다.");
+    }
+
+    game.strokes.pop();
+      if (game.strokes.length === 0) {
+    return game;
+}
+
+    this.games.set(roomId, game);
+    return game;
+  }
+
   submitGuess(roomId: string, playerId: string, text: string): CatchMindGameState {
     const game = this.games.get(roomId);
 
@@ -371,6 +411,10 @@ class CatchMindGameManager {
     }
 
     const currentDrawerPlayerId = this.getCurrentDrawerPlayerId(game);
+
+    if (currentDrawerPlayerId === playerId) {
+      throw new Error("출제자는 정답을 입력할 수 없습니다.");
+    }
 
     if (game.guessedPlayerIds.length > 0) {
       throw new Error("이미 정답자가 나왔습니다.");
@@ -387,14 +431,6 @@ class CatchMindGameManager {
     if (!trimmedText) {
       throw new Error("채팅 내용을 입력하세요.");
     }
-
-    if (currentDrawerPlayerId === playerId) {
-      game.chats.push({
-        playerId,
-        playerName: player.name,
-        text: trimmedText,
-        createdAt: Date.now(),
-      });
 
     const answer = game.answer?.trim().toLowerCase() ?? "";
     const guess = trimmedText.trim().toLowerCase();
@@ -428,15 +464,17 @@ class CatchMindGameManager {
     );
 
     game.chats.push({
-      playerId,
-      playerName: player.name,
-      text: "정답!",
+      playerId: "SYSTEM",
+      playerName: "SYSTEM",
+      text: `🎉 ${player.name}님이 정답을 맞혔습니다!\n정답 : ${game.answer}`,
       createdAt: Date.now(),
     });
 
     game.phase = "ROUND_RESULT";
+
     game.timerEndsAt = Date.now() + game.settings.roundResultTime * 1000;
-    this.updatePlayerStatuses(game);
+    
+        this.updatePlayerStatuses(game);
 
     this.games.set(roomId, game);
     return game;
@@ -475,13 +513,107 @@ class CatchMindGameManager {
     return game.drawerOrder[game.currentDrawerIndex] ?? null;
   }
 
-  private makeHint(answer: string | null): string {
-    if (!answer) return "";
+private makeTimedHint(game: CatchMindGameState): string {
+  const answer = game.answer;
 
-    return answer
-      .split("")
+  if (!answer) return "";
+
+  const visibleCharacters = [...answer].filter(
+    (char) => char !== " "
+  );
+
+  const totalCharacterCount = visibleCharacters.length;
+
+  if (
+    game.phase !== "DRAWING" ||
+    !game.timerEndsAt ||
+    totalCharacterCount === 0
+  ) {
+    return [...answer]
       .map((char) => (char === " " ? " " : "□"))
       .join("");
+  }
+
+  const totalMs = game.settings.drawingTime * 1000;
+  const remainingMs = Math.max(
+    0,
+    game.timerEndsAt - Date.now()
+  );
+
+  const elapsedMs = Math.max(0, totalMs - remainingMs);
+  const progress = Math.min(1, elapsedMs / totalMs);
+
+  // 처음 40% 동안에는 자음을 공개하지 않음
+  let revealedCount = 0;
+
+  if (progress >= 0.4) {
+    // 40%부터 90% 구간에 초성을 하나씩 공개
+    const revealProgress = Math.min(
+      1,
+      (progress - 0.4) / 0.5
+    );
+
+    revealedCount = Math.min(
+      totalCharacterCount,
+      Math.floor(revealProgress * totalCharacterCount) + 1
+    );
+  }
+
+  let characterIndex = 0;
+
+  return [...answer]
+    .map((char) => {
+      if (char === " ") {
+        return " ";
+      }
+
+      const shouldReveal =
+        characterIndex < revealedCount;
+
+      characterIndex += 1;
+
+      return shouldReveal
+        ? this.getInitialConsonant(char)
+        : "□";
+    })
+    .join("");
+  }
+
+  private getInitialConsonant(char: string): string {
+    const initialConsonants = [
+      "ㄱ",
+      "ㄲ",
+      "ㄴ",
+      "ㄷ",
+      "ㄸ",
+      "ㄹ",
+      "ㅁ",
+      "ㅂ",
+      "ㅃ",
+      "ㅅ",
+      "ㅆ",
+      "ㅇ",
+      "ㅈ",
+      "ㅉ",
+      "ㅊ",
+      "ㅋ",
+      "ㅌ",
+      "ㅍ",
+      "ㅎ",
+    ];
+
+    const code = char.charCodeAt(0);
+
+    // 한글 완성형 문자가 아니면 해당 문자를 그대로 반환
+    if (code < 0xac00 || code > 0xd7a3) {
+      return char;
+    }
+
+    const initialIndex = Math.floor(
+      (code - 0xac00) / 588
+    );
+
+    return initialConsonants[initialIndex] ?? char;
   }
 
   private pickRandomWords(count: number): string[] {

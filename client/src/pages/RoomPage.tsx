@@ -5,6 +5,7 @@ import { EVENTS } from "../shared/events";
 import "./RoomPage.css";
 import LiarRoom from "../rooms/LiarRoom";
 import RoomChat from "../rooms/RoomChat";
+import CatchMindRoom from "../rooms/CatchMindRoom";
 
 type RoomPlayerDto = {
   id: string;
@@ -25,6 +26,14 @@ type LiarSettings = {
   maxDescriptionLength: number;
 };
 
+ type CatchMindSettings= {
+  roundCount: number;
+  wordSelectTime: number;
+  drawingTime: number;
+  roundResultTime: number;
+  allowDrawerSkip: boolean;
+};
+
 type RoomDto = {
   id: string;
   title: string;
@@ -33,7 +42,10 @@ type RoomDto = {
   game: string;
   players: RoomPlayerDto[];
   status: "waiting" | "playing" | "paused";
-  gameSettings: { liar: LiarSettings };
+  gameSettings: {
+  liar: LiarSettings;
+  catchMind: CatchMindSettings;
+};
 };
 
 const statusText = {
@@ -60,28 +72,39 @@ export default function RoomPage() {
 
     const fallbackRoom = location.state?.room;
 
-    if (fallbackRoom && !room) {
-      setRoom({
-        id: fallbackRoom.id,
-        title: fallbackRoom.name,
-        hostId: "",
-        maxPlayers: fallbackRoom.maxPlayers,
-        game: fallbackRoom.game,
-        players: [],
-        status: "waiting",
-        gameSettings: {
-          liar: {
-            liarCount: 1,
-            roundCount: 5,
-            descriptionTime: 45,
-            descriptionCycleCount: 2,
-            discussionTime: 120,
-            voteTime: 30,
-            tieSpeechTime: 20,
-            minDescriptionLength: 2,
-            maxDescriptionLength: 30,
+    if (fallbackRoom) {
+      setRoom((prev) => {
+        if (prev) return prev;
+
+        return {
+          id: fallbackRoom.id,
+          title: fallbackRoom.name,
+          hostId: "",
+          maxPlayers: fallbackRoom.maxPlayers,
+          game: fallbackRoom.game,
+          players: [],
+          status: "waiting",
+          gameSettings: {
+            liar: {
+              liarCount: 1,
+              roundCount: 5,
+              descriptionTime: 45,
+              descriptionCycleCount: 2,
+              discussionTime: 120,
+              voteTime: 30,
+              tieSpeechTime: 20,
+              minDescriptionLength: 2,
+              maxDescriptionLength: 30,
+            },
+            catchMind: {
+              roundCount: 3,
+              wordSelectTime: 10,
+              drawingTime: 90,
+              roundResultTime: 5,
+              allowDrawerSkip: true,
+            },
           },
-        },
+        };
       });
     }
 
@@ -112,7 +135,7 @@ export default function RoomPage() {
       socket.off(EVENTS.GAME_STARTED, handleGameStarted);
       socket.off(EVENTS.START_GAME_FAILED, handleStartGameFailed);
     };
-  }, [roomId, location.state, navigate, room]);
+  }, [roomId, location.state, navigate]);
 
   const handleToggleReady = () => {
     socket.emit(EVENTS.TOGGLE_READY);
@@ -125,6 +148,7 @@ export default function RoomPage() {
 
     socket.emit(EVENTS.LEAVE_ROOM);
   };
+
 
   if (!room) {
     return (
@@ -153,6 +177,32 @@ export default function RoomPage() {
     if (!room || !isHost) return;
 
     socket.emit(EVENTS.LIAR_UPDATE_SETTINGS, {
+      [key]: value,
+    });
+  };
+
+  const handleUpdateCatchMindSetting = (
+    key: keyof CatchMindSettings,
+    value: number | boolean
+  ) => {
+    if (!room || !isHost) return;
+
+    setRoom((prev) => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        gameSettings: {
+          ...prev.gameSettings,
+          catchMind: {
+            ...prev.gameSettings.catchMind,
+            [key]: value,
+          },
+        },
+      };
+    });
+
+    socket.emit(EVENTS.CATCH_MIND_UPDATE_SETTINGS, {
       [key]: value,
     });
   };
@@ -197,6 +247,14 @@ export default function RoomPage() {
                   playersCount={room.players.length}
                   isHost={isHost}
                   onUpdateSetting={handleUpdateLiarSetting}
+                />
+              )}
+    
+              {room.game === "캐치마인드" && (
+                <CatchMindRoom
+                  settings={room.gameSettings.catchMind}
+                  isHost={isHost}
+                  onUpdateSetting={handleUpdateCatchMindSetting}
                 />
               )}
 

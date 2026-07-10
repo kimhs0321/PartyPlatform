@@ -1,9 +1,9 @@
 import type { Server } from "socket.io";
-import { playerManager } from "../../managers/PlayerManager";
-import { catchMindGameManager } from "../../managers/CatchMindGameManager";
+import { playerManager } from "../../../managers/PlayerManager";
+import { catchMindGameManager } from "../CatchMindGameManager";
 import { emitCatchMindState } from "./catchMindEmitter";
 import { scheduleWordSelectTimeout } from "./catchMindScheduler";
-import type { CatchMindGameSettings } from "../../shared/types/catchMind/catchMindGame";
+import type { CatchMindGameSettings } from "../types/catchMindGame";
 
 type StartedRoom = {
   id: string;
@@ -16,8 +16,8 @@ type StartedRoom = {
 export function startCatchMindGame(io: Server, startedRoom: StartedRoom) {
   const players = startedRoom.playerIds
     .map((playerId) => playerManager.getPlayer(playerId))
-    .filter(
-      (player): player is { id: string; nickname: string } => Boolean(player)
+    .filter((player): player is { id: string; nickname: string } =>
+      Boolean(player)
     )
     .map((player) => ({
       id: player.id,
@@ -31,8 +31,7 @@ export function startCatchMindGame(io: Server, startedRoom: StartedRoom) {
   );
 
   catchMindGameManager.startRound(startedRoom.id);
-
   emitCatchMindState(io, startedRoom.id);
 
-  scheduleWordSelectTimeout(io, startedRoom.id);
+  //scheduleWordSelectTimeout(io, startedRoom.id);
 }

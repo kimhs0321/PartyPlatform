@@ -55,4 +55,7 @@ export const EVENTS = {
   CATCH_MIND_DRAW: "catchMind:draw",
   CATCH_MIND_SEND_CHAT: "catchMind:sendChat",
   CATCH_MIND_CLEAR_CANVAS: "catchMind:clearCanvas",
+  CATCH_MIND_UNDO: "catchMind:undo",
+  CATCH_MIND_UPDATE_SETTINGS: "catchMind:updateSettings",
+  CATCH_MIND_SKIP: "catchMind:skip",
 } as const;

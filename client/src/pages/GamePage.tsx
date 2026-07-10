@@ -3,10 +3,12 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { socket } from "../socket/socket";
 import { EVENTS } from "../shared/events";
 import LiarGame from "../games/LiarGame";
-import MonopolyGame from "../games/MonopolyGame";
 import UnknownGame from "../games/UnknownGame";
 import "./GamePage.css";
-import type { ClientLiarGameState } from "../../../shared/types/liar/liarGame";
+import type { ClientLiarGameState } from "../../../server/src/games/liar/types/liarGame";
+import CatchMindGame from "../games/CatchMindGame.tsx";
+import type { ClientCatchMindGameState } from "../../../server/src/games/catchMind/types/catchMindGame";
+
 
 type RoomPlayerDto = {
   id: string;
@@ -30,10 +32,11 @@ export default function GamePage() {
   const location = useLocation();
   const navigate = useNavigate();
   const [liarGameState, setLiarGameState] = useState<ClientLiarGameState | null>(null);
+  const [catchMindGameState, setCatchMindGameState] = useState<ClientCatchMindGameState | null>(null);
   const [room, setRoom] = useState<RoomDto | null>(
     location.state?.room ?? null
   );
-
+  
   useEffect(() => {
     if (!socket.connected) {
       socket.connect();
@@ -62,10 +65,17 @@ export default function GamePage() {
 
     socket.on(EVENTS.LIAR_GAME_STATE, handleLiarGameState);
 
+    const handleCatchMindGameState = (state: ClientCatchMindGameState) => {
+      setCatchMindGameState(state);
+    };
+
+    socket.on(EVENTS.CATCH_MIND_STATE, handleCatchMindGameState);
+
     return () => {
       socket.off(EVENTS.ROOM_INFO, handleRoomInfo);
       socket.off(EVENTS.GAME_ENDED, handleGameEnded);
       socket.off(EVENTS.LIAR_GAME_STATE, handleLiarGameState);
+      socket.off(EVENTS.CATCH_MIND_STATE, handleCatchMindGameState);
     };
   }, [roomId, navigate]);
 
@@ -97,9 +107,9 @@ export default function GamePage() {
       case "라이어 게임":
        return <LiarGame state={liarGameState} />;
 
-      case "모노폴리":
-        return <MonopolyGame />;
-
+      case "캐치마인드":
+        return <CatchMindGame state={catchMindGameState} />;
+          
       default:
         return <UnknownGame />;
     }

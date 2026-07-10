@@ -1,7 +1,7 @@
 import type { Socket } from "socket.io";
-import { EVENTS } from "../../../shared/events";
-import { playerManager } from "../../../managers/PlayerManager";
-import { catchMindGameManager } from "../../../managers/CatchMindGameManager";
+import { EVENTS } from "../../../../shared/events";
+import { playerManager } from "../../../../managers/PlayerManager";
+import { catchMindGameManager } from "../../CatchMindGameManager";
 
 export function getGameState(socket: Socket) {
   return () => {

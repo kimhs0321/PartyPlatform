@@ -112,9 +112,7 @@ export default function LobbyPage() {
               <span>게임</span>
               <select value={game} onChange={(e) => setGame(e.target.value)}>
                 <option>라이어 게임</option>
-                <option>모노폴리</option>
-                <option>OX 퀴즈</option>
-                <option>마피아</option>
+                <option>캐치마인드</option>
               </select>
             </label>
 

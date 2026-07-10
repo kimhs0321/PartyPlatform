@@ -1,6 +1,7 @@
 import type { Room } from "../shared/types/Room";
 import type { Player } from "../shared/types/Player";
 import { DEFAULT_LIAR_GAME_SETTINGS } from "../shared/types/liarGame";
+import { DEFAULT_CATCH_MIND_GAME_SETTINGS } from "../shared/types/catchMindGame";
 
 class RoomManager {
   private rooms = new Map<string, Room>();
@@ -27,6 +28,7 @@ class RoomManager {
       game,
       gameSettings: {
         liar: { ...DEFAULT_LIAR_GAME_SETTINGS },
+        catchMind: { ...DEFAULT_CATCH_MIND_GAME_SETTINGS },
       },
     };
 

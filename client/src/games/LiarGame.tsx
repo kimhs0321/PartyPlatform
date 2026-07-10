@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { socket } from "../socket/socket";
 import { EVENTS } from "../shared/events";
-import type { ClientLiarGameState } from "../../../shared/types/liar/liarGame";
+import type { ClientLiarGameState } from "../../../server/src/games/liar/types/liarGame";
 import "./LiarGame.css";
 import { useGameTimer } from "../hooks/useGameTimer";
 import ChatPanel from "../components/chat/ChatPanel";

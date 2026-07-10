@@ -1,0 +1,512 @@
+.catchmind-game {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.catchmind-loading {
+  padding: 40px;
+  text-align: center;
+  background: #f7faff;
+  border: 1px solid #c9d6e8;
+  border-radius: 12px;
+}
+
+.catchmind-top {
+  display: grid;
+  grid-template-columns: 180px 1fr 220px;
+  gap: 12px;
+  align-items: center;
+}
+
+.catchmind-timer,
+.catchmind-hint,
+.catchmind-round {
+  background: #ffffff;
+  border: 1px solid #c9d6e8;
+  border-radius: 12px;
+  padding: 12px 16px;
+}
+
+.catchmind-timer span,
+.catchmind-hint span {
+  display: block;
+  font-size: 12px;
+  color: #607086;
+  margin-bottom: 4px;
+}
+
+.catchmind-timer strong {
+  font-size: 26px;
+  color: #1d5fd1;
+}
+
+.catchmind-round {
+  text-align: center;
+  font-weight: 800;
+  font-size: 18px;
+}
+
+.catchmind-status {
+  padding: 12px 16px;
+  background: #eaf3ff;
+  border: 1px solid #c9d6e8;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.catchmind-board-layout {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr) 150px;
+  gap: 12px;
+  align-items: start;
+}
+
+.catchmind-player-column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.catchmind-player-card {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-height: 76px;
+  padding: 10px;
+  background: #ffffff;
+  border: 1px solid #c9d6e8;
+  border-radius: 12px;
+}
+
+.catchmind-player-card.drawer {
+  border-width: 2px;
+}
+
+.catchmind-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: #f0f5ff;
+  border: 1px solid #c9d6e8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+}
+
+.catchmind-player-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 13px;
+}
+
+.catchmind-player-info strong {
+  font-size: 14px;
+}
+
+.catchmind-center {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.catchmind-sketchbook {
+  background: #dcecff;
+  border: 1px solid #9eb9db;
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.catchmind-canvas {
+  width: 100%;
+  height: 560px;
+  background: #ffffff;
+  border: 2px solid #1f2d3d;
+  border-radius: 8px;
+  display: block;
+  cursor: not-allowed;
+  user-select: none;
+}
+
+.catchmind-canvas.drawable {
+  cursor: crosshair;
+}
+
+.catchmind-tools {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 10px 12px;
+  background: #ffffff;
+  border: 1px solid #c9d6e8;
+  border-radius: 12px;
+}
+
+.catchmind-tool-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.catchmind-tool-label {
+  font-size: 12px;
+  font-weight: 800;
+  color: #607086;
+}
+
+.catchmind-color-list,
+.catchmind-size-list {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.catchmind-color-button {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 999px;
+  border: 2px solid #d5dfec;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.catchmind-color-button.white {
+  border-color: #9ca3af;
+}
+
+.catchmind-color-button.selected {
+  transform: scale(1.12);
+  border: 3px solid #1d5fd1;
+  box-shadow: 0 0 0 4px rgba(29, 95, 209, 0.18);
+}
+
+.catchmind-size-button {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #c9d6e8;
+  border-radius: 999px;
+  background: #f7faff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.catchmind-size-button span {
+  display: block;
+  border-radius: 999px;
+  background: #1f2d3d;
+}
+
+.catchmind-size-button.selected {
+  transform: scale(1.08);
+  border-color: #1d5fd1;
+  box-shadow: 0 0 0 3px rgba(29,95,209,.14);
+}
+
+.catchmind-color-button:hover:not(:disabled),
+.catchmind-size-button:hover:not(:disabled) {
+  transform: scale(1.08);
+}
+
+.catchmind-tool-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.catchmind-clear-button {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 1px solid #9eb9db;
+  border-radius: 50%;
+  background: #f7faff;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.catchmind-color-button:disabled,
+.catchmind-size-button:disabled,
+.catchmind-eraser-button:disabled,
+.catchmind-undo-button:disabled,
+.catchmind-clear-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.catchmind-chat {
+  background: #ffffff;
+  border: 1px solid #c9d6e8;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.catchmind-chat-list {
+  height: 120px;
+  padding: 10px 14px;
+  overflow-y: auto;
+  font-size: 14px;
+}
+
+.catchmind-chat-list p {
+  margin: 4px 0;
+}
+
+.catchmind-empty-chat {
+  color: #607086;
+}
+
+.catchmind-chat-input {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+  border-top: 1px solid #c9d6e8;
+}
+
+.catchmind-chat-input input {
+  flex: 1;
+  border: 1px solid #c9d6e8;
+  border-radius: 8px;
+  padding: 9px 10px;
+}
+
+.catchmind-word-select {
+  height: 560px;
+  background: #ffffff;
+  border: 2px solid #1f2d3d;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.catchmind-word-options {
+  display: flex;
+  gap: 12px;
+}
+
+.catchmind-word-options button {
+  min-width: 120px;
+  padding: 14px 18px;
+  border: 1px solid #9eb9db;
+  border-radius: 10px;
+  background: #f7faff;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.catchmind-player-card.drawer {
+  border-color: #1d5fd1;
+  background: #eef5ff;
+}
+
+.catchmind-eraser-button {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #c9d6e8;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.catchmind-eraser-button.selected {
+  border: 2px solid #1c7ed6;
+}
+
+.catchmind-undo-button {
+  width: 36px;
+  height: 36px;
+  border: 1px solid #c9d6e8;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.catchmind-sketchbook {
+  position: relative;
+}
+
+.catchmind-result-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(2px);
+}
+
+.catchmind-result-card {
+  min-width: 340px;
+  padding: 30px 38px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+
+  background: #ffffff;
+  border: 1px solid #d8e2ef;
+  border-radius: 16px;
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.28);
+
+  text-align: center;
+  animation: catchmind-result-pop 0.35s ease-out;
+}
+
+.catchmind-result-label {
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.catchmind-result-answer {
+  color: #1f2937;
+  font-size: 34px;
+  font-weight: 900;
+}
+
+.catchmind-result-success {
+  margin-top: 4px;
+  color: #2f9e44;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.catchmind-result-winner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 10px 18px;
+  background: #ebfbee;
+  border: 1px solid #b2f2bb;
+  border-radius: 10px;
+}
+
+.catchmind-result-winner strong {
+  color: #2b8a3e;
+  font-size: 20px;
+}
+
+.catchmind-result-winner span {
+  color: #2f9e44;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.catchmind-result-fail {
+  color: #e03131;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.catchmind-player-card.guessed {
+  border: 3px solid #2f9e44;
+  background: #ebfbee;
+  box-shadow:
+    0 0 0 4px rgba(47, 158, 68, 0.14),
+    0 8px 20px rgba(47, 158, 68, 0.24);
+
+  animation: catchmind-winner-pop 0.45s ease-out;
+}
+
+.catchmind-player-card.guessed .catchmind-avatar {
+  background: #2f9e44;
+  color: #ffffff;
+}
+
+.catchmind-score-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.catchmind-score-delta {
+  color: #2f9e44;
+  font-size: 16px;
+  font-weight: 900;
+  animation: catchmind-score-rise 0.7s ease-out;
+}
+
+.catchmind-skip-button {
+  min-width: 44px;
+  height: 34px;
+  padding: 0 8px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #e8590c;
+  border-radius: 7px;
+  background: #fff4e6;
+  color: #d9480f;
+
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 800;
+  white-space: nowrap;
+
+  box-sizing: border-box;
+  cursor: pointer;
+}
+.catchmind-skip-button:hover:not(:disabled) {
+  background: #ffe8cc;
+}
+
+.catchmind-skip-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+@keyframes catchmind-result-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes catchmind-winner-pop {
+  0% {
+    transform: scale(0.92);
+  }
+
+  60% {
+    transform: scale(1.05);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes catchmind-score-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.8);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
