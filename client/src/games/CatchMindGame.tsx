@@ -15,12 +15,15 @@ type CatchMindGameProps = {
 const COLORS = [
   "#111111", // 검정
   "#e03131", // 빨강
-  "#1c7ed6", // 파랑
-  "#2f9e44", // 초록
+  "#f76707", // 주황
   "#ffd43b", // 노랑
+  "#2f9e44", // 초록
+  "#1c7ed6", // 파랑
+  "#7048e8", // 보라
+  "#7B4B2A" // 갈색
 ];
 
-const BRUSH_SIZES = [2, 4, 8];
+const BRUSH_SIZES = [2, 4, 8, 14, 24];
 
 const CANVAS_WIDTH = 1000;
 const CANVAS_HEIGHT = 560;
@@ -33,6 +36,7 @@ export default function CatchMindGame({ state }: CatchMindGameProps) {
   const [now, setNow] = useState(Date.now());
   const [serverTimeOffset, setServerTimeOffset] = useState(0);
   const [isEraser, setIsEraser] = useState(false);
+  const [cursorPoint, setCursorPoint] = useState<DrawingPoint | null>(null);
 
   const isDrawingRef = useRef(false);
   const chatListRef = useRef<HTMLDivElement>(null);
@@ -74,6 +78,36 @@ export default function CatchMindGame({ state }: CatchMindGameProps) {
     (player) => player.playerId === state.currentDrawerPlayerId
   );
 
+  const rankedPlayers = [...state.players]
+    .filter((player) => player.status !== "LEFT")
+    .sort((a, b) => b.score - a.score);
+
+  const playerRankMap = new Map<string, number>();
+
+  let previousScore: number | null = null;
+  let previousRank = 0;
+
+  rankedPlayers.forEach((player, index) => {
+    const rank =
+      previousScore !== null && player.score === previousScore
+        ? previousRank
+        : index + 1;
+
+    playerRankMap.set(player.playerId, rank);
+
+    previousScore = player.score;
+    previousRank = rank;
+  });
+
+  const finalRankedPlayers = rankedPlayers.map((player, index) => ({
+  ...player,
+  rank: playerRankMap.get(player.playerId) ?? index + 1,
+}));
+
+const winners = finalRankedPlayers.filter(
+  (player) => player.rank === 1
+);
+
   const leftPlayers = state.players.slice(0, 4);
   const rightPlayers = state.players.slice(4, 8);
 
@@ -105,18 +139,38 @@ export default function CatchMindGame({ state }: CatchMindGameProps) {
   ) => {
     if (!canDraw) return;
 
+    const point = getCanvasPoint(event);
+
+    setCursorPoint(point);
     isDrawingRef.current = true;
-    setCurrentStroke([getCanvasPoint(event)]);
+    setCurrentStroke([point]);
   };
 
   const handlePointerMove = (
     event: React.MouseEvent<SVGSVGElement>
   ) => {
-    if (!canDraw || !isDrawingRef.current) return;
+    if (!canDraw) return;
 
     const point = getCanvasPoint(event);
 
+    setCursorPoint(point);
+
+    if (!isDrawingRef.current) return;
+
     setCurrentStroke((prev) => [...prev, point]);
+  };
+
+  const handlePointerEnter = (
+    event: React.MouseEvent<SVGSVGElement>
+  ) => {
+    if (!canDraw) return;
+
+    setCursorPoint(getCanvasPoint(event));
+  };
+
+  const handlePointerLeave = () => {
+    finishStroke();
+    setCursorPoint(null);
   };
 
   const finishStroke = () => {
@@ -124,15 +178,19 @@ export default function CatchMindGame({ state }: CatchMindGameProps) {
 
     isDrawingRef.current = false;
 
-    if (currentStroke.length < 2) {
-      setCurrentStroke([]);
-      return;
-    }
+  if (currentStroke.length === 0) {
+    return;
+  }
+
+  const strokePoints =
+    currentStroke.length === 1
+      ? [currentStroke[0], currentStroke[0]]
+      : currentStroke;
 
     const stroke: DrawingStroke = {
       color: isEraser ? "#ffffff" : selectedColor,
       width: isEraser ? brushSize * 4 : brushSize,
-      points: currentStroke,
+      points: strokePoints,
     };
 
     socket.emit(EVENTS.CATCH_MIND_DRAW, {
@@ -197,6 +255,15 @@ export default function CatchMindGame({ state }: CatchMindGameProps) {
         )
       : state.remainingSeconds;
 
+  if (state.phase === "GAME_END") {
+    return (
+      <FinalResultBoard
+        winners={winners}
+        rankedPlayers={finalRankedPlayers}
+      />
+    );
+  }    
+
   return (
     <section className="catchmind-game">
       <header className="catchmind-top">
@@ -228,11 +295,15 @@ export default function CatchMindGame({ state }: CatchMindGameProps) {
         {!isDrawer && " · 정답을 입력하세요"}
       </div>
 
+
+
       <main className="catchmind-board-layout">
+
         <PlayerColumn
           players={leftPlayers}
           drawerId={state.currentDrawerPlayerId}
           phase={state.phase}
+          rankMap={playerRankMap}
         />
 
         <section className="catchmind-center">
@@ -260,15 +331,16 @@ export default function CatchMindGame({ state }: CatchMindGameProps) {
             ) : (
               <>
                 <svg
-                  className={`catchmind-canvas ${
-                    canDraw ? "drawable" : ""
-                  }`}
-                  viewBox={`0 0 ${CANVAS_WIDTH} ${CANVAS_HEIGHT}`}
-                  onMouseDown={handlePointerDown}
-                  onMouseMove={handlePointerMove}
-                  onMouseUp={finishStroke}
-                  onMouseLeave={finishStroke}
-                >
+                    className={`catchmind-canvas ${
+                      canDraw ? "drawable" : ""
+                    }`}
+                    viewBox={`0 0 ${CANVAS_WIDTH} ${CANVAS_HEIGHT}`}
+                    onMouseEnter={handlePointerEnter}
+                    onMouseDown={handlePointerDown}
+                    onMouseMove={handlePointerMove}
+                    onMouseUp={finishStroke}
+                    onMouseLeave={handlePointerLeave}
+                  >
                   <rect
                     x="0"
                     y="0"
@@ -295,6 +367,27 @@ export default function CatchMindGame({ state }: CatchMindGameProps) {
                           : brushSize,
                         points: currentStroke,
                       }}
+                    />
+                  )}
+
+                  {canDraw && cursorPoint && (
+                    <circle
+                      cx={cursorPoint.x}
+                      cy={cursorPoint.y}
+                      r={
+                        isEraser
+                          ? (brushSize * 4) / 2
+                          : brushSize / 2
+                      }
+                      fill="none"
+                      stroke={
+                        isEraser
+                          ? "#495057"
+                          : selectedColor
+                      }
+                      strokeWidth={1.5}
+                      opacity={0.85}
+                      pointerEvents="none"
                     />
                   )}
                 </svg>
@@ -406,8 +499,8 @@ export default function CatchMindGame({ state }: CatchMindGameProps) {
                   >
                     <span
                       style={{
-                        width: size * 3,
-                        height: size * 3,
+                        width: Math.min(22, Math.max(4, size)),
+                        height: Math.min(22, Math.max(4, size)),
                       }}
                     />
                   </button>
@@ -510,8 +603,106 @@ export default function CatchMindGame({ state }: CatchMindGameProps) {
           players={rightPlayers}
           drawerId={state.currentDrawerPlayerId}
           phase={state.phase}
+          rankMap={playerRankMap}
         />
       </main>
+    </section>
+  );
+}
+
+type RankedPlayer = ClientCatchMindGameState["players"][number] & {
+  rank: number;
+};
+
+function FinalResultBoard({
+  winners,
+  rankedPlayers,
+}: {
+  winners: RankedPlayer[];
+  rankedPlayers: RankedPlayer[];
+}) {
+  const isJointWinner = winners.length > 1;
+
+  return (
+    <section className="catchmind-final-result">
+      <div className="catchmind-fireworks" aria-hidden="true">
+          {Array.from({ length: 24 }).map((_, index) => (
+            <span
+              key={index}
+              className={`firework-${index + 1}`}
+            >
+              {index % 4 === 0
+                ? "✦"
+                : index % 4 === 1
+                  ? "✧"
+                  : index % 4 === 2
+                    ? "✨"
+                    : "★"}
+            </span>
+          ))}
+        </div>
+      <div className="catchmind-winner-panel">
+        <div className="catchmind-winner-trophy">🏆</div>
+
+        <span className="catchmind-winner-label">
+          {isJointWinner ? "공동 우승" : "최종 우승"}
+        </span>
+
+        <div className="catchmind-winner-names">
+          {winners.map((winner) => (
+            <strong key={winner.playerId}>
+              {winner.name}
+            </strong>
+          ))}
+        </div>
+
+        <div className="catchmind-winner-score">
+          {winners[0]?.score ?? 0}점
+        </div>
+      </div>
+
+      <div className="catchmind-final-ranking">
+        <div className="catchmind-final-ranking-header">
+          <span>순위</span>
+          <span>플레이어</span>
+          <span>점수</span>
+          <span>정답</span>
+          <span>출제 성공</span>
+        </div>
+
+        {rankedPlayers.map((player) => (
+          <div
+            key={player.playerId}
+            className={`catchmind-final-ranking-row rank-${player.rank}`}
+          >
+            <span className="catchmind-final-rank">
+              {player.rank === 1
+                ? "🥇"
+                : player.rank === 2
+                  ? "🥈"
+                  : player.rank === 3
+                    ? "🥉"
+                    : `${player.rank}위`}
+            </span>
+
+            <strong>{player.name}</strong>
+
+            <b>{player.score}점</b>
+
+            <span className="catchmind-final-stat">
+              {player.correctCount}회
+            </span>
+
+            <span className="catchmind-final-stat">
+              {player.successfulDrawCount}회
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <p className="catchmind-final-return">
+        잠시 후 방으로 돌아갑니다.
+      </p>
     </section>
   );
 }
@@ -537,14 +728,29 @@ function PolylineStroke({
   );
 }
 
+function getRankMark(rank: number | undefined) {
+  if (rank == null) return "";
+
+  if (rank === 1) return "🥇";
+  if (rank === 2) return "🥈";
+  if (rank === 3) return "🥉";
+
+  return `#${rank}`;
+}
+
 function PlayerColumn({
   players,
   drawerId,
   phase,
+  rankMap,
 }: {
   players: ClientCatchMindGameState["players"];
   drawerId: string | null;
   phase: ClientCatchMindGameState["phase"];
+  rankMap: Map<string, number>;
+
+
+  
 }) {
   return (
     <aside className="catchmind-player-column">
@@ -564,7 +770,17 @@ function PlayerColumn({
           </div>
 
           <div className="catchmind-player-info">
-            <strong>{player.name}</strong>
+            <div className="catchmind-player-name-row">
+              <strong>{player.name}</strong>
+
+              <span
+                className={`catchmind-rank-mark rank-${
+                  rankMap.get(player.playerId) ?? 0
+                }`}
+              >
+                {getRankMark(rankMap.get(player.playerId))}
+              </span>
+            </div>
 
             <div className="catchmind-score-row">
               <span>점수 {player.score}</span>

@@ -5,7 +5,7 @@ import {
   ClientCatchMindGameState,
   DrawingStroke,
 } from "./types/catchMindGame";
-import { CATCH_MIND_WORDS } from "./keywords/catchMindKeywords";
+import { CATCH_MIND_WORDS } from "./keywords/index";
 
 
 type CatchMindGamePlayerInput = {
@@ -24,9 +24,14 @@ class CatchMindGameManager {
     const catchMindPlayers: CatchMindPlayerState[] = players.map((player) => ({
       playerId: player.id,
       name: player.name,
+
       score: 0,
       scoreDelta: 0,
       scoreReasons: [],
+
+      correctCount: 0,
+      successfulDrawCount: 0,
+
       status: "WAITING",
     }));
 
@@ -276,18 +281,27 @@ class CatchMindGameManager {
     const isLastDrawer = game.currentDrawerIndex >= activePlayerCount - 1;
 
     if (!isLastDrawer) {
-        game.currentDrawerIndex += 1;
-        game.phase = "WORD_SELECT";
-        game.answer = null;
-        game.wordCandidates = this.pickRandomWords(3);
-        game.guessedPlayerIds = [];
-        game.chats = [];
-        game.strokes = [];
-        game.timerEndsAt = Date.now() + game.settings.wordSelectTime * 1000;
+      game.currentDrawerIndex += 1;
+      game.phase = "WORD_SELECT";
+      game.answer = null;
+      game.wordCandidates = this.pickRandomWords(3);
+      game.guessedPlayerIds = [];
+      game.chats = [];
+      game.strokes = [];
 
-        this.updatePlayerStatuses(game);
-        this.games.set(roomId, game);
-        return game;
+      game.players = game.players.map((player) => ({
+        ...player,
+        scoreDelta: 0,
+        scoreReasons: [],
+      }));
+
+      game.timerEndsAt =
+        Date.now() + game.settings.wordSelectTime * 1000;
+
+      this.updatePlayerStatuses(game);
+      this.games.set(roomId, game);
+
+      return game;
     }
 
     if (game.round >= game.settings.roundCount) {
@@ -448,20 +462,48 @@ class CatchMindGameManager {
     }
 
     const score = this.calculateGuessScore(game);
+    const drawerScore = Math.max(10, Math.floor(score * 0.5));
 
     game.guessedPlayerIds = [playerId];
 
-    game.players = game.players.map((p) =>
-      p.playerId === playerId
-        ? {
-            ...p,
-            score: p.score + score,
-            scoreDelta: p.scoreDelta + score,
-            scoreReasons: [...p.scoreReasons, `정답 +${score}`],
-            status: "GUESSED",
-          }
-        : p
-    );
+    game.players = game.players.map((p) => {
+      if (p.playerId === playerId) {
+        return {
+          ...p,
+
+          score: p.score + score,
+          scoreDelta: p.scoreDelta + score,
+
+          scoreReasons: [
+            ...p.scoreReasons,
+            `정답 +${score}`,
+          ],
+
+          correctCount: p.correctCount + 1,
+
+          status: "GUESSED",
+        };
+      }
+
+      if (p.playerId === currentDrawerPlayerId) {
+        return {
+          ...p,
+
+          score: p.score + drawerScore,
+          scoreDelta: p.scoreDelta + drawerScore,
+
+          scoreReasons: [
+            ...p.scoreReasons,
+            `출제 성공 +${drawerScore}`,
+          ],
+
+          successfulDrawCount:
+            p.successfulDrawCount + 1,
+        };
+      }
+
+      return p;
+    });
 
     game.chats.push({
       playerId: "SYSTEM",

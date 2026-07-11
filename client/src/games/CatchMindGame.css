@@ -131,7 +131,7 @@
 }
 
 .catchmind-canvas.drawable {
-  cursor: crosshair;
+  cursor: none;
 }
 
 .catchmind-tools {
@@ -179,7 +179,7 @@
 }
 
 .catchmind-color-button.selected {
-  transform: scale(1.12);
+  transform: scale(1.2);
   border: 3px solid #1d5fd1;
   box-shadow: 0 0 0 4px rgba(29, 95, 209, 0.18);
 }
@@ -471,6 +471,472 @@
 .catchmind-skip-button:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+}
+
+.catchmind-player-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.catchmind-rank-mark {
+  min-width: 34px;
+  text-align: center;
+
+  font-size: 13px;
+  font-weight: 900;
+  color: #64748b;
+}
+
+.catchmind-rank-mark.rank-1,
+.catchmind-rank-mark.rank-2,
+.catchmind-rank-mark.rank-3 {
+  font-size: 32px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.4),
+    0 2px 4px rgba(0,0,0,.18);
+
+  transform: translateY(-1px);
+}
+
+.catchmind-final-result {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 28px;
+
+  padding: 40px;
+
+  overflow-y: auto;
+
+  background: rgba(12,17,28,.82);
+  backdrop-filter: blur(6px);
+}
+.catchmind-winner-panel {
+  position: relative;
+  z-index: 2;
+
+  width: min(700px, 100%);
+  padding: 40px 50px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.96),
+      rgba(255, 247, 204, 0.96)
+    );
+
+  border: 2px solid #f2bf32;
+  border-radius: 20px;
+
+  box-shadow:
+    0 0 0 7px rgba(242, 191, 50, 0.14),
+    0 18px 44px rgba(117, 84, 9, 0.2);
+
+  animation: catchmind-winner-enter 0.55s ease-out;
+}
+
+.catchmind-winner-trophy {
+  font-size: 110px;
+  line-height: 1;
+  filter: drop-shadow(0 7px 7px rgba(107, 76, 8, 0.25));
+  animation:
+    catchmind-trophy-bounce .8s ease,
+    catchmind-trophy-glow 2s infinite;
+}
+
+.catchmind-winner-label {
+  color: #a56a00;
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing:1px;
+}
+
+.catchmind-winner-names {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 18px;
+}
+
+.catchmind-winner-names strong {
+  color: #6f4600;
+  font-size: 48px;
+  font-weight: 950;
+}
+
+.catchmind-winner-score {
+  color: #1f2d3d;
+  font-size: 40px;
+  font-weight: 900;
+}
+
+.catchmind-final-ranking {
+  position: relative;
+  z-index: 2;
+
+  width: min(760px, 100%);
+  overflow: hidden;
+
+  background: #ffffff;
+  border: 1px solid #c9d6e8;
+  border-radius: 14px;
+  box-shadow: 0 12px 30px rgba(30, 64, 110, 0.12);
+}
+
+.catchmind-final-ranking {
+  animation: catchmind-ranking-enter .45s ease .35s both;
+}
+
+.catchmind-final-stat {
+  color: #52657a;
+  font-size: 14px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.catchmind-final-ranking-header span:nth-child(n + 3) {
+  text-align: center;
+}
+
+.catchmind-final-ranking-row > b {
+  text-align: center;
+}
+
+.catchmind-winner-panel::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      120deg,
+      transparent 20%,
+      rgba(255,255,255,.7) 50%,
+      transparent 80%
+    );
+
+  transform: translateX(-120%);
+  animation: winner-shine 2.5s infinite;
+}
+
+.catchmind-final-rank {
+  color: #52657a;
+  font-weight: 900;
+}
+
+@keyframes winner-shine {
+
+  from {
+    transform: translateX(-120%);
+  }
+
+  to {
+    transform: translateX(120%);
+  }
+
+}
+
+@keyframes catchmind-ranking-enter {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes catchmind-trophy-glow{
+
+0%{
+filter:
+drop-shadow(0 0 6px gold);
+}
+
+50%{
+filter:
+drop-shadow(0 0 18px gold);
+}
+
+100%{
+filter:
+drop-shadow(0 0 6px gold);
+}
+
+}
+
+.catchmind-final-ranking-header,
+.catchmind-final-ranking-row {
+  display: grid;
+  grid-template-columns:
+    64px
+    minmax(120px, 1fr)
+    90px
+    70px
+    90px;
+
+  align-items: center;
+  gap: 10px;
+}
+
+.catchmind-final-ranking-header {
+  padding: 11px 18px;
+  background: #edf4ff;
+  border-bottom: 1px solid #c9d6e8;
+
+  color: #607086;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.catchmind-final-ranking-row {
+  min-height: 54px;
+  padding: 10px 18px;
+  border-bottom: 1px solid #e5edf7;
+}
+
+.catchmind-final-ranking-row:last-child {
+  border-bottom: 0;
+}
+
+.catchmind-final-ranking-row.rank-1 {
+  background: #fff9db;
+}
+
+.catchmind-final-ranking-row strong {
+  color: #1f2d3d;
+  font-size: 16px;
+}
+
+.catchmind-final-ranking-row b {
+  color: #1d5fd1;
+  text-align: right;
+  font-size: 16px;
+}
+
+.catchmind-final-rank {
+  color: #52657a;
+  font-weight: 900;
+}
+
+.catchmind-final-ranking-row.rank-1 .catchmind-final-rank {
+  color: #d48806;
+}
+
+.catchmind-final-return {
+  position: relative;
+  z-index: 2;
+  margin: 0;
+
+  color: #607086;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* 간단한 폭죽 파티클 */
+.catchmind-fireworks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.catchmind-fireworks span {
+  position: absolute;
+  color: #f2b705;
+  font-size: 28px;
+  opacity: 0;
+  animation: catchmind-firework 1.8s ease-out infinite;
+}
+
+.catchmind-fireworks {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.catchmind-fireworks span {
+  position: absolute;
+
+  font-size: 28px;
+  line-height: 1;
+
+  opacity: 0;
+
+  animation-name: catchmind-firework;
+  animation-duration: 1.8s;
+  animation-timing-function: ease-out;
+  animation-iteration-count: infinite;
+}
+
+.catchmind-fireworks span:nth-child(4n + 1) {
+  color: #ffd43b;
+}
+
+.catchmind-fireworks span:nth-child(4n + 2) {
+  color: #74c0fc;
+}
+
+.catchmind-fireworks span:nth-child(4n + 3) {
+  color: #ff8787;
+}
+
+.catchmind-fireworks span:nth-child(4n) {
+  color: #b197fc;
+}
+
+/* 왼쪽 영역 */
+.firework-1  { left: 6%;  top: 8%;  animation-delay: 0s; }
+.firework-2  { left: 14%; top: 18%; animation-delay: .25s; }
+.firework-3  { left: 22%; top: 6%;  animation-delay: .5s; }
+.firework-4  { left: 10%; top: 36%; animation-delay: .75s; }
+.firework-5  { left: 18%; top: 48%; animation-delay: 1s; }
+.firework-6  { left: 28%; top: 24%; animation-delay: 1.25s; }
+
+/* 오른쪽 영역 */
+.firework-7  { right: 6%;  top: 10%; animation-delay: .15s; }
+.firework-8  { right: 14%; top: 20%; animation-delay: .4s; }
+.firework-9  { right: 22%; top: 7%;  animation-delay: .65s; }
+.firework-10 { right: 10%; top: 38%; animation-delay: .9s; }
+.firework-11 { right: 18%; top: 50%; animation-delay: 1.15s; }
+.firework-12 { right: 28%; top: 25%; animation-delay: 1.4s; }
+
+/* 상단 중앙 */
+.firework-13 { left: 38%; top: 5%;  animation-delay: .2s; }
+.firework-14 { left: 46%; top: 2%;  animation-delay: .45s; }
+.firework-15 { left: 54%; top: 4%;  animation-delay: .7s; }
+.firework-16 { left: 62%; top: 7%;  animation-delay: .95s; }
+
+/* 중간 외곽 */
+.firework-17 { left: 4%;  top: 65%; animation-delay: .35s; }
+.firework-18 { left: 24%; top: 70%; animation-delay: .6s; }
+.firework-19 { right: 4%; top: 66%; animation-delay: .85s; }
+.firework-20 { right: 24%; top: 72%; animation-delay: 1.1s; }
+
+/* 하단 */
+.firework-21 { left: 34%; top: 82%; animation-delay: .3s; }
+.firework-22 { left: 44%; top: 88%; animation-delay: .55s; }
+.firework-23 { right: 34%; top: 84%; animation-delay: .8s; }
+.firework-24 { right: 44%; top: 90%; animation-delay: 1.05s; }
+
+@keyframes catchmind-firework {
+  0% {
+    opacity: 0;
+    transform:
+      translateY(18px)
+      scale(0.25)
+      rotate(0deg);
+  }
+
+  25% {
+    opacity: 1;
+    transform:
+      translateY(0)
+      scale(1.35)
+      rotate(55deg);
+  }
+
+  55% {
+    opacity: 0.95;
+    transform:
+      translateY(-12px)
+      scale(1)
+      rotate(115deg);
+  }
+
+  100% {
+    opacity: 0;
+    transform:
+      translateY(-34px)
+      scale(0.45)
+      rotate(190deg);
+  }
+}
+
+@keyframes catchmind-winner-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-22px) scale(0.9);
+  }
+
+  70% {
+    transform: translateY(4px) scale(1.03);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes catchmind-trophy-bounce {
+  0% {
+    opacity: 0;
+    transform: translateY(-28px) rotate(-8deg) scale(0.65);
+  }
+
+  65% {
+    transform: translateY(5px) rotate(4deg) scale(1.12);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotate(0) scale(1);
+  }
+}
+
+@keyframes catchmind-firework {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) rotate(0);
+  }
+
+  35% {
+    opacity: 1;
+    transform: scale(1.35) rotate(70deg);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(0.65) rotate(150deg);
+  }
+}
+
+@keyframes catchmind-rank-pop {
+  0% {
+    transform: scale(.7);
+    opacity: .5;
+  }
+
+  70% {
+    transform: scale(1.15);
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 @keyframes catchmind-result-pop {

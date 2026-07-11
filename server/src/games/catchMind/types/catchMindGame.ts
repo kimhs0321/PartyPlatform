@@ -27,6 +27,9 @@ export type CatchMindPlayerState = {
   scoreDelta: number;
   scoreReasons: string[];
 
+  correctCount: number;
+  successfulDrawCount: number;
+
   status: CatchMindPlayerStatus;
 };
 

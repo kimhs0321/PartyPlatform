@@ -108,7 +108,7 @@ export function scheduleRoundResultTimeout(io: Server, roomId: string) {
       if (updatedGame?.phase === "GAME_END") {
         setTimeout(() => {
           endRoomGame(io, roomId);
-        }, 5000);
+        }, 10000);
       }
     } catch {
       // 상태 변경 실패 무시

@@ -31,9 +31,6 @@ export const EVENTS = {
   GET_GAME_STATE: "get-game-state",
   GAME_STATE: "game-state",
 
-  ROOM_SEND_CHAT: "ROOM_SEND_CHAT",
-  ROOM_CHAT_MESSAGE: "ROOM_CHAT_MESSAGE",
-
   LIAR_START_GAME: "liar:start-game",
   LIAR_GAME_STATE: "liar:game-state",
   LIAR_SUBMIT_DESCRIPTION: "liar:submit-description",
@@ -49,7 +46,7 @@ export const EVENTS = {
   LIAR_TOGGLE_PAUSE: "liar:togglePause",
   LIAR_UPDATE_SETTINGS: "liar:update-settings",
 
-  // CatchMind
+    // CatchMind
   CATCH_MIND_STATE: "catchMind:state",
   CATCH_MIND_SELECT_WORD: "catchMind:selectWord",
   CATCH_MIND_DRAW: "catchMind:draw",
