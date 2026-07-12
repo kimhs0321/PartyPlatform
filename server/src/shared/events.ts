@@ -58,4 +58,13 @@ export const EVENTS = {
   CATCH_MIND_UNDO: "catchMind:undo",
   CATCH_MIND_UPDATE_SETTINGS: "catchMind:updateSettings",
   CATCH_MIND_SKIP: "catchMind:skip",
+
+  // RelayDrawing
+  RELAY_DRAWING_STATE: "relayDrawing:state",
+  RELAY_DRAWING_START_GAME: "relayDrawing:startGame", 
+  RELAY_DRAWING_DRAW: "relayDrawing:draw",
+  RELAY_DRAWING_SEND_CHAT: "relayDrawing:sendChat",
+  RELAY_DRAWING_CLEAR_CANVAS: "relayDrawing:clearCanvas",
+  RELAY_DRAWING_UNDO: "relayDrawing:undo",
+  RELAY_DRAWING_UPDATE_SETTINGS:"relayDrawing:updateSettings",
 } as const;

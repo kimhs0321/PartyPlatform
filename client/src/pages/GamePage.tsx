@@ -8,6 +8,10 @@ import "./GamePage.css";
 import type { ClientLiarGameState } from "../../../server/src/games/liar/types/liarGame";
 import CatchMindGame from "../games/CatchMindGame.tsx";
 import type { ClientCatchMindGameState } from "../../../server/src/games/catchMind/types/catchMindGame";
+import RelayDrawingGame from "../games/RelayDrawingGame.tsx";
+import type {
+  ClientRelayDrawingGameState,
+} from "../../../server/src/shared/types/relayDrawing";
 
 
 type RoomPlayerDto = {
@@ -34,8 +38,8 @@ export default function GamePage() {
   const [liarGameState, setLiarGameState] = useState<ClientLiarGameState | null>(null);
   const [catchMindGameState, setCatchMindGameState] = useState<ClientCatchMindGameState | null>(null);
   const [room, setRoom] = useState<RoomDto | null>(
-    location.state?.room ?? null
-  );
+    location.state?.room ?? null );
+  const [relayDrawingGameState,setRelayDrawingGameState,] = useState<ClientRelayDrawingGameState | null>(null);  
   
   useEffect(() => {
     if (!socket.connected) {
@@ -71,12 +75,17 @@ export default function GamePage() {
 
     socket.on(EVENTS.CATCH_MIND_STATE, handleCatchMindGameState);
 
+    const handleRelayDrawingState = (state: ClientRelayDrawingGameState,) => {setRelayDrawingGameState(state);};
+    socket.on(EVENTS.RELAY_DRAWING_STATE,handleRelayDrawingState,);
+
     return () => {
       socket.off(EVENTS.ROOM_INFO, handleRoomInfo);
       socket.off(EVENTS.GAME_ENDED, handleGameEnded);
       socket.off(EVENTS.LIAR_GAME_STATE, handleLiarGameState);
       socket.off(EVENTS.CATCH_MIND_STATE, handleCatchMindGameState);
+      socket.off(EVENTS.RELAY_DRAWING_STATE,handleRelayDrawingState,);
     };
+
   }, [roomId, navigate]);
 
   const me = room?.players.find((player) => player.id === socket.id);
@@ -109,7 +118,10 @@ export default function GamePage() {
 
       case "캐치마인드":
         return <CatchMindGame state={catchMindGameState} />;
-          
+      
+      case "릴레이 드로잉":
+        return ( <RelayDrawingGame state={relayDrawingGameState}  /> );  
+
       default:
         return <UnknownGame />;
     }

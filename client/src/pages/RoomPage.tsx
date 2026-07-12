@@ -6,6 +6,7 @@ import "./RoomPage.css";
 import LiarRoom from "../rooms/LiarRoom";
 import RoomChat from "../rooms/RoomChat";
 import CatchMindRoom from "../rooms/CatchMindRoom";
+import RelayDrawingRoom from "../rooms/RelayDrawingRoom";
 
 type RoomPlayerDto = {
   id: string;
@@ -34,6 +35,16 @@ type LiarSettings = {
   allowDrawerSkip: boolean;
 };
 
+type RelayDrawingSettings = {
+  gameDuration: number;
+  prepareTime: number;
+  turnDuration: number;
+  finalGuessTime: number;
+  wordVisibility:
+    | "ALL_DRAWERS"
+    | "FIRST_DRAWER_ONLY";
+};
+
 type RoomDto = {
   id: string;
   title: string;
@@ -45,6 +56,7 @@ type RoomDto = {
   gameSettings: {
   liar: LiarSettings;
   catchMind: CatchMindSettings;
+  relayDrawing: RelayDrawingSettings;
 };
 };
 
@@ -102,6 +114,13 @@ export default function RoomPage() {
               drawingTime: 90,
               roundResultTime: 5,
               allowDrawerSkip: true,
+            },
+            relayDrawing: {
+              gameDuration: 300,
+              prepareTime: 3,
+              turnDuration: 12,
+              finalGuessTime: 10,
+              wordVisibility: "ALL_DRAWERS",
             },
           },
         };
@@ -207,6 +226,37 @@ export default function RoomPage() {
     });
   };
 
+  const handleUpdateRelayDrawingSetting = (
+    key: keyof RelayDrawingSettings,
+    value:
+      | number
+      | RelayDrawingSettings["wordVisibility"],
+  ) => {
+    if (!room || !isHost) return;
+
+    setRoom((prev) => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        gameSettings: {
+          ...prev.gameSettings,
+          relayDrawing: {
+            ...prev.gameSettings.relayDrawing,
+            [key]: value,
+          },
+        },
+      };
+    });
+
+    socket.emit(
+      EVENTS.RELAY_DRAWING_UPDATE_SETTINGS,
+      {
+        [key]: value,
+      },
+    );
+  };
+
   const nonHostPlayers = room.players.filter((player) => !player.isHost);
   const allPlayersReady =
     nonHostPlayers.length > 0 && nonHostPlayers.every((player) => player.isReady);
@@ -255,6 +305,18 @@ export default function RoomPage() {
                   settings={room.gameSettings.catchMind}
                   isHost={isHost}
                   onUpdateSetting={handleUpdateCatchMindSetting}
+                />
+              )}
+
+              {room.game === "릴레이 드로잉" && (
+                <RelayDrawingRoom
+                  settings={
+                    room.gameSettings.relayDrawing
+                  }
+                  isHost={isHost}
+                  onUpdateSetting={
+                    handleUpdateRelayDrawingSetting
+                  }
                 />
               )}
 
