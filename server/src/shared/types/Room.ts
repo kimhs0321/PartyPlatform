@@ -1,5 +1,7 @@
 import type { LiarGameSettings } from "./liarGame";
 import type { CatchMindGameSettings } from "./catchMindGame";
+import type { RelayDrawingSettings } from "./relayDrawing";
+import type { UlsanMarbleSettings } from "./ulsanMarble";
 
 export type RoomStatus = "waiting" | "playing" | "paused";
 
@@ -16,6 +18,8 @@ export type Room = {
 
   gameSettings: {
     liar: LiarGameSettings;
-    catchMind: CatchMindGameSettings
+    catchMind: CatchMindGameSettings;
+    relayDrawing: RelayDrawingSettings;
+    ulsanMarble: UlsanMarbleSettings;
   };
 };

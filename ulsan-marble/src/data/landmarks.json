@@ -1,0 +1,164 @@
+{
+  "id": "ulsan_marble_regional_landmarks",
+  "version": 1,
+  "rules": {
+    "definition": {
+      "normalLandmarkStage": "모든 일반 부동산이 도달할 수 있는 최종 개발 단계",
+      "regionalLandmark": "지정 대표 부동산이 LANDMARK 단계에 도달하고 권역 개발권 조건을 충족했을 때 활성화되는 권역 특수 효과"
+    },
+    "activationConditions": [
+      "플레이어가 대표 랜드마크 부동산을 소유해야 한다.",
+      "대표 랜드마크 부동산이 LANDMARK 단계여야 한다.",
+      "플레이어가 해당 권역의 requiredOwnedProperties 이상을 소유해야 한다."
+    ],
+    "deactivationConditions": [
+      "대표 랜드마크 소유권을 잃은 경우",
+      "권역 소유 수가 requiredOwnedProperties 미만으로 감소한 경우",
+      "대표 랜드마크 단계가 LANDMARK 미만으로 하락한 경우"
+    ],
+    "commonEffects": {
+      "districtBaseTollMultiplier": 1.1,
+      "festivalDistrictTollMultiplier": 1.2,
+      "touristPaymentMultiplier": 1.25
+    },
+    "effectCalculation": {
+      "normalDistrictToll": "baseToll * districtBaseTollMultiplier",
+      "festivalDistrictToll": "baseToll * districtBaseTollMultiplier * festivalDistrictTollMultiplier",
+      "touristPayment": "finalToll * touristPaymentMultiplier"
+    },
+    "touristNpcRules": {
+      "spawnPosition": 0,
+      "turnOrder": "LAST_PLAYER_AFTER",
+      "diceCount": 2,
+      "extraTurnOnDouble": false,
+      "activatesSpecialTiles": false,
+      "paysTollOnOwnedProperty": true,
+      "disappearsAfterCompletingOneLap": true,
+      "maximumActiveTourists": 1,
+      "newFestivalWhileTouristActive": "KEEP_CURRENT_TOURIST"
+    },
+    "stackingRules": {
+      "districtBaseTollMultiplier": "정책·뉴스·축제 효과와 곱연산",
+      "festivalDistrictTollMultiplier": "해당 권역 축제 기간에만 적용",
+      "touristPaymentMultiplier": "활성 대표 랜드마크 권역 부동산에 관광객이 도착했을 때만 적용"
+    }
+  },
+  "landmarks": [
+    {
+      "id": "nam_ulsan_grand_park",
+      "propertyId": "ulsan_grand_park",
+      "boardTileId": 12,
+      "name": "울산대공원",
+      "district": "NAM",
+      "requiredOwnedProperties": 6,
+      "districtPropertyCount": 9,
+      "basePrice": 440,
+      "tags": [
+        "TOURISM",
+        "PARK"
+      ],
+      "linkedFestival": {
+        "id": "whale_festival",
+        "name": "울산고래축제"
+      },
+      "activationEffects": {
+        "districtBaseTollMultiplier": 1.1,
+        "festivalDistrictTollMultiplier": 1.2,
+        "touristPaymentMultiplier": 1.25
+      }
+    },
+    {
+      "id": "jung_taehwagang_national_garden",
+      "propertyId": "taehwagang_national_garden",
+      "boardTileId": 39,
+      "name": "태화강 국가정원",
+      "district": "JUNG",
+      "requiredOwnedProperties": 6,
+      "districtPropertyCount": 9,
+      "basePrice": 360,
+      "tags": [
+        "TOURISM",
+        "PARK"
+      ],
+      "linkedFestival": {
+        "id": "maduhee_festival",
+        "name": "마두희축제"
+      },
+      "activationEffects": {
+        "districtBaseTollMultiplier": 1.1,
+        "festivalDistrictTollMultiplier": 1.2,
+        "touristPaymentMultiplier": 1.25
+      }
+    },
+    {
+      "id": "buk_mongdol_beach",
+      "propertyId": "mongdol_beach",
+      "boardTileId": 46,
+      "name": "몽돌해변",
+      "district": "BUK",
+      "requiredOwnedProperties": 7,
+      "districtPropertyCount": 11,
+      "basePrice": 300,
+      "tags": [
+        "TOURISM",
+        "COAST"
+      ],
+      "linkedFestival": {
+        "id": "soeburi_festival",
+        "name": "울산쇠부리축제"
+      },
+      "activationEffects": {
+        "districtBaseTollMultiplier": 1.1,
+        "festivalDistrictTollMultiplier": 1.2,
+        "touristPaymentMultiplier": 1.25
+      }
+    },
+    {
+      "id": "dong_daewangam_park",
+      "propertyId": "daewangam_park",
+      "boardTileId": 27,
+      "name": "대왕암공원",
+      "district": "DONG",
+      "requiredOwnedProperties": 5,
+      "districtPropertyCount": 7,
+      "basePrice": 170,
+      "tags": [
+        "TOURISM",
+        "COAST",
+        "PARK"
+      ],
+      "linkedFestival": {
+        "id": "donggu_tourism_festival",
+        "name": "동구 관광축제"
+      },
+      "activationEffects": {
+        "districtBaseTollMultiplier": 1.1,
+        "festivalDistrictTollMultiplier": 1.2,
+        "touristPaymentMultiplier": 1.25
+      }
+    },
+    {
+      "id": "ulju_ganjeolgot",
+      "propertyId": "ganjeolgot",
+      "boardTileId": 15,
+      "name": "간절곶",
+      "district": "ULJU",
+      "requiredOwnedProperties": 3,
+      "districtPropertyCount": 5,
+      "basePrice": 80,
+      "tags": [
+        "TOURISM",
+        "COAST"
+      ],
+      "linkedFestival": {
+        "id": "onggi_festival",
+        "name": "울산옹기축제"
+      },
+      "activationEffects": {
+        "districtBaseTollMultiplier": 1.1,
+        "festivalDistrictTollMultiplier": 1.2,
+        "touristPaymentMultiplier": 1.25
+      }
+    }
+  ]
+}

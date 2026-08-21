@@ -1,0 +1,2280 @@
+{
+  "id": "ulsan_marble_companies",
+  "name": "울산마블 가상 상장기업 상세 데이터",
+  "version": 2,
+  "status": "DETAILED_FIRST_PLAYTEST",
+  "currencyUnit": "만원",
+  "fictionalCompanyNotice": "이 파일의 기업명과 설정은 게임을 위해 만든 가상 정보이며 실제 기업·단체와 관련이 없다.",
+  "rules": {
+    "companyCount": 40,
+    "industryCount": 10,
+    "companiesPerIndustry": 4,
+    "priceChangeInterval": "EVERY_GLOBAL_TURN",
+    "tradingTiming": "PLAYER_TURN_AFTER_TILE_RESOLUTION",
+    "marketSharesOnly": true,
+    "tradeVolumeSystemEnabled": false,
+    "orderBookSystemEnabled": false,
+    "priceRoundingUnit": 1,
+    "minimumStockPrice": 1,
+    "dividendIntervalTurns": 5,
+    "archetypeDefinitions": {
+      "STABLE": "낮은 변동성, 높은 배당, 높은 안정성",
+      "BALANCED": "중간 변동성과 배당",
+      "GROWTH": "높은 변동성, 낮은 배당, 성장형",
+      "SPECULATIVE": "매우 높은 변동성, 무배당, 상장폐지 위험이 큰 종목"
+    },
+    "statusFlow": [
+      "NORMAL",
+      "MANAGEMENT",
+      "TRADING_HALT",
+      "DELISTED"
+    ],
+    "recommendedEventFormula": "priceChangeRate = randomChange + industryEffect * companySensitivity + companySpecificEffect",
+    "sensitivityMeaning": "양수는 해당 요인 발생 시 상승 민감도, 음수는 해당 요인 발생 시 하락 민감도를 의미한다."
+  },
+  "industries": [
+    {
+      "id": "AUTOMOTIVE",
+      "name": "자동차·모빌리티"
+    },
+    {
+      "id": "SHIPBUILDING",
+      "name": "조선·해양"
+    },
+    {
+      "id": "ENERGY_CHEMICAL",
+      "name": "에너지·석유화학"
+    },
+    {
+      "id": "SEMICONDUCTOR",
+      "name": "반도체·전자"
+    },
+    {
+      "id": "FINANCE",
+      "name": "금융"
+    },
+    {
+      "id": "CONSTRUCTION",
+      "name": "건설·인프라"
+    },
+    {
+      "id": "STEEL_MATERIALS",
+      "name": "철강·소재"
+    },
+    {
+      "id": "BIO_HEALTH",
+      "name": "바이오·헬스케어"
+    },
+    {
+      "id": "PLATFORM_GAME",
+      "name": "플랫폼·게임"
+    },
+    {
+      "id": "RETAIL_CONSUMER",
+      "name": "유통·소비재"
+    }
+  ],
+  "companies": [
+    {
+      "id": "taehwa_motors",
+      "name": "태화모터스",
+      "industry": "AUTOMOTIVE",
+      "archetype": "STABLE",
+      "basePrice": 90,
+      "totalShares": 500,
+      "volatility": 0.035,
+      "dividendRatePerSettlement": 0.03,
+      "stability": 90,
+      "managementThresholdRate": 0.3,
+      "delistingThresholdRate": 0.18,
+      "statusAtStart": "NORMAL",
+      "ticker": "THM",
+      "businessSummary": "승용차와 하이브리드 차량을 생산하는 대형 완성차 기업이다.",
+      "mainBusinesses": [
+        "완성차",
+        "하이브리드 차량",
+        "자동차 수출"
+      ],
+      "strengths": [
+        "높은 수출 비중",
+        "안정적인 생산 규모",
+        "꾸준한 배당"
+      ],
+      "risks": [
+        "대규모 리콜",
+        "철강 가격 상승",
+        "해외 수요 감소"
+      ],
+      "positiveNews": [
+        "자동차 수출 호조",
+        "신차 판매 흥행",
+        "환율 상승"
+      ],
+      "negativeNews": [
+        "대규모 리콜",
+        "철강 가격 급등",
+        "수출 규제 강화"
+      ],
+      "sensitivity": {
+        "EXPORT": 1.25,
+        "EXCHANGE_RATE": 0.75,
+        "RAW_MATERIAL": -0.85,
+        "DOMESTIC_CONSUMPTION": 0.45
+      },
+      "growthPotential": 55,
+      "debtRisk": 25,
+      "dividendReliability": 90,
+      "randomPriceChangeRange": {
+        "min": -0.035,
+        "max": 0.035
+      },
+      "marketRole": "배당과 방어력이 높은 핵심 종목"
+    },
+    {
+      "id": "haeoreum_auto",
+      "name": "해오름자동차",
+      "industry": "AUTOMOTIVE",
+      "archetype": "BALANCED",
+      "basePrice": 70,
+      "totalShares": 400,
+      "volatility": 0.065,
+      "dividendRatePerSettlement": 0.02,
+      "stability": 75,
+      "managementThresholdRate": 0.28,
+      "delistingThresholdRate": 0.16,
+      "statusAtStart": "NORMAL",
+      "ticker": "HRA",
+      "businessSummary": "소형 승용차와 상용차를 중심으로 내수 시장을 공략하는 자동차 기업이다.",
+      "mainBusinesses": [
+        "소형 승용차",
+        "상용차",
+        "공공기관 차량"
+      ],
+      "strengths": [
+        "가격 경쟁력",
+        "내수 기반",
+        "상용차 판매"
+      ],
+      "risks": [
+        "소비 위축",
+        "부품 공급 차질",
+        "공공 발주 감소"
+      ],
+      "positiveNews": [
+        "내수 소비 회복",
+        "공공차량 대량 수주",
+        "상용차 판매 증가"
+      ],
+      "negativeNews": [
+        "소비심리 악화",
+        "부품 공급 중단",
+        "금리 인상"
+      ],
+      "sensitivity": {
+        "DOMESTIC_CONSUMPTION": 1.05,
+        "PUBLIC_INVESTMENT": 0.75,
+        "INTEREST_RATE": -0.55,
+        "RAW_MATERIAL": -0.55
+      },
+      "growthPotential": 58,
+      "debtRisk": 35,
+      "dividendReliability": 72,
+      "randomPriceChangeRange": {
+        "min": -0.065,
+        "max": 0.065
+      },
+      "marketRole": "성장성과 안정성이 균형을 이루는 일반 종목"
+    },
+    {
+      "id": "ulrim_mobility",
+      "name": "울림모빌리티",
+      "industry": "AUTOMOTIVE",
+      "archetype": "GROWTH",
+      "basePrice": 50,
+      "totalShares": 300,
+      "volatility": 0.105,
+      "dividendRatePerSettlement": 0.01,
+      "stability": 60,
+      "managementThresholdRate": 0.25,
+      "delistingThresholdRate": 0.14,
+      "statusAtStart": "NORMAL",
+      "ticker": "URM",
+      "businessSummary": "자율주행 셔틀과 도심형 이동 서비스 플랫폼을 개발하는 성장 기업이다.",
+      "mainBusinesses": [
+        "자율주행 셔틀",
+        "모빌리티 플랫폼",
+        "차량 관제 소프트웨어"
+      ],
+      "strengths": [
+        "높은 성장성",
+        "스마트시티 수혜",
+        "소프트웨어 매출"
+      ],
+      "risks": [
+        "기술 상용화 지연",
+        "정부 보조금 축소",
+        "안전사고"
+      ],
+      "positiveNews": [
+        "자율주행 실증 성공",
+        "스마트시티 사업 선정",
+        "정부 보조금 확대"
+      ],
+      "negativeNews": [
+        "시험운행 사고",
+        "기술 인증 지연",
+        "보조금 축소"
+      ],
+      "sensitivity": {
+        "TECHNOLOGY_SUCCESS": 1.35,
+        "GOVERNMENT_SUPPORT": 1.15,
+        "SMART_CITY": 1.1,
+        "TECHNOLOGY_FAILURE": -1.4
+      },
+      "growthPotential": 85,
+      "debtRisk": 55,
+      "dividendReliability": 35,
+      "randomPriceChangeRange": {
+        "min": -0.105,
+        "max": 0.105
+      },
+      "marketRole": "호재에 강하게 반응하는 성장 종목"
+    },
+    {
+      "id": "vector_ev",
+      "name": "벡터EV",
+      "industry": "AUTOMOTIVE",
+      "archetype": "SPECULATIVE",
+      "basePrice": 30,
+      "totalShares": 200,
+      "volatility": 0.16,
+      "dividendRatePerSettlement": 0.0,
+      "stability": 40,
+      "managementThresholdRate": 0.22,
+      "delistingThresholdRate": 0.12,
+      "statusAtStart": "NORMAL",
+      "ticker": "VEC",
+      "businessSummary": "고성능 전기차와 차세대 배터리 팩을 개발하는 신생 기업이다.",
+      "mainBusinesses": [
+        "전기차 시제품",
+        "고성능 배터리 팩",
+        "전기차 기술 라이선스"
+      ],
+      "strengths": [
+        "매우 높은 성장 기대",
+        "신기술 테마",
+        "대형 계약 가능성"
+      ],
+      "risks": [
+        "상용 제품 부족",
+        "자금 조달 실패",
+        "배터리 화재"
+      ],
+      "positiveNews": [
+        "대기업 투자 유치",
+        "배터리 성능 시험 성공",
+        "전기차 예약 급증"
+      ],
+      "negativeNews": [
+        "투자 유치 실패",
+        "배터리 화재",
+        "양산 일정 연기"
+      ],
+      "sensitivity": {
+        "TECHNOLOGY_SUCCESS": 1.7,
+        "INVESTMENT": 1.5,
+        "EV_POLICY": 1.3,
+        "TECHNOLOGY_FAILURE": -1.8
+      },
+      "growthPotential": 96,
+      "debtRisk": 82,
+      "dividendReliability": 0,
+      "randomPriceChangeRange": {
+        "min": -0.16,
+        "max": 0.16
+      },
+      "marketRole": "큰 상승과 급락이 모두 가능한 고위험 종목"
+    },
+    {
+      "id": "donghae_shipbuilding",
+      "name": "동해조선",
+      "industry": "SHIPBUILDING",
+      "archetype": "STABLE",
+      "basePrice": 85,
+      "totalShares": 500,
+      "volatility": 0.035,
+      "dividendRatePerSettlement": 0.03,
+      "stability": 90,
+      "managementThresholdRate": 0.3,
+      "delistingThresholdRate": 0.18,
+      "statusAtStart": "NORMAL",
+      "ticker": "DHS",
+      "businessSummary": "LNG선과 대형 상선을 건조하며 장기 수주잔고를 보유한 대형 조선사다.",
+      "mainBusinesses": [
+        "LNG선",
+        "원유운반선",
+        "대형 상선"
+      ],
+      "strengths": [
+        "풍부한 수주잔고",
+        "고부가가치 선박",
+        "해외 선주 기반"
+      ],
+      "risks": [
+        "후판 가격 상승",
+        "납기 지연",
+        "해운 경기 둔화"
+      ],
+      "positiveNews": [
+        "LNG선 대형 수주",
+        "선가 상승",
+        "해운 경기 호황"
+      ],
+      "negativeNews": [
+        "후판 가격 급등",
+        "수주 취소",
+        "공정 지연"
+      ],
+      "sensitivity": {
+        "SHIP_ORDER": 1.35,
+        "EXPORT": 0.8,
+        "RAW_MATERIAL": -0.9,
+        "SHIPPING_CYCLE": 0.85
+      },
+      "growthPotential": 62,
+      "debtRisk": 30,
+      "dividendReliability": 84,
+      "randomPriceChangeRange": {
+        "min": -0.035,
+        "max": 0.035
+      },
+      "marketRole": "배당과 방어력이 높은 핵심 종목"
+    },
+    {
+      "id": "cheonghae_heavy",
+      "name": "청해중공업",
+      "industry": "SHIPBUILDING",
+      "archetype": "BALANCED",
+      "basePrice": 65,
+      "totalShares": 400,
+      "volatility": 0.065,
+      "dividendRatePerSettlement": 0.02,
+      "stability": 75,
+      "managementThresholdRate": 0.28,
+      "delistingThresholdRate": 0.16,
+      "statusAtStart": "NORMAL",
+      "ticker": "CHH",
+      "businessSummary": "선박 엔진과 해양 플랜트 장비, 선박 수리 사업을 운영한다.",
+      "mainBusinesses": [
+        "선박 엔진",
+        "해양 플랜트 장비",
+        "선박 수리"
+      ],
+      "strengths": [
+        "정비 매출",
+        "조선업 동반 성장",
+        "다양한 고객군"
+      ],
+      "risks": [
+        "조선업 불황",
+        "부품 원가 상승",
+        "플랜트 발주 감소"
+      ],
+      "positiveNews": [
+        "선박 엔진 수주 증가",
+        "수리선 입항 증가",
+        "해양 플랜트 발주"
+      ],
+      "negativeNews": [
+        "조선 발주 감소",
+        "부품 가격 상승",
+        "대형 계약 해지"
+      ],
+      "sensitivity": {
+        "SHIP_ORDER": 1.05,
+        "PORT_ACTIVITY": 0.75,
+        "RAW_MATERIAL": -0.65,
+        "OFFSHORE_PLANT": 0.8
+      },
+      "growthPotential": 60,
+      "debtRisk": 40,
+      "dividendReliability": 68,
+      "randomPriceChangeRange": {
+        "min": -0.065,
+        "max": 0.065
+      },
+      "marketRole": "성장성과 안정성이 균형을 이루는 일반 종목"
+    },
+    {
+      "id": "wave_marine",
+      "name": "웨이브마린",
+      "industry": "SHIPBUILDING",
+      "archetype": "GROWTH",
+      "basePrice": 48,
+      "totalShares": 300,
+      "volatility": 0.105,
+      "dividendRatePerSettlement": 0.01,
+      "stability": 60,
+      "managementThresholdRate": 0.25,
+      "delistingThresholdRate": 0.14,
+      "statusAtStart": "NORMAL",
+      "ticker": "WVM",
+      "businessSummary": "해상풍력 작업선과 친환경 선박을 설계하는 해양 신사업 기업이다.",
+      "mainBusinesses": [
+        "해상풍력 작업선",
+        "친환경 선박",
+        "해양 설계"
+      ],
+      "strengths": [
+        "친환경 정책 수혜",
+        "신규 시장",
+        "높은 기술 가치"
+      ],
+      "risks": [
+        "프로젝트 지연",
+        "보조금 의존",
+        "실적 변동"
+      ],
+      "positiveNews": [
+        "해상풍력 단지 승인",
+        "친환경 선박 수주",
+        "탄소중립 지원 확대"
+      ],
+      "negativeNews": [
+        "해상풍력 사업 취소",
+        "보조금 축소",
+        "설계 결함"
+      ],
+      "sensitivity": {
+        "GREEN_POLICY": 1.3,
+        "SHIP_ORDER": 0.85,
+        "GOVERNMENT_SUPPORT": 1.0,
+        "PROJECT_DELAY": -1.2
+      },
+      "growthPotential": 84,
+      "debtRisk": 58,
+      "dividendReliability": 28,
+      "randomPriceChangeRange": {
+        "min": -0.105,
+        "max": 0.105
+      },
+      "marketRole": "호재에 강하게 반응하는 성장 종목"
+    },
+    {
+      "id": "neodock",
+      "name": "네오도크",
+      "industry": "SHIPBUILDING",
+      "archetype": "SPECULATIVE",
+      "basePrice": 28,
+      "totalShares": 200,
+      "volatility": 0.16,
+      "dividendRatePerSettlement": 0.0,
+      "stability": 40,
+      "managementThresholdRate": 0.22,
+      "delistingThresholdRate": 0.12,
+      "statusAtStart": "NORMAL",
+      "ticker": "NDK",
+      "businessSummary": "스마트 조선소 로봇과 노후 선박 재활용 기술을 개발하는 벤처기업이다.",
+      "mainBusinesses": [
+        "조선소 자동화 로봇",
+        "선박 해체",
+        "금속 재활용"
+      ],
+      "strengths": [
+        "자동화 테마",
+        "친환경 재활용",
+        "높은 기술 확장성"
+      ],
+      "risks": [
+        "기술 검증 부족",
+        "수주 편중",
+        "현금 부족"
+      ],
+      "positiveNews": [
+        "대형 조선소 공급계약",
+        "로봇 성능 인증",
+        "재활용 규제 강화"
+      ],
+      "negativeNews": [
+        "로봇 납품 실패",
+        "계약 취소",
+        "운영자금 부족"
+      ],
+      "sensitivity": {
+        "AUTOMATION": 1.55,
+        "SHIP_ORDER": 0.7,
+        "ENVIRONMENT_REGULATION": 0.9,
+        "TECHNOLOGY_FAILURE": -1.65
+      },
+      "growthPotential": 92,
+      "debtRisk": 86,
+      "dividendReliability": 0,
+      "randomPriceChangeRange": {
+        "min": -0.16,
+        "max": 0.16
+      },
+      "marketRole": "큰 상승과 급락이 모두 가능한 고위험 종목"
+    },
+    {
+      "id": "onsan_energy",
+      "name": "온산에너지",
+      "industry": "ENERGY_CHEMICAL",
+      "archetype": "STABLE",
+      "basePrice": 88,
+      "totalShares": 500,
+      "volatility": 0.035,
+      "dividendRatePerSettlement": 0.03,
+      "stability": 90,
+      "managementThresholdRate": 0.3,
+      "delistingThresholdRate": 0.18,
+      "statusAtStart": "NORMAL",
+      "ticker": "OSE",
+      "businessSummary": "정유와 발전 사업을 함께 운영하는 대형 종합에너지 기업이다.",
+      "mainBusinesses": [
+        "정유",
+        "화력 발전",
+        "에너지 유통"
+      ],
+      "strengths": [
+        "대규모 설비",
+        "안정적인 현금흐름",
+        "높은 배당"
+      ],
+      "risks": [
+        "유가 급변",
+        "환경 규제",
+        "정제마진 악화"
+      ],
+      "positiveNews": [
+        "정제마진 상승",
+        "전력 수요 증가",
+        "에너지 가격 상승"
+      ],
+      "negativeNews": [
+        "환경세 인상",
+        "정제마진 하락",
+        "대형 설비 사고"
+      ],
+      "sensitivity": {
+        "OIL_PRICE": 0.45,
+        "REFINING_MARGIN": 1.3,
+        "ENERGY_DEMAND": 0.85,
+        "ENVIRONMENT_REGULATION": -1.05
+      },
+      "growthPotential": 48,
+      "debtRisk": 28,
+      "dividendReliability": 92,
+      "randomPriceChangeRange": {
+        "min": -0.035,
+        "max": 0.035
+      },
+      "marketRole": "배당과 방어력이 높은 핵심 종목"
+    },
+    {
+      "id": "blueflame_chemical",
+      "name": "블루플레임화학",
+      "industry": "ENERGY_CHEMICAL",
+      "archetype": "BALANCED",
+      "basePrice": 68,
+      "totalShares": 400,
+      "volatility": 0.065,
+      "dividendRatePerSettlement": 0.02,
+      "stability": 75,
+      "managementThresholdRate": 0.28,
+      "delistingThresholdRate": 0.16,
+      "statusAtStart": "NORMAL",
+      "ticker": "BFC",
+      "businessSummary": "산업용 수지와 합성소재를 생산하는 중견 석유화학 기업이다.",
+      "mainBusinesses": [
+        "합성수지",
+        "산업용 화학소재",
+        "포장재 원료"
+      ],
+      "strengths": [
+        "다양한 제품군",
+        "수출 비중",
+        "제조업 연계"
+      ],
+      "risks": [
+        "나프타 가격 상승",
+        "중국 공급과잉",
+        "화학설비 사고"
+      ],
+      "positiveNews": [
+        "화학제품 가격 상승",
+        "수출 주문 증가",
+        "신소재 공급계약"
+      ],
+      "negativeNews": [
+        "원료 가격 급등",
+        "공급과잉",
+        "공장 가동 중단"
+      ],
+      "sensitivity": {
+        "CHEMICAL_CYCLE": 1.1,
+        "EXPORT": 0.7,
+        "OIL_PRICE": -0.6,
+        "RAW_MATERIAL": -0.75
+      },
+      "growthPotential": 57,
+      "debtRisk": 42,
+      "dividendReliability": 66,
+      "randomPriceChangeRange": {
+        "min": -0.065,
+        "max": 0.065
+      },
+      "marketRole": "성장성과 안정성이 균형을 이루는 일반 종목"
+    },
+    {
+      "id": "solarcraft",
+      "name": "솔라크래프트",
+      "industry": "ENERGY_CHEMICAL",
+      "archetype": "GROWTH",
+      "basePrice": 46,
+      "totalShares": 300,
+      "volatility": 0.105,
+      "dividendRatePerSettlement": 0.01,
+      "stability": 60,
+      "managementThresholdRate": 0.25,
+      "delistingThresholdRate": 0.14,
+      "statusAtStart": "NORMAL",
+      "ticker": "SLC",
+      "businessSummary": "태양광 모듈과 수소 설비를 공급하는 친환경 에너지 기업이다.",
+      "mainBusinesses": [
+        "태양광 모듈",
+        "수소 저장 설비",
+        "에너지 관리"
+      ],
+      "strengths": [
+        "친환경 정책 수혜",
+        "높은 성장성",
+        "수출 가능성"
+      ],
+      "risks": [
+        "정책 변경",
+        "중국산 가격 경쟁",
+        "설비 투자 부담"
+      ],
+      "positiveNews": [
+        "재생에너지 보조금 확대",
+        "대형 태양광 수주",
+        "수소단지 조성"
+      ],
+      "negativeNews": [
+        "보조금 축소",
+        "제품 가격 폭락",
+        "수소 설비 사고"
+      ],
+      "sensitivity": {
+        "GREEN_POLICY": 1.4,
+        "GOVERNMENT_SUPPORT": 1.2,
+        "ENERGY_DEMAND": 0.65,
+        "PRICE_COMPETITION": -1.1
+      },
+      "growthPotential": 88,
+      "debtRisk": 63,
+      "dividendReliability": 22,
+      "randomPriceChangeRange": {
+        "min": -0.105,
+        "max": 0.105
+      },
+      "marketRole": "호재에 강하게 반응하는 성장 종목"
+    },
+    {
+      "id": "green_refine",
+      "name": "그린리파인",
+      "industry": "ENERGY_CHEMICAL",
+      "archetype": "SPECULATIVE",
+      "basePrice": 27,
+      "totalShares": 200,
+      "volatility": 0.16,
+      "dividendRatePerSettlement": 0.0,
+      "stability": 40,
+      "managementThresholdRate": 0.22,
+      "delistingThresholdRate": 0.12,
+      "statusAtStart": "NORMAL",
+      "ticker": "GRF",
+      "businessSummary": "폐플라스틱 열분해와 재생 연료 생산을 추진하는 초기 단계 기업이다.",
+      "mainBusinesses": [
+        "폐플라스틱 열분해",
+        "재생 연료",
+        "탄소배출권"
+      ],
+      "strengths": [
+        "환경 테마",
+        "높은 정책 수혜 가능성",
+        "신시장 선점"
+      ],
+      "risks": [
+        "수익성 미검증",
+        "시설 사고",
+        "인허가 지연"
+      ],
+      "positiveNews": [
+        "열분해 공장 승인",
+        "대기업 장기 구매계약",
+        "환경규제 강화"
+      ],
+      "negativeNews": [
+        "인허가 반려",
+        "공장 화재",
+        "기술 수율 미달"
+      ],
+      "sensitivity": {
+        "ENVIRONMENT_REGULATION": 1.45,
+        "GOVERNMENT_SUPPORT": 1.35,
+        "TECHNOLOGY_SUCCESS": 1.4,
+        "ACCIDENT": -1.8
+      },
+      "growthPotential": 94,
+      "debtRisk": 88,
+      "dividendReliability": 0,
+      "randomPriceChangeRange": {
+        "min": -0.16,
+        "max": 0.16
+      },
+      "marketRole": "큰 상승과 급락이 모두 가능한 고위험 종목"
+    },
+    {
+      "id": "corechips",
+      "name": "코어칩스",
+      "industry": "SEMICONDUCTOR",
+      "archetype": "STABLE",
+      "basePrice": 95,
+      "totalShares": 500,
+      "volatility": 0.035,
+      "dividendRatePerSettlement": 0.03,
+      "stability": 90,
+      "managementThresholdRate": 0.3,
+      "delistingThresholdRate": 0.18,
+      "statusAtStart": "NORMAL",
+      "ticker": "CRC",
+      "businessSummary": "자동차용 전력반도체와 산업용 제어칩을 공급하는 안정형 반도체 기업이다.",
+      "mainBusinesses": [
+        "전력반도체",
+        "자동차용 반도체",
+        "산업 제어칩"
+      ],
+      "strengths": [
+        "장기 공급계약",
+        "자동차 산업 연계",
+        "높은 진입장벽"
+      ],
+      "risks": [
+        "반도체 경기 둔화",
+        "공장 정전",
+        "기술 세대교체"
+      ],
+      "positiveNews": [
+        "차량용 반도체 공급 부족",
+        "대형 장기계약",
+        "전기차 판매 증가"
+      ],
+      "negativeNews": [
+        "반도체 가격 하락",
+        "공장 가동 중단",
+        "고객사 주문 축소"
+      ],
+      "sensitivity": {
+        "SEMICONDUCTOR_CYCLE": 1.05,
+        "EV_POLICY": 0.75,
+        "TECH_DEMAND": 0.85,
+        "FACTORY_ACCIDENT": -1.2
+      },
+      "growthPotential": 68,
+      "debtRisk": 20,
+      "dividendReliability": 88,
+      "randomPriceChangeRange": {
+        "min": -0.035,
+        "max": 0.035
+      },
+      "marketRole": "배당과 방어력이 높은 핵심 종목"
+    },
+    {
+      "id": "neo_silicon",
+      "name": "네오실리콘",
+      "industry": "SEMICONDUCTOR",
+      "archetype": "BALANCED",
+      "basePrice": 72,
+      "totalShares": 400,
+      "volatility": 0.065,
+      "dividendRatePerSettlement": 0.02,
+      "stability": 75,
+      "managementThresholdRate": 0.28,
+      "delistingThresholdRate": 0.16,
+      "statusAtStart": "NORMAL",
+      "ticker": "NSI",
+      "businessSummary": "메모리 컨트롤러와 데이터 저장장치용 칩을 설계한다.",
+      "mainBusinesses": [
+        "메모리 컨트롤러",
+        "저장장치 칩",
+        "반도체 설계"
+      ],
+      "strengths": [
+        "팹리스 구조",
+        "데이터센터 수요",
+        "제품 다각화"
+      ],
+      "risks": [
+        "메모리 불황",
+        "파운드리 공급 부족",
+        "가격 경쟁"
+      ],
+      "positiveNews": [
+        "데이터센터 투자 확대",
+        "신형 컨트롤러 채택",
+        "메모리 가격 반등"
+      ],
+      "negativeNews": [
+        "메모리 감산",
+        "파운드리 공급 차질",
+        "경쟁사 저가 공세"
+      ],
+      "sensitivity": {
+        "SEMICONDUCTOR_CYCLE": 1.15,
+        "DATA_CENTER": 0.95,
+        "SUPPLY_SHORTAGE": -0.7,
+        "TECHNOLOGY_SUCCESS": 0.85
+      },
+      "growthPotential": 72,
+      "debtRisk": 38,
+      "dividendReliability": 62,
+      "randomPriceChangeRange": {
+        "min": -0.065,
+        "max": 0.065
+      },
+      "marketRole": "성장성과 안정성이 균형을 이루는 일반 종목"
+    },
+    {
+      "id": "lumen_electronics",
+      "name": "루멘전자",
+      "industry": "SEMICONDUCTOR",
+      "archetype": "GROWTH",
+      "basePrice": 54,
+      "totalShares": 300,
+      "volatility": 0.105,
+      "dividendRatePerSettlement": 0.01,
+      "stability": 60,
+      "managementThresholdRate": 0.25,
+      "delistingThresholdRate": 0.14,
+      "statusAtStart": "NORMAL",
+      "ticker": "LME",
+      "businessSummary": "고효율 디스플레이와 산업용 광센서를 개발하는 전자부품 기업이다.",
+      "mainBusinesses": [
+        "미니 LED",
+        "광센서",
+        "산업용 디스플레이"
+      ],
+      "strengths": [
+        "고부가가치 제품",
+        "로봇·자동차 수요",
+        "기술 성장성"
+      ],
+      "risks": [
+        "신제품 실패",
+        "패널 가격 하락",
+        "대형 고객 의존"
+      ],
+      "positiveNews": [
+        "차세대 디스플레이 양산",
+        "스마트기기 수요 증가",
+        "자동차 센서 수주"
+      ],
+      "negativeNews": [
+        "신제품 수율 부진",
+        "고객사 계약 해지",
+        "디스플레이 가격 하락"
+      ],
+      "sensitivity": {
+        "TECHNOLOGY_SUCCESS": 1.25,
+        "CONSUMER_ELECTRONICS": 0.8,
+        "AUTOMOTIVE": 0.65,
+        "TECHNOLOGY_FAILURE": -1.3
+      },
+      "growthPotential": 82,
+      "debtRisk": 52,
+      "dividendReliability": 25,
+      "randomPriceChangeRange": {
+        "min": -0.105,
+        "max": 0.105
+      },
+      "marketRole": "호재에 강하게 반응하는 성장 종목"
+    },
+    {
+      "id": "pixelwave",
+      "name": "픽셀웨이브",
+      "industry": "SEMICONDUCTOR",
+      "archetype": "SPECULATIVE",
+      "basePrice": 32,
+      "totalShares": 200,
+      "volatility": 0.16,
+      "dividendRatePerSettlement": 0.0,
+      "stability": 40,
+      "managementThresholdRate": 0.22,
+      "delistingThresholdRate": 0.12,
+      "statusAtStart": "NORMAL",
+      "ticker": "PXW",
+      "businessSummary": "인공지능 연산칩을 설계하지만 아직 안정적인 양산 매출이 없는 팹리스 기업이다.",
+      "mainBusinesses": [
+        "AI 가속기",
+        "엣지 컴퓨팅 칩",
+        "반도체 설계 IP"
+      ],
+      "strengths": [
+        "AI 테마",
+        "높은 기술 가치",
+        "대형 고객 계약 가능성"
+      ],
+      "risks": [
+        "양산 실패",
+        "막대한 연구비",
+        "경쟁사 특허 분쟁"
+      ],
+      "positiveNews": [
+        "AI칩 성능 공개",
+        "클라우드 업체 공급계약",
+        "대규모 투자 유치"
+      ],
+      "negativeNews": [
+        "칩 양산 연기",
+        "특허 소송",
+        "성능 목표 미달"
+      ],
+      "sensitivity": {
+        "AI_BOOM": 1.7,
+        "TECHNOLOGY_SUCCESS": 1.55,
+        "INVESTMENT": 1.35,
+        "TECHNOLOGY_FAILURE": -1.85
+      },
+      "growthPotential": 98,
+      "debtRisk": 84,
+      "dividendReliability": 0,
+      "randomPriceChangeRange": {
+        "min": -0.16,
+        "max": 0.16
+      },
+      "marketRole": "큰 상승과 급락이 모두 가능한 고위험 종목"
+    },
+    {
+      "id": "taehwa_finance",
+      "name": "태화금융",
+      "industry": "FINANCE",
+      "archetype": "STABLE",
+      "basePrice": 82,
+      "totalShares": 500,
+      "volatility": 0.035,
+      "dividendRatePerSettlement": 0.03,
+      "stability": 90,
+      "managementThresholdRate": 0.3,
+      "delistingThresholdRate": 0.18,
+      "statusAtStart": "NORMAL",
+      "ticker": "THF",
+      "businessSummary": "은행·보험·카드 사업을 함께 보유한 종합금융그룹이다.",
+      "mainBusinesses": [
+        "은행",
+        "보험",
+        "카드"
+      ],
+      "strengths": [
+        "사업 다각화",
+        "높은 배당",
+        "안정적인 자본"
+      ],
+      "risks": [
+        "대규모 부실대출",
+        "금융 규제",
+        "경기 침체"
+      ],
+      "positiveNews": [
+        "순이자마진 개선",
+        "배당 확대",
+        "부실률 감소"
+      ],
+      "negativeNews": [
+        "대출 부실 증가",
+        "금융 규제 강화",
+        "대형 금융사고"
+      ],
+      "sensitivity": {
+        "INTEREST_RATE": 0.55,
+        "ECONOMIC_GROWTH": 0.7,
+        "CREDIT_DEFAULT": -1.2,
+        "FINANCIAL_REGULATION": -0.8
+      },
+      "growthPotential": 45,
+      "debtRisk": 22,
+      "dividendReliability": 94,
+      "randomPriceChangeRange": {
+        "min": -0.035,
+        "max": 0.035
+      },
+      "marketRole": "배당과 방어력이 높은 핵심 종목"
+    },
+    {
+      "id": "hangyeol_bank",
+      "name": "한결은행",
+      "industry": "FINANCE",
+      "archetype": "BALANCED",
+      "basePrice": 62,
+      "totalShares": 400,
+      "volatility": 0.065,
+      "dividendRatePerSettlement": 0.02,
+      "stability": 75,
+      "managementThresholdRate": 0.28,
+      "delistingThresholdRate": 0.16,
+      "statusAtStart": "NORMAL",
+      "ticker": "HGB",
+      "businessSummary": "지역 중소기업과 가계대출에 강점을 가진 상업은행이다.",
+      "mainBusinesses": [
+        "중소기업 대출",
+        "가계대출",
+        "예금"
+      ],
+      "strengths": [
+        "지역 영업망",
+        "중소기업 고객",
+        "안정적 이자수익"
+      ],
+      "risks": [
+        "지역 경기 침체",
+        "연체율 상승",
+        "금리 급변"
+      ],
+      "positiveNews": [
+        "중소기업 경기 회복",
+        "대출 성장",
+        "연체율 하락"
+      ],
+      "negativeNews": [
+        "지역 기업 부도",
+        "대출 규제",
+        "연체율 급등"
+      ],
+      "sensitivity": {
+        "REGIONAL_ECONOMY": 1.0,
+        "INTEREST_RATE": 0.4,
+        "SME_SUPPORT": 0.75,
+        "CREDIT_DEFAULT": -1.1
+      },
+      "growthPotential": 52,
+      "debtRisk": 35,
+      "dividendReliability": 74,
+      "randomPriceChangeRange": {
+        "min": -0.065,
+        "max": 0.065
+      },
+      "marketRole": "성장성과 안정성이 균형을 이루는 일반 종목"
+    },
+    {
+      "id": "loop_capital",
+      "name": "루프캐피탈",
+      "industry": "FINANCE",
+      "archetype": "GROWTH",
+      "basePrice": 44,
+      "totalShares": 300,
+      "volatility": 0.105,
+      "dividendRatePerSettlement": 0.01,
+      "stability": 60,
+      "managementThresholdRate": 0.25,
+      "delistingThresholdRate": 0.14,
+      "statusAtStart": "NORMAL",
+      "ticker": "LPC",
+      "businessSummary": "모바일 결제와 온라인 대출중개를 운영하는 핀테크 기업이다.",
+      "mainBusinesses": [
+        "모바일 결제",
+        "온라인 대출",
+        "신용평가 데이터"
+      ],
+      "strengths": [
+        "높은 이용자 성장",
+        "데이터 사업",
+        "비대면 금융"
+      ],
+      "risks": [
+        "금융 규제",
+        "개인정보 유출",
+        "대출 부실"
+      ],
+      "positiveNews": [
+        "간편결제 이용자 급증",
+        "금융 규제 완화",
+        "대형 플랫폼 제휴"
+      ],
+      "negativeNews": [
+        "개인정보 유출",
+        "대출 연체 증가",
+        "수수료 규제"
+      ],
+      "sensitivity": {
+        "DIGITAL_FINANCE": 1.3,
+        "REGULATION_EASING": 1.1,
+        "CONSUMPTION": 0.65,
+        "DATA_BREACH": -1.6
+      },
+      "growthPotential": 86,
+      "debtRisk": 60,
+      "dividendReliability": 20,
+      "randomPriceChangeRange": {
+        "min": -0.105,
+        "max": 0.105
+      },
+      "marketRole": "호재에 강하게 반응하는 성장 종목"
+    },
+    {
+      "id": "moadream_securities",
+      "name": "모아드림증권",
+      "industry": "FINANCE",
+      "archetype": "SPECULATIVE",
+      "basePrice": 26,
+      "totalShares": 200,
+      "volatility": 0.16,
+      "dividendRatePerSettlement": 0.0,
+      "stability": 40,
+      "managementThresholdRate": 0.22,
+      "delistingThresholdRate": 0.12,
+      "statusAtStart": "NORMAL",
+      "ticker": "MDS",
+      "businessSummary": "개인 투자자 거래와 테마형 상품에 집중하는 소형 증권사다.",
+      "mainBusinesses": [
+        "주식 중개",
+        "테마형 펀드",
+        "신용거래"
+      ],
+      "strengths": [
+        "거래대금 증가 수혜",
+        "높은 수수료 성장",
+        "강한 시장 테마성"
+      ],
+      "risks": [
+        "증시 침체",
+        "신용거래 손실",
+        "불완전판매 제재"
+      ],
+      "positiveNews": [
+        "주식시장 거래 폭증",
+        "신규 투자자 유입",
+        "상장 주관 성공"
+      ],
+      "negativeNews": [
+        "증시 급락",
+        "금융당국 제재",
+        "신용거래 부실"
+      ],
+      "sensitivity": {
+        "STOCK_MARKET": 1.65,
+        "TRADING_VOLUME": 1.45,
+        "INTEREST_RATE": -0.7,
+        "FINANCIAL_SCANDAL": -1.8
+      },
+      "growthPotential": 90,
+      "debtRisk": 79,
+      "dividendReliability": 0,
+      "randomPriceChangeRange": {
+        "min": -0.16,
+        "max": 0.16
+      },
+      "marketRole": "큰 상승과 급락이 모두 가능한 고위험 종목"
+    },
+    {
+      "id": "haegang_construction",
+      "name": "해강건설",
+      "industry": "CONSTRUCTION",
+      "archetype": "STABLE",
+      "basePrice": 86,
+      "totalShares": 500,
+      "volatility": 0.035,
+      "dividendRatePerSettlement": 0.03,
+      "stability": 90,
+      "managementThresholdRate": 0.3,
+      "delistingThresholdRate": 0.18,
+      "statusAtStart": "NORMAL",
+      "ticker": "HGC",
+      "businessSummary": "주택과 공공 인프라를 함께 시공하는 대형 종합건설사다.",
+      "mainBusinesses": [
+        "주택 건설",
+        "공공 인프라",
+        "산업시설"
+      ],
+      "strengths": [
+        "다양한 수주",
+        "공공사업 경험",
+        "안정적인 브랜드"
+      ],
+      "risks": [
+        "건설원가 상승",
+        "미분양",
+        "대형 현장 사고"
+      ],
+      "positiveNews": [
+        "대규모 재개발 수주",
+        "공공 인프라 확대",
+        "주택경기 회복"
+      ],
+      "negativeNews": [
+        "건설자재 급등",
+        "미분양 증가",
+        "현장 안전사고"
+      ],
+      "sensitivity": {
+        "CONSTRUCTION_BOOM": 1.15,
+        "PUBLIC_INVESTMENT": 0.85,
+        "RAW_MATERIAL": -0.9,
+        "INTEREST_RATE": -0.6
+      },
+      "growthPotential": 58,
+      "debtRisk": 33,
+      "dividendReliability": 82,
+      "randomPriceChangeRange": {
+        "min": -0.035,
+        "max": 0.035
+      },
+      "marketRole": "배당과 방어력이 높은 핵심 종목"
+    },
+    {
+      "id": "dodam_infra",
+      "name": "도담인프라",
+      "industry": "CONSTRUCTION",
+      "archetype": "BALANCED",
+      "basePrice": 66,
+      "totalShares": 400,
+      "volatility": 0.065,
+      "dividendRatePerSettlement": 0.02,
+      "stability": 75,
+      "managementThresholdRate": 0.28,
+      "delistingThresholdRate": 0.16,
+      "statusAtStart": "NORMAL",
+      "ticker": "DDI",
+      "businessSummary": "도로·항만·교량 등 토목 인프라 사업에 특화된 건설기업이다.",
+      "mainBusinesses": [
+        "도로",
+        "항만",
+        "교량"
+      ],
+      "strengths": [
+        "공공 발주 수혜",
+        "항만 전문성",
+        "장기 프로젝트"
+      ],
+      "risks": [
+        "정부 예산 축소",
+        "공기 지연",
+        "원가 초과"
+      ],
+      "positiveNews": [
+        "SOC 예산 확대",
+        "항만 확장 사업",
+        "대형 교량 수주"
+      ],
+      "negativeNews": [
+        "공공예산 삭감",
+        "공사 지연",
+        "원가 초과"
+      ],
+      "sensitivity": {
+        "PUBLIC_INVESTMENT": 1.3,
+        "PORT_ACTIVITY": 0.75,
+        "RAW_MATERIAL": -0.75,
+        "PROJECT_DELAY": -1.0
+      },
+      "growthPotential": 62,
+      "debtRisk": 45,
+      "dividendReliability": 67,
+      "randomPriceChangeRange": {
+        "min": -0.065,
+        "max": 0.065
+      },
+      "marketRole": "성장성과 안정성이 균형을 이루는 일반 종목"
+    },
+    {
+      "id": "seeum_development",
+      "name": "세움개발",
+      "industry": "CONSTRUCTION",
+      "archetype": "GROWTH",
+      "basePrice": 47,
+      "totalShares": 300,
+      "volatility": 0.105,
+      "dividendRatePerSettlement": 0.01,
+      "stability": 60,
+      "managementThresholdRate": 0.25,
+      "delistingThresholdRate": 0.14,
+      "statusAtStart": "NORMAL",
+      "ticker": "SUD",
+      "businessSummary": "도심 재개발과 스마트빌딩 개발을 추진하는 부동산 개발회사다.",
+      "mainBusinesses": [
+        "도심 재개발",
+        "스마트빌딩",
+        "상업시설 개발"
+      ],
+      "strengths": [
+        "부동산 상승 수혜",
+        "높은 개발이익",
+        "스마트시티 연계"
+      ],
+      "risks": [
+        "금리 인상",
+        "분양 실패",
+        "인허가 지연"
+      ],
+      "positiveNews": [
+        "재개발 구역 지정",
+        "분양 흥행",
+        "스마트시티 정책"
+      ],
+      "negativeNews": [
+        "금리 인상",
+        "분양 미달",
+        "인허가 취소"
+      ],
+      "sensitivity": {
+        "PROPERTY_MARKET": 1.35,
+        "SMART_CITY": 0.95,
+        "INTEREST_RATE": -1.1,
+        "REGULATION": -0.9
+      },
+      "growthPotential": 84,
+      "debtRisk": 68,
+      "dividendReliability": 20,
+      "randomPriceChangeRange": {
+        "min": -0.105,
+        "max": 0.105
+      },
+      "marketRole": "호재에 강하게 반응하는 성장 종목"
+    },
+    {
+      "id": "grandbridge",
+      "name": "그랜드브릿지",
+      "industry": "CONSTRUCTION",
+      "archetype": "SPECULATIVE",
+      "basePrice": 29,
+      "totalShares": 200,
+      "volatility": 0.16,
+      "dividendRatePerSettlement": 0.0,
+      "stability": 40,
+      "managementThresholdRate": 0.22,
+      "delistingThresholdRate": 0.12,
+      "statusAtStart": "NORMAL",
+      "ticker": "GDB",
+      "businessSummary": "초대형 복합개발 사업에 집중하며 차입 비중이 높은 고위험 개발사다.",
+      "mainBusinesses": [
+        "복합개발",
+        "대형 랜드마크",
+        "프로젝트 금융"
+      ],
+      "strengths": [
+        "사업 성공 시 큰 이익",
+        "대형 개발 테마",
+        "자산가치 상승 가능성"
+      ],
+      "risks": [
+        "과도한 차입",
+        "사업 중단",
+        "금리 상승"
+      ],
+      "positiveNews": [
+        "초대형 개발 승인",
+        "프로젝트 금융 조달",
+        "분양 완판"
+      ],
+      "negativeNews": [
+        "사업 중단",
+        "자금 조달 실패",
+        "채무불이행 우려"
+      ],
+      "sensitivity": {
+        "MEGA_PROJECT": 1.7,
+        "PROPERTY_MARKET": 1.25,
+        "INTEREST_RATE": -1.5,
+        "CREDIT_CRISIS": -1.8
+      },
+      "growthPotential": 93,
+      "debtRisk": 94,
+      "dividendReliability": 0,
+      "randomPriceChangeRange": {
+        "min": -0.16,
+        "max": 0.16
+      },
+      "marketRole": "큰 상승과 급락이 모두 가능한 고위험 종목"
+    },
+    {
+      "id": "cheongmyeong_materials",
+      "name": "청명소재",
+      "industry": "STEEL_MATERIALS",
+      "archetype": "STABLE",
+      "basePrice": 84,
+      "totalShares": 500,
+      "volatility": 0.035,
+      "dividendRatePerSettlement": 0.03,
+      "stability": 90,
+      "managementThresholdRate": 0.3,
+      "delistingThresholdRate": 0.18,
+      "statusAtStart": "NORMAL",
+      "ticker": "CMM",
+      "businessSummary": "자동차용 고강도 강판과 산업용 금속소재를 공급한다.",
+      "mainBusinesses": [
+        "자동차 강판",
+        "산업용 금속",
+        "표면처리 강재"
+      ],
+      "strengths": [
+        "장기 납품계약",
+        "고부가 강판",
+        "안정적 배당"
+      ],
+      "risks": [
+        "철광석 가격 상승",
+        "자동차 생산 감소",
+        "수입재 경쟁"
+      ],
+      "positiveNews": [
+        "자동차 생산 증가",
+        "강판 가격 인상",
+        "고강도 소재 수주"
+      ],
+      "negativeNews": [
+        "철광석 가격 급등",
+        "자동차 감산",
+        "수입 철강 확대"
+      ],
+      "sensitivity": {
+        "AUTOMOTIVE": 1.0,
+        "STEEL_PRICE": 0.7,
+        "RAW_MATERIAL": -0.85,
+        "EXPORT": 0.5
+      },
+      "growthPotential": 50,
+      "debtRisk": 27,
+      "dividendReliability": 88,
+      "randomPriceChangeRange": {
+        "min": -0.035,
+        "max": 0.035
+      },
+      "marketRole": "배당과 방어력이 높은 핵심 종목"
+    },
+    {
+      "id": "ironroot",
+      "name": "아이언루트",
+      "industry": "STEEL_MATERIALS",
+      "archetype": "BALANCED",
+      "basePrice": 64,
+      "totalShares": 400,
+      "volatility": 0.065,
+      "dividendRatePerSettlement": 0.02,
+      "stability": 75,
+      "managementThresholdRate": 0.28,
+      "delistingThresholdRate": 0.16,
+      "statusAtStart": "NORMAL",
+      "ticker": "IRR",
+      "businessSummary": "조선용 후판과 대형 구조용 강재를 생산하는 철강기업이다.",
+      "mainBusinesses": [
+        "조선용 후판",
+        "구조용 강재",
+        "산업 플레이트"
+      ],
+      "strengths": [
+        "조선업 수주 연계",
+        "대형 설비",
+        "제품 단가 상승 수혜"
+      ],
+      "risks": [
+        "조선 불황",
+        "원료탄 가격 상승",
+        "설비 과잉"
+      ],
+      "positiveNews": [
+        "조선 수주 증가",
+        "후판 가격 인상",
+        "산업설비 투자 확대"
+      ],
+      "negativeNews": [
+        "조선 발주 감소",
+        "원료탄 급등",
+        "공장 가동률 하락"
+      ],
+      "sensitivity": {
+        "SHIP_ORDER": 1.1,
+        "STEEL_PRICE": 0.8,
+        "RAW_MATERIAL": -0.9,
+        "INDUSTRIAL_CYCLE": 0.55
+      },
+      "growthPotential": 56,
+      "debtRisk": 43,
+      "dividendReliability": 65,
+      "randomPriceChangeRange": {
+        "min": -0.065,
+        "max": 0.065
+      },
+      "marketRole": "성장성과 안정성이 균형을 이루는 일반 종목"
+    },
+    {
+      "id": "neo_alloy",
+      "name": "네오합금",
+      "industry": "STEEL_MATERIALS",
+      "archetype": "GROWTH",
+      "basePrice": 45,
+      "totalShares": 300,
+      "volatility": 0.105,
+      "dividendRatePerSettlement": 0.01,
+      "stability": 60,
+      "managementThresholdRate": 0.25,
+      "delistingThresholdRate": 0.14,
+      "statusAtStart": "NORMAL",
+      "ticker": "NAL",
+      "businessSummary": "배터리와 항공 산업용 특수합금을 개발하는 고성장 소재기업이다.",
+      "mainBusinesses": [
+        "배터리 합금",
+        "항공 합금",
+        "고내열 소재"
+      ],
+      "strengths": [
+        "고부가 제품",
+        "전기차 수혜",
+        "높은 기술 장벽"
+      ],
+      "risks": [
+        "신제품 인증 지연",
+        "희소금속 가격",
+        "대형 고객 의존"
+      ],
+      "positiveNews": [
+        "배터리 업체 공급계약",
+        "항공소재 인증",
+        "전기차 판매 증가"
+      ],
+      "negativeNews": [
+        "인증 실패",
+        "희소금속 가격 급등",
+        "고객사 계약 해지"
+      ],
+      "sensitivity": {
+        "EV_POLICY": 1.1,
+        "TECHNOLOGY_SUCCESS": 1.2,
+        "RARE_METAL_PRICE": -1.0,
+        "AEROSPACE": 0.75
+      },
+      "growthPotential": 87,
+      "debtRisk": 55,
+      "dividendReliability": 18,
+      "randomPriceChangeRange": {
+        "min": -0.105,
+        "max": 0.105
+      },
+      "marketRole": "호재에 강하게 반응하는 성장 종목"
+    },
+    {
+      "id": "coremetal",
+      "name": "코어메탈",
+      "industry": "STEEL_MATERIALS",
+      "archetype": "SPECULATIVE",
+      "basePrice": 25,
+      "totalShares": 200,
+      "volatility": 0.16,
+      "dividendRatePerSettlement": 0.0,
+      "stability": 40,
+      "managementThresholdRate": 0.22,
+      "delistingThresholdRate": 0.12,
+      "statusAtStart": "NORMAL",
+      "ticker": "CMT",
+      "businessSummary": "폐배터리와 전자폐기물에서 희소금속을 회수하는 재활용 기업이다.",
+      "mainBusinesses": [
+        "폐배터리 재활용",
+        "희소금속 회수",
+        "전자폐기물 처리"
+      ],
+      "strengths": [
+        "재활용 규제 수혜",
+        "희소금속 가격 상승 수혜",
+        "높은 테마성"
+      ],
+      "risks": [
+        "회수율 불확실",
+        "설비 사고",
+        "원료 확보 실패"
+      ],
+      "positiveNews": [
+        "폐배터리 의무재활용 강화",
+        "희소금속 가격 급등",
+        "대형 원료 공급계약"
+      ],
+      "negativeNews": [
+        "공장 폭발",
+        "회수율 목표 미달",
+        "원료 공급 중단"
+      ],
+      "sensitivity": {
+        "ENVIRONMENT_REGULATION": 1.4,
+        "RARE_METAL_PRICE": 1.35,
+        "EV_POLICY": 0.95,
+        "ACCIDENT": -1.85
+      },
+      "growthPotential": 95,
+      "debtRisk": 87,
+      "dividendReliability": 0,
+      "randomPriceChangeRange": {
+        "min": -0.16,
+        "max": 0.16
+      },
+      "marketRole": "큰 상승과 급락이 모두 가능한 고위험 종목"
+    },
+    {
+      "id": "cellonia",
+      "name": "셀로니아",
+      "industry": "BIO_HEALTH",
+      "archetype": "STABLE",
+      "basePrice": 78,
+      "totalShares": 500,
+      "volatility": 0.035,
+      "dividendRatePerSettlement": 0.03,
+      "stability": 90,
+      "managementThresholdRate": 0.3,
+      "delistingThresholdRate": 0.18,
+      "statusAtStart": "NORMAL",
+      "ticker": "CLN",
+      "businessSummary": "백신과 바이오시밀러를 생산하며 비교적 안정적인 매출을 보유한 제약기업이다.",
+      "mainBusinesses": [
+        "백신",
+        "바이오시밀러",
+        "의약품 위탁생산"
+      ],
+      "strengths": [
+        "제품 다각화",
+        "장기 공급계약",
+        "방어적 수요"
+      ],
+      "risks": [
+        "품질 문제",
+        "약가 인하",
+        "생산시설 오염"
+      ],
+      "positiveNews": [
+        "백신 공급계약",
+        "바이오시밀러 승인",
+        "생산시설 증설"
+      ],
+      "negativeNews": [
+        "품질검사 실패",
+        "약가 인하",
+        "생산시설 가동 중단"
+      ],
+      "sensitivity": {
+        "DRUG_APPROVAL": 1.05,
+        "HEALTH_DEMAND": 0.85,
+        "PRICE_REGULATION": -0.75,
+        "QUALITY_ISSUE": -1.35
+      },
+      "growthPotential": 64,
+      "debtRisk": 26,
+      "dividendReliability": 80,
+      "randomPriceChangeRange": {
+        "min": -0.035,
+        "max": 0.035
+      },
+      "marketRole": "배당과 방어력이 높은 핵심 종목"
+    },
+    {
+      "id": "bionexus",
+      "name": "바이오넥서스",
+      "industry": "BIO_HEALTH",
+      "archetype": "BALANCED",
+      "basePrice": 58,
+      "totalShares": 400,
+      "volatility": 0.065,
+      "dividendRatePerSettlement": 0.02,
+      "stability": 75,
+      "managementThresholdRate": 0.28,
+      "delistingThresholdRate": 0.16,
+      "statusAtStart": "NORMAL",
+      "ticker": "BNX",
+      "businessSummary": "진단키트와 정밀검사 장비를 개발·판매하는 의료진단 기업이다.",
+      "mainBusinesses": [
+        "진단키트",
+        "정밀검사 장비",
+        "검사 데이터"
+      ],
+      "strengths": [
+        "반복 매출",
+        "수출 가능성",
+        "신제품 출시"
+      ],
+      "risks": [
+        "수요 급감",
+        "허가 지연",
+        "가격 경쟁"
+      ],
+      "positiveNews": [
+        "신규 진단제품 허가",
+        "감염병 확산",
+        "해외 공급계약"
+      ],
+      "negativeNews": [
+        "제품 허가 반려",
+        "수요 급감",
+        "경쟁사 저가 출시"
+      ],
+      "sensitivity": {
+        "DISEASE_OUTBREAK": 1.2,
+        "DRUG_APPROVAL": 0.95,
+        "EXPORT": 0.65,
+        "PRICE_COMPETITION": -0.95
+      },
+      "growthPotential": 69,
+      "debtRisk": 42,
+      "dividendReliability": 55,
+      "randomPriceChangeRange": {
+        "min": -0.065,
+        "max": 0.065
+      },
+      "marketRole": "성장성과 안정성이 균형을 이루는 일반 종목"
+    },
+    {
+      "id": "medivera",
+      "name": "메디베라",
+      "industry": "BIO_HEALTH",
+      "archetype": "GROWTH",
+      "basePrice": 42,
+      "totalShares": 300,
+      "volatility": 0.105,
+      "dividendRatePerSettlement": 0.01,
+      "stability": 60,
+      "managementThresholdRate": 0.25,
+      "delistingThresholdRate": 0.14,
+      "statusAtStart": "NORMAL",
+      "ticker": "MDV",
+      "businessSummary": "웨어러블 의료기기와 디지털 치료 프로그램을 개발하는 헬스테크 기업이다.",
+      "mainBusinesses": [
+        "웨어러블 의료기기",
+        "디지털 치료제",
+        "건강 데이터"
+      ],
+      "strengths": [
+        "디지털 헬스 성장",
+        "구독형 매출",
+        "해외 확장성"
+      ],
+      "risks": [
+        "의료기기 허가",
+        "개인정보 문제",
+        "낮은 수익성"
+      ],
+      "positiveNews": [
+        "의료기기 허가",
+        "병원 대형 계약",
+        "건강보험 적용"
+      ],
+      "negativeNews": [
+        "허가 지연",
+        "개인정보 유출",
+        "임상 효과 부족"
+      ],
+      "sensitivity": {
+        "DIGITAL_HEALTH": 1.3,
+        "DRUG_APPROVAL": 1.15,
+        "INSURANCE_COVERAGE": 1.0,
+        "DATA_BREACH": -1.55
+      },
+      "growthPotential": 88,
+      "debtRisk": 61,
+      "dividendReliability": 15,
+      "randomPriceChangeRange": {
+        "min": -0.105,
+        "max": 0.105
+      },
+      "marketRole": "호재에 강하게 반응하는 성장 종목"
+    },
+    {
+      "id": "gencurion",
+      "name": "젠큐리온",
+      "industry": "BIO_HEALTH",
+      "archetype": "SPECULATIVE",
+      "basePrice": 24,
+      "totalShares": 200,
+      "volatility": 0.16,
+      "dividendRatePerSettlement": 0.0,
+      "stability": 40,
+      "managementThresholdRate": 0.22,
+      "delistingThresholdRate": 0.12,
+      "statusAtStart": "NORMAL",
+      "ticker": "GNC",
+      "businessSummary": "유전자 치료제와 희귀질환 신약을 연구하는 임상단계 바이오기업이다.",
+      "mainBusinesses": [
+        "유전자 치료제",
+        "희귀질환 신약",
+        "기술수출"
+      ],
+      "strengths": [
+        "임상 성공 시 큰 가치 상승",
+        "희귀질환 시장",
+        "기술수출 가능성"
+      ],
+      "risks": [
+        "임상 실패",
+        "자금 고갈",
+        "허가 불확실성"
+      ],
+      "positiveNews": [
+        "임상시험 성공",
+        "글로벌 제약사 기술수출",
+        "신약 우선심사"
+      ],
+      "negativeNews": [
+        "임상시험 실패",
+        "부작용 발생",
+        "유상증자"
+      ],
+      "sensitivity": {
+        "CLINICAL_SUCCESS": 1.9,
+        "LICENSING_DEAL": 1.7,
+        "DRUG_APPROVAL": 1.45,
+        "CLINICAL_FAILURE": -2.0
+      },
+      "growthPotential": 100,
+      "debtRisk": 92,
+      "dividendReliability": 0,
+      "randomPriceChangeRange": {
+        "min": -0.16,
+        "max": 0.16
+      },
+      "marketRole": "큰 상승과 급락이 모두 가능한 고위험 종목"
+    },
+    {
+      "id": "nuri_portal",
+      "name": "누리포털",
+      "industry": "PLATFORM_GAME",
+      "archetype": "STABLE",
+      "basePrice": 80,
+      "totalShares": 500,
+      "volatility": 0.035,
+      "dividendRatePerSettlement": 0.03,
+      "stability": 90,
+      "managementThresholdRate": 0.3,
+      "delistingThresholdRate": 0.18,
+      "statusAtStart": "NORMAL",
+      "ticker": "NRP",
+      "businessSummary": "검색·광고·클라우드 서비스를 운영하는 대형 인터넷 플랫폼 기업이다.",
+      "mainBusinesses": [
+        "검색 광고",
+        "클라우드",
+        "온라인 콘텐츠"
+      ],
+      "strengths": [
+        "안정적인 광고 매출",
+        "높은 이용자 기반",
+        "클라우드 성장"
+      ],
+      "risks": [
+        "플랫폼 규제",
+        "광고 경기 둔화",
+        "개인정보 사고"
+      ],
+      "positiveNews": [
+        "온라인 광고 성장",
+        "클라우드 대형 계약",
+        "이용자 증가"
+      ],
+      "negativeNews": [
+        "플랫폼 규제 강화",
+        "광고시장 침체",
+        "개인정보 유출"
+      ],
+      "sensitivity": {
+        "AD_MARKET": 1.0,
+        "CLOUD_DEMAND": 0.85,
+        "PLATFORM_REGULATION": -1.0,
+        "DATA_BREACH": -1.3
+      },
+      "growthPotential": 66,
+      "debtRisk": 18,
+      "dividendReliability": 78,
+      "randomPriceChangeRange": {
+        "min": -0.035,
+        "max": 0.035
+      },
+      "marketRole": "배당과 방어력이 높은 핵심 종목"
+    },
+    {
+      "id": "pixel_madang",
+      "name": "픽셀마당",
+      "industry": "PLATFORM_GAME",
+      "archetype": "BALANCED",
+      "basePrice": 60,
+      "totalShares": 400,
+      "volatility": 0.065,
+      "dividendRatePerSettlement": 0.02,
+      "stability": 75,
+      "managementThresholdRate": 0.28,
+      "delistingThresholdRate": 0.16,
+      "statusAtStart": "NORMAL",
+      "ticker": "PXM",
+      "businessSummary": "모바일 캐주얼 게임과 가족형 온라인 게임을 서비스한다.",
+      "mainBusinesses": [
+        "모바일 게임",
+        "캐주얼 게임",
+        "게임 광고"
+      ],
+      "strengths": [
+        "다수의 게임 포트폴리오",
+        "안정적인 이용자",
+        "낮은 개발비"
+      ],
+      "risks": [
+        "신작 부진",
+        "광고 단가 하락",
+        "게임 규제"
+      ],
+      "positiveNews": [
+        "신작 흥행",
+        "이용자 급증",
+        "해외 서비스 성공"
+      ],
+      "negativeNews": [
+        "신작 실패",
+        "확률형 규제",
+        "이용자 이탈"
+      ],
+      "sensitivity": {
+        "GAME_HIT": 1.2,
+        "USER_GROWTH": 0.9,
+        "AD_MARKET": 0.55,
+        "GAME_REGULATION": -1.1
+      },
+      "growthPotential": 71,
+      "debtRisk": 36,
+      "dividendReliability": 58,
+      "randomPriceChangeRange": {
+        "min": -0.065,
+        "max": 0.065
+      },
+      "marketRole": "성장성과 안정성이 균형을 이루는 일반 종목"
+    },
+    {
+      "id": "playon_lab",
+      "name": "플레이온랩",
+      "industry": "PLATFORM_GAME",
+      "archetype": "GROWTH",
+      "basePrice": 43,
+      "totalShares": 300,
+      "volatility": 0.105,
+      "dividendRatePerSettlement": 0.01,
+      "stability": 60,
+      "managementThresholdRate": 0.25,
+      "delistingThresholdRate": 0.14,
+      "statusAtStart": "NORMAL",
+      "ticker": "POL",
+      "businessSummary": "대규모 멀티플레이 게임과 실시간 라이브 서비스를 개발하는 게임사다.",
+      "mainBusinesses": [
+        "온라인 멀티플레이",
+        "라이브 서비스",
+        "게임 엔진"
+      ],
+      "strengths": [
+        "높은 흥행 가능성",
+        "장기 서비스 매출",
+        "글로벌 시장"
+      ],
+      "risks": [
+        "개발 지연",
+        "서버 장애",
+        "신작 의존"
+      ],
+      "positiveNews": [
+        "신작 동시접속자 급증",
+        "글로벌 출시 성공",
+        "대형 퍼블리싱 계약"
+      ],
+      "negativeNews": [
+        "출시 연기",
+        "서버 대규모 장애",
+        "이용자 평가 급락"
+      ],
+      "sensitivity": {
+        "GAME_HIT": 1.55,
+        "GLOBAL_LAUNCH": 1.2,
+        "USER_GROWTH": 1.05,
+        "GAME_FAILURE": -1.65
+      },
+      "growthPotential": 91,
+      "debtRisk": 64,
+      "dividendReliability": 8,
+      "randomPriceChangeRange": {
+        "min": -0.105,
+        "max": 0.105
+      },
+      "marketRole": "호재에 강하게 반응하는 성장 종목"
+    },
+    {
+      "id": "moalink",
+      "name": "모아링크",
+      "industry": "PLATFORM_GAME",
+      "archetype": "SPECULATIVE",
+      "basePrice": 23,
+      "totalShares": 200,
+      "volatility": 0.16,
+      "dividendRatePerSettlement": 0.0,
+      "stability": 40,
+      "managementThresholdRate": 0.22,
+      "delistingThresholdRate": 0.12,
+      "statusAtStart": "NORMAL",
+      "ticker": "MAL",
+      "businessSummary": "크리에이터와 짧은 영상 중심의 신생 소셜 플랫폼을 운영한다.",
+      "mainBusinesses": [
+        "소셜 플랫폼",
+        "크리에이터 후원",
+        "숏폼 광고"
+      ],
+      "strengths": [
+        "빠른 이용자 증가",
+        "바이럴 성장",
+        "플랫폼 확장성"
+      ],
+      "risks": [
+        "수익모델 부족",
+        "콘텐츠 논란",
+        "개인정보 규제"
+      ],
+      "positiveNews": [
+        "가입자 폭증",
+        "유명 크리에이터 독점계약",
+        "광고 매출 증가"
+      ],
+      "negativeNews": [
+        "유해 콘텐츠 논란",
+        "개인정보 사고",
+        "이용자 이탈"
+      ],
+      "sensitivity": {
+        "USER_GROWTH": 1.7,
+        "AD_MARKET": 1.0,
+        "CREATOR_ECONOMY": 1.25,
+        "PLATFORM_SCANDAL": -1.9
+      },
+      "growthPotential": 97,
+      "debtRisk": 85,
+      "dividendReliability": 0,
+      "randomPriceChangeRange": {
+        "min": -0.16,
+        "max": 0.16
+      },
+      "marketRole": "큰 상승과 급락이 모두 가능한 고위험 종목"
+    },
+    {
+      "id": "harubom_retail",
+      "name": "하루봄리테일",
+      "industry": "RETAIL_CONSUMER",
+      "archetype": "STABLE",
+      "basePrice": 76,
+      "totalShares": 500,
+      "volatility": 0.035,
+      "dividendRatePerSettlement": 0.03,
+      "stability": 90,
+      "managementThresholdRate": 0.3,
+      "delistingThresholdRate": 0.18,
+      "statusAtStart": "NORMAL",
+      "ticker": "HBR",
+      "businessSummary": "대형마트와 편의점을 운영하며 생활필수품 판매 비중이 높은 유통기업이다.",
+      "mainBusinesses": [
+        "대형마트",
+        "편의점",
+        "온라인 장보기"
+      ],
+      "strengths": [
+        "필수소비재 매출",
+        "전국 유통망",
+        "안정적인 현금흐름"
+      ],
+      "risks": [
+        "소비 침체",
+        "인건비 상승",
+        "온라인 경쟁"
+      ],
+      "positiveNews": [
+        "소비 회복",
+        "명절 매출 증가",
+        "온라인 주문 성장"
+      ],
+      "negativeNews": [
+        "소비심리 악화",
+        "물류비 상승",
+        "가격 경쟁 심화"
+      ],
+      "sensitivity": {
+        "DOMESTIC_CONSUMPTION": 0.85,
+        "INFLATION": -0.35,
+        "TOURISM": 0.3,
+        "LOGISTICS_COST": -0.65
+      },
+      "growthPotential": 47,
+      "debtRisk": 24,
+      "dividendReliability": 86,
+      "randomPriceChangeRange": {
+        "min": -0.035,
+        "max": 0.035
+      },
+      "marketRole": "배당과 방어력이 높은 핵심 종목"
+    },
+    {
+      "id": "goodwhale_food",
+      "name": "굿웨일푸드",
+      "industry": "RETAIL_CONSUMER",
+      "archetype": "BALANCED",
+      "basePrice": 57,
+      "totalShares": 400,
+      "volatility": 0.065,
+      "dividendRatePerSettlement": 0.02,
+      "stability": 75,
+      "managementThresholdRate": 0.28,
+      "delistingThresholdRate": 0.16,
+      "statusAtStart": "NORMAL",
+      "ticker": "GWF",
+      "businessSummary": "수산가공식품과 지역 특산 먹거리를 생산·유통하는 식품기업이다.",
+      "mainBusinesses": [
+        "수산가공식품",
+        "간편식",
+        "지역 특산품"
+      ],
+      "strengths": [
+        "관광 소비 수혜",
+        "식품 수요 안정성",
+        "지역 브랜드"
+      ],
+      "risks": [
+        "수산물 가격 상승",
+        "식품 안전사고",
+        "관광객 감소"
+      ],
+      "positiveNews": [
+        "관광객 증가",
+        "신제품 흥행",
+        "수출 계약"
+      ],
+      "negativeNews": [
+        "원재료 가격 급등",
+        "식품 위생 문제",
+        "관광 경기 침체"
+      ],
+      "sensitivity": {
+        "TOURISM": 1.0,
+        "FOOD_CONSUMPTION": 0.75,
+        "RAW_MATERIAL": -0.75,
+        "FOOD_SAFETY": -1.45
+      },
+      "growthPotential": 60,
+      "debtRisk": 38,
+      "dividendReliability": 64,
+      "randomPriceChangeRange": {
+        "min": -0.065,
+        "max": 0.065
+      },
+      "marketRole": "성장성과 안정성이 균형을 이루는 일반 종목"
+    },
+    {
+      "id": "living_maru",
+      "name": "리빙마루",
+      "industry": "RETAIL_CONSUMER",
+      "archetype": "GROWTH",
+      "basePrice": 41,
+      "totalShares": 300,
+      "volatility": 0.105,
+      "dividendRatePerSettlement": 0.01,
+      "stability": 60,
+      "managementThresholdRate": 0.25,
+      "delistingThresholdRate": 0.14,
+      "statusAtStart": "NORMAL",
+      "ticker": "LVM",
+      "businessSummary": "가구와 생활용품을 온·오프라인으로 판매하는 리빙 전문기업이다.",
+      "mainBusinesses": [
+        "가구",
+        "생활용품",
+        "온라인 리빙몰"
+      ],
+      "strengths": [
+        "주택시장 연계",
+        "온라인 성장",
+        "브랜드 확장"
+      ],
+      "risks": [
+        "주택경기 침체",
+        "목재 가격 상승",
+        "소비 둔화"
+      ],
+      "positiveNews": [
+        "주택 거래 증가",
+        "온라인 매출 성장",
+        "신규 매장 성공"
+      ],
+      "negativeNews": [
+        "주택경기 침체",
+        "목재 가격 급등",
+        "소비 위축"
+      ],
+      "sensitivity": {
+        "PROPERTY_MARKET": 1.05,
+        "DOMESTIC_CONSUMPTION": 0.85,
+        "RAW_MATERIAL": -0.7,
+        "INTEREST_RATE": -0.55
+      },
+      "growthPotential": 78,
+      "debtRisk": 50,
+      "dividendReliability": 24,
+      "randomPriceChangeRange": {
+        "min": -0.105,
+        "max": 0.105
+      },
+      "marketRole": "호재에 강하게 반응하는 성장 종목"
+    },
+    {
+      "id": "trendbasket",
+      "name": "트렌드바스켓",
+      "industry": "RETAIL_CONSUMER",
+      "archetype": "SPECULATIVE",
+      "basePrice": 22,
+      "totalShares": 200,
+      "volatility": 0.16,
+      "dividendRatePerSettlement": 0.0,
+      "stability": 40,
+      "managementThresholdRate": 0.22,
+      "delistingThresholdRate": 0.12,
+      "statusAtStart": "NORMAL",
+      "ticker": "TRB",
+      "businessSummary": "패션·뷰티 중심의 라이브커머스와 유행상품 판매를 운영한다.",
+      "mainBusinesses": [
+        "라이브커머스",
+        "패션 유통",
+        "뷰티 상품"
+      ],
+      "strengths": [
+        "유행 반응 속도",
+        "높은 매출 성장 가능성",
+        "인플루언서 마케팅"
+      ],
+      "risks": [
+        "유행 실패",
+        "재고 누적",
+        "광고 논란"
+      ],
+      "positiveNews": [
+        "라이브방송 대흥행",
+        "인플루언서 독점계약",
+        "패션 유행 선점"
+      ],
+      "negativeNews": [
+        "재고 대량 발생",
+        "광고 모델 논란",
+        "유행상품 판매 부진"
+      ],
+      "sensitivity": {
+        "CONSUMER_TREND": 1.65,
+        "DOMESTIC_CONSUMPTION": 1.15,
+        "INFLUENCER_MARKETING": 1.35,
+        "SCANDAL": -1.75
+      },
+      "growthPotential": 94,
+      "debtRisk": 83,
+      "dividendReliability": 0,
+      "randomPriceChangeRange": {
+        "min": -0.16,
+        "max": 0.16
+      },
+      "marketRole": "큰 상승과 급락이 모두 가능한 고위험 종목"
+    }
+  ],
+  "companyDataDescription": "각 기업은 고유 사업, 강점, 위험, 호재, 악재, 경제요인 민감도를 가진다. 실제 주가 변동은 공통 변동값과 회사별 민감도를 함께 사용한다."
+}

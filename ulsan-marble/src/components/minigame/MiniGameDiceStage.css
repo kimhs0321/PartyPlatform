@@ -1,0 +1,169 @@
+.minigame-dice-stage {
+  position: relative;
+  min-height: 252px;
+  overflow: hidden;
+  border: 1px solid rgba(119, 197, 230, 0.24);
+  border-radius: 18px;
+  background:
+    radial-gradient(
+      circle at 50% 42%,
+      rgba(76, 173, 218, 0.16),
+      rgba(5, 19, 30, 0.35) 42%,
+      rgba(2, 11, 18, 0.72) 82%
+    );
+}
+
+.minigame-dice-stage::after {
+  content: "";
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  bottom: 65px;
+  height: 1px;
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(145, 210, 236, 0.34),
+      transparent
+    );
+}
+
+.minigame-dice-stage__canvas {
+  position: absolute;
+  inset: 0 0 48px;
+}
+
+.minigame-dice-stage__canvas canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.minigame-dice-stage__readout {
+  position: absolute;
+  left: 50%;
+  bottom: 13px;
+  z-index: 2;
+  min-width: 228px;
+  min-height: 50px;
+  padding: 7px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  box-sizing: border-box;
+  color: #ecfaff;
+  border: 1px solid rgba(141, 211, 239, 0.38);
+  border-radius: 13px;
+  background: rgba(4, 24, 37, 0.93);
+  box-shadow:
+    0 12px 24px rgba(0, 0, 0, 0.3),
+    inset 0 1px rgba(255, 255, 255, 0.07);
+  transform: translateX(-50%);
+  backdrop-filter: blur(8px);
+}
+
+.minigame-dice-stage__readout > span {
+  color: #91cee7;
+  font-size: 11px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.minigame-dice-stage__readout > div {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.minigame-dice-stage__readout b {
+  min-width: 28px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  color: #173144;
+  font-size: 18px;
+  font-weight: 950;
+  border-radius: 8px;
+  background: #edf8fc;
+}
+
+.minigame-dice-stage__readout em {
+  color: #89adbd;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.minigame-dice-stage__readout div > strong {
+  min-width: 36px;
+  color: #ffffff;
+  font-size: 27px;
+  line-height: 1;
+  text-align: center;
+}
+
+.minigame-dice-stage__readout > strong {
+  color: #c5ebfa;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+.minigame-dice-stage.is-rolling
+  .minigame-dice-stage__readout {
+  min-width: 180px;
+  border-radius: 999px;
+  animation:
+    minigame-dice-pulse 850ms ease-in-out infinite alternate;
+}
+
+.minigame-dice-stage.is-settled
+  .minigame-dice-stage__readout {
+  animation: minigame-dice-readout-in 350ms ease-out both;
+}
+
+@keyframes minigame-dice-pulse {
+  from {
+    opacity: 0.72;
+    transform: translateX(-50%) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+@keyframes minigame-dice-readout-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(8px) scale(0.94);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 650px), (max-height: 650px) {
+  .minigame-dice-stage {
+    min-height: 222px;
+  }
+
+  .minigame-dice-stage__canvas {
+    bottom: 44px;
+  }
+
+  .minigame-dice-stage__readout {
+    min-width: 208px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .minigame-dice-stage__readout {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

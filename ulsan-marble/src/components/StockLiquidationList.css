@@ -1,0 +1,171 @@
+.stock-liquidation-section {
+  margin-top: 15px;
+}
+
+.stock-liquidation-section__title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.stock-liquidation-section__title strong {
+  color: #f8f9fa;
+  font-size: 14px;
+}
+
+.stock-liquidation-section__title span {
+  color: #aeb9c0;
+  font-size: 11px;
+}
+
+.stock-liquidation-list {
+  display: grid;
+  gap: 8px;
+}
+
+.stock-liquidation-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  padding: 11px 12px;
+  border: 1px solid rgba(144, 202, 230, 0.16);
+  border-radius: 12px;
+  background: rgba(20, 47, 65, 0.34);
+}
+
+.stock-liquidation-card__info {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.stock-liquidation-card__info strong {
+  overflow: hidden;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stock-liquidation-card__info strong small {
+  margin-left: 7px;
+  color: #8fb6ca;
+  font-size: 10px;
+  font-weight: 750;
+}
+
+.stock-liquidation-card__info span {
+  color: #aab9c2;
+  font-size: 11px;
+}
+
+.stock-liquidation-card__info span.is-profit {
+  color: #8ce99a;
+}
+
+.stock-liquidation-card__info span.is-loss {
+  color: #ffa8a8;
+}
+
+.stock-liquidation-card__controls {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: auto auto auto;
+  align-items: end;
+  gap: 8px;
+}
+
+.stock-liquidation-card__quick-buttons {
+  display: flex;
+  gap: 4px;
+}
+
+.stock-liquidation-card__quick-buttons button,
+.stock-liquidation-card__sell button {
+  min-height: 34px;
+  color: #f7fbfd;
+  font-size: 11px;
+  font-weight: 850;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.stock-liquidation-card__quick-buttons button {
+  padding: 0 9px;
+  border: 1px solid rgba(143, 201, 226, 0.25);
+  background: rgba(25, 78, 105, 0.78);
+}
+
+.stock-liquidation-card__controls label {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.stock-liquidation-card__controls label > span {
+  color: #9fb0ba;
+  font-size: 10px;
+}
+
+.stock-liquidation-card__controls input {
+  width: 76px;
+  min-height: 34px;
+  padding: 0 8px;
+  color: #fff;
+  border: 1px solid rgba(143, 201, 226, 0.24);
+  border-radius: 8px;
+  background: rgba(5, 20, 31, 0.72);
+}
+
+.stock-liquidation-card__sell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stock-liquidation-card__sell > span {
+  min-width: 76px;
+  color: #ffd8a8;
+  font-size: 12px;
+  font-weight: 900;
+  text-align: right;
+}
+
+.stock-liquidation-card__sell button {
+  min-width: 58px;
+  padding: 0 12px;
+  border: 1px solid rgba(100, 205, 239, 0.36);
+  background: linear-gradient(180deg, #257ca0, #17536f);
+}
+
+.stock-liquidation-card button:hover {
+  filter: brightness(1.1);
+}
+
+@media (max-width: 760px) {
+  .stock-liquidation-card {
+    grid-template-columns: 1fr;
+  }
+
+  .stock-liquidation-card__controls {
+    grid-template-columns: auto minmax(78px, 1fr) auto;
+  }
+}
+
+@media (max-width: 520px) {
+  .stock-liquidation-card__controls {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .stock-liquidation-card__quick-buttons,
+  .stock-liquidation-card__sell {
+    justify-content: space-between;
+  }
+
+  .stock-liquidation-card__controls input {
+    width: 100%;
+  }
+}

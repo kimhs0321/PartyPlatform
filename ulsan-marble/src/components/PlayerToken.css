@@ -1,0 +1,90 @@
+.player-token {
+  position: relative;
+  z-index: 20;
+  width: clamp(20px, min(28cqw, 43cqh), 30px);
+  aspect-ratio: 1;
+  align-self: center;
+  justify-self: center;
+  display: grid;
+  place-items: center;
+  transform: translate(var(--token-offset-x), var(--token-offset-y));
+  color: #ffffff;
+  background:
+    radial-gradient(circle at 34% 26%, rgba(255, 255, 255, 0.76), transparent 19%),
+    var(--player-color);
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  box-shadow:
+    0 4px 8px rgba(0, 0, 0, 0.46),
+    inset 0 -3px 5px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+  transition: transform 100ms ease-out;
+}
+
+.player-token span {
+  font-size: clamp(9px, min(12cqw, 18cqh), 12px);
+  font-weight: 950;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+}
+
+.player-token--active {
+  z-index: 22;
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.92),
+    0 0 0 6px color-mix(in srgb, var(--player-color) 70%, transparent),
+    0 5px 12px rgba(0, 0, 0, 0.55);
+}
+
+.player-token--moving {
+  animation: player-token-hop 170ms ease-in-out infinite alternate;
+}
+
+@keyframes player-token-hop {
+  from {
+    margin-top: 0;
+  }
+
+  to {
+    margin-top: -7px;
+  }
+}
+
+.player-token--bankrupt {
+  opacity: 0.34;
+  filter: grayscale(1);
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.3),
+    0 4px 8px rgba(0, 0, 0, 0.38);
+}
+
+.player-token--jailed:not(.player-token--bankrupt) {
+  filter: saturate(0.45) brightness(0.82);
+  box-shadow:
+    0 0 0 3px rgba(122, 139, 148, 0.85),
+    0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.player-token--jailed:not(.player-token--bankrupt)::after {
+  content: "🔒";
+  position: absolute;
+  top: -12px;
+  right: -10px;
+  display: grid;
+  place-items: center;
+  width: 17px;
+  height: 17px;
+  font-size: 10px;
+  background: #26343c;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+}
+
+.player-token__label--single {
+  font-size: clamp(10px, min(14cqw, 20cqh), 14px);
+}
+
+.player-token__label--double {
+  font-size: clamp(8px, min(10cqw, 16cqh), 11px);
+  letter-spacing: -0.12em;
+}

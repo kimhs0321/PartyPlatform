@@ -1,0 +1,43 @@
+.stock-turn-actions {
+  position: absolute;
+  right: clamp(550px, 15vw, 270px);
+  left: auto;
+  bottom: clamp(104px, 12vh, 140px);
+  z-index: 56;
+
+  display: flex;
+  gap: 10px;
+
+  transform: none;
+  pointer-events: auto;
+}
+
+.stock-turn-actions button {
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: 14px;
+  color: #f2fbff;
+  font-size: 15px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.34),
+    inset 0 1px rgba(255, 255, 255, 0.14);
+}
+
+.stock-turn-actions__market {
+  min-width: 154px;
+  border: 1px solid rgba(112, 214, 168, 0.5);
+  background: linear-gradient(180deg, #23855d, #14553f);
+}
+
+.stock-turn-actions__end {
+  min-width: 116px;
+  border: 1px solid rgba(150, 195, 218, 0.4);
+  background: linear-gradient(180deg, #31556c, #1e394c);
+}
+
+.stock-turn-actions button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}

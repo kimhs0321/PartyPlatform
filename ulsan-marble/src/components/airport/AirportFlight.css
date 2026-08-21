@@ -1,0 +1,112 @@
+.airport-flight-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 80;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.airport-flight-plane {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 112px;
+  height: 82px;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
+.airport-flight-plane__icon {
+  position: relative;
+  z-index: 2;
+  color: #f4fbff;
+  font-family: Arial, sans-serif;
+  font-size: 72px;
+  line-height: 1;
+  filter:
+    drop-shadow(0 5px 2px rgba(0, 0, 0, 0.32))
+    drop-shadow(0 0 12px rgba(105, 210, 255, 0.72));
+}
+
+.airport-flight-plane__trail {
+  position: absolute;
+  right: 72px;
+  top: 50%;
+  width: 112px;
+  height: 7px;
+  border-radius: 999px;
+  transform: translateY(-50%);
+  opacity: 0.78;
+  background: linear-gradient(90deg, transparent, rgba(206, 242, 255, 0.88));
+  filter: blur(2px);
+}
+
+.airport-flight-plane__passenger {
+  position: absolute;
+  left: 42%;
+  top: 49%;
+  z-index: 3;
+  min-width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  padding: 0 6px;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 950;
+  line-height: 1;
+  border: 3px solid rgba(255, 255, 255, 0.88);
+  border-radius: 999px;
+  transform: translate(-50%, -50%) rotate(-8deg);
+  background: var(--airport-passenger-color);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.35);
+}
+
+.airport-flight-status {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  min-width: 250px;
+  display: grid;
+  gap: 3px;
+  padding: 11px 16px;
+  color: #eaf9ff;
+  border: 1px solid rgba(121, 211, 249, 0.24);
+  border-radius: 12px;
+  transform: translate(-50%, 92px);
+  text-align: center;
+  background: rgba(5, 29, 44, 0.82);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.34);
+  animation: airport-flight-status-in 360ms 180ms ease-out both;
+}
+
+.airport-flight-status span {
+  color: #79d7ff;
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.16em;
+}
+
+.airport-flight-status strong {
+  font-size: 13px;
+}
+
+@keyframes airport-flight-status-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 106px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 92px) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .airport-flight-status {
+    animation: none;
+  }
+}

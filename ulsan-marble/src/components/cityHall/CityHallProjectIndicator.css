@@ -1,0 +1,99 @@
+.city-hall-project-indicator {
+  position: absolute;
+  left: 50%;
+  top: clamp(256px, 29vh, 304px);
+  width: min(450px, calc(100vw - 40px));
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: stretch;
+  gap: 0;
+  overflow: hidden;
+  transform: translateX(-50%);
+  color: #edf7ff;
+  border: 1px solid rgba(144, 191, 221, 0.27);
+  border-radius: 11px;
+  background: rgba(24, 48, 67, 0.88);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+}
+
+.city-hall-project-indicator__badge {
+  display: grid;
+  place-content: center;
+  gap: 1px;
+  min-width: 84px;
+  padding: 8px 10px;
+  color: #eef8fd;
+  text-align: center;
+  border-right: 1px solid rgba(156, 196, 220, 0.22);
+  background: rgba(19, 93, 132, 0.72);
+}
+
+.city-hall-project-indicator__badge span {
+  color: #b9dceb;
+  font-size: 9px;
+  font-weight: 850;
+}
+
+.city-hall-project-indicator__badge strong {
+  font-size: 10px;
+  line-height: 1.15;
+}
+
+.city-hall-project-indicator__content {
+  min-width: 0;
+  display: grid;
+  align-content: center;
+  gap: 1px;
+  padding: 8px 11px;
+}
+
+.city-hall-project-indicator__content small {
+  overflow: hidden;
+  color: #9cc4dc;
+  font-size: 9px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.city-hall-project-indicator__content strong,
+.city-hall-project-indicator__content em {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.city-hall-project-indicator__content strong {
+  font-size: 12px;
+}
+
+.city-hall-project-indicator__content em {
+  color: #c8e3f0;
+  font-size: 10px;
+  font-style: normal;
+}
+
+.city-hall-project-indicator__turns {
+  min-width: 60px;
+  display: grid;
+  place-content: center;
+  padding: 6px 9px;
+  text-align: center;
+  border-left: 1px solid rgba(156, 196, 220, 0.22);
+  background: rgba(9, 27, 42, 0.3);
+}
+
+.city-hall-project-indicator__turns b {
+  color: #9cd8f1;
+  font-size: 17px;
+  line-height: 1;
+}
+
+.city-hall-project-indicator__turns span {
+  margin-top: 2px;
+  color: #b8d9e9;
+  font-size: 8px;
+  font-weight: 850;
+}

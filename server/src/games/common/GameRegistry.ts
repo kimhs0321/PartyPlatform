@@ -1,10 +1,14 @@
 import type { GameModule } from "./GameModule";
 import { liarModule } from "../liar/liar.module";
 import { catchMindModule } from "../catchMind/catchMind.module";
+import { relayDrawingModule } from "../RelayDrawing/relayDrawing.module";
+import { ulsanMarbleModule } from "../ulsanMarble/ulsanMarble.module";
 
 export const GAME_MODULES: GameModule[] = [
   liarModule,
   catchMindModule,
+  relayDrawingModule,
+  ulsanMarbleModule,
 ];
 
 export function getEnabledGameModules(): GameModule[] {
@@ -14,3 +18,4 @@ export function getEnabledGameModules(): GameModule[] {
 export function findGameModuleByName(name: string): GameModule | undefined {
   return GAME_MODULES.find((gameModule) => gameModule.name === name);
 }
+

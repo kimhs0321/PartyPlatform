@@ -1,0 +1,254 @@
+.asset-liquidation-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 84;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(1, 8, 14, 0.54);
+  backdrop-filter: blur(4px);
+  pointer-events: auto;
+}
+
+.asset-liquidation-modal {
+  width: min(620px, calc(100vw - 40px));
+  max-height: min(760px, calc(100vh - 40px));
+  overflow: auto;
+  padding: 24px;
+  color: #eef7fb;
+  border: 1px solid rgba(255, 135, 135, 0.34);
+  border-radius: 20px;
+  background:
+    linear-gradient(180deg, rgba(50, 24, 30, 0.98), rgba(24, 16, 21, 0.98));
+  box-shadow:
+    0 28px 84px rgba(0, 0, 0, 0.6),
+    inset 0 1px rgba(255, 255, 255, 0.07);
+}
+
+.asset-liquidation-modal__eyebrow {
+  color: #ffa8a8;
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+}
+
+.asset-liquidation-modal h2 {
+  margin: 5px 0 8px;
+  font-size: 28px;
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+}
+
+.asset-liquidation-modal__description {
+  margin: 0 0 17px;
+  color: #cbbbc0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.asset-liquidation-modal__description strong {
+  color: #ffffff;
+}
+
+.asset-liquidation-modal__summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.asset-liquidation-modal__summary > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 38px;
+  padding: 0 11px;
+  border: 1px solid rgba(255, 196, 196, 0.12);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.asset-liquidation-modal__summary dt {
+  color: #bfa9b0;
+  font-size: 12px;
+}
+
+.asset-liquidation-modal__summary dd {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.asset-liquidation-modal__summary dd.is-shortfall {
+  color: #ff8787;
+}
+
+.asset-liquidation-modal__notice {
+  margin-top: 13px;
+  padding: 10px 12px;
+  color: #c5f6d5;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.45;
+  text-align: center;
+  border: 1px solid rgba(105, 219, 124, 0.23);
+  border-radius: 10px;
+  background: rgba(45, 130, 65, 0.12);
+}
+
+.asset-liquidation-modal__notice.is-bankruptcy-risk {
+  color: #ffc9c9;
+  border-color: rgba(255, 107, 107, 0.25);
+  background: rgba(180, 55, 55, 0.14);
+}
+
+.asset-liquidation-modal__assets {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.asset-liquidation-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 11px 12px;
+  border: 1px solid rgba(255, 196, 196, 0.14);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.asset-liquidation-card__info {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.asset-liquidation-card__info strong {
+  overflow: hidden;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.asset-liquidation-card__info span {
+  color: #b9a8ad;
+  font-size: 11px;
+}
+
+.asset-liquidation-card__action {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.asset-liquidation-card__action span {
+  color: #ffd8a8;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.asset-liquidation-card__action button,
+.asset-liquidation-modal__bankruptcy {
+  color: #ffffff;
+  font-weight: 900;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.asset-liquidation-card__action button {
+  min-width: 58px;
+  min-height: 34px;
+  border: 1px solid rgba(255, 190, 112, 0.38);
+  background: linear-gradient(180deg, #bf702f, #84441f);
+}
+
+.asset-liquidation-card__action button:hover {
+  filter: brightness(1.1);
+}
+
+.asset-liquidation-modal__empty {
+  padding: 20px 12px;
+  color: #bfaeb3;
+  font-size: 13px;
+  text-align: center;
+  border: 1px dashed rgba(255, 196, 196, 0.18);
+  border-radius: 11px;
+}
+
+.asset-liquidation-modal__error {
+  margin: 12px 0 0;
+  color: #ff8787;
+  font-size: 12px;
+  font-weight: 850;
+  text-align: center;
+}
+
+.asset-liquidation-modal__bankruptcy {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 14px;
+  border: 1px solid rgba(255, 135, 135, 0.4);
+  background: linear-gradient(180deg, #b84c5b, #7c2d39);
+}
+
+.asset-liquidation-modal__bankruptcy:hover {
+  filter: brightness(1.08);
+}
+
+@media (max-width: 680px) {
+  .asset-liquidation-modal__summary {
+    grid-template-columns: 1fr;
+  }
+
+  .asset-liquidation-card {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .asset-liquidation-card__action {
+    justify-content: space-between;
+  }
+}
+
+.asset-liquidation-property-section {
+  margin-top: 15px;
+}
+
+.asset-liquidation-property-section__title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.asset-liquidation-property-section__title strong {
+  color: #f8f9fa;
+  font-size: 14px;
+}
+
+.asset-liquidation-property-section__title span {
+  color: #b9a8ad;
+  font-size: 11px;
+}
+
+.asset-liquidation-modal__exemption {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 14px;
+  color: #e7f5ff;
+  font-weight: 900;
+  border: 1px solid rgba(116, 192, 252, 0.42);
+  border-radius: 10px;
+  background: linear-gradient(180deg, #3679a8, #245171);
+  cursor: pointer;
+}
+
+.asset-liquidation-modal__exemption:hover {
+  filter: brightness(1.08);
+}

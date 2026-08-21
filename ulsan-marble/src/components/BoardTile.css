@@ -1,0 +1,423 @@
+.board-tile {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: 10% 6% 5%;
+  color: #162331;
+  background: #f6f1e7;
+  border: 1px solid rgba(13, 33, 48, 0.42);
+  container-type: size;
+  animation: board-tile-enter 220ms ease-out both;
+  animation-delay: calc(var(--tile-order) * 4ms);
+}
+
+.board-tile::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  z-index: 0;
+  pointer-events: none;
+  border: 1px solid rgba(255, 255, 255, 0.34);
+}
+
+.board-tile__district-band {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 1;
+  height: 16%;
+  min-height: 6px;
+  background: var(--district-color);
+  border-bottom: 1px solid rgba(14, 35, 50, 0.36);
+}
+
+.board-tile__name {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  display: -webkit-box;
+  overflow: hidden;
+  color: inherit;
+  font-size: clamp(10px, min(16cqw, 29cqh), 15px);
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: -0.06em;
+  text-align: center;
+  text-wrap: balance;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.board-tile--owned .board-tile__name {
+  width: 90%;
+  transform: translateY(-3%);
+}
+
+.board-tile--landmark {
+  box-shadow: inset 0 0 0 2px rgba(218, 176, 53, 0.78);
+}
+
+.board-tile--city-landmark {
+  border-color: rgba(25, 145, 155, 0.72);
+  box-shadow:
+    inset 0 0 0 2px rgba(223, 190, 78, 0.82),
+    inset 0 0 0 4px rgba(24, 167, 181, 0.2);
+}
+
+.board-tile--city-landmark .board-tile__district-band {
+  background:
+    linear-gradient(
+      90deg,
+      #0f7884,
+      var(--district-city) 50%,
+      #35c5c8
+    );
+}
+
+.board-tile--start {
+  color: #ffffff;
+  background: linear-gradient(145deg, #087f5b, #12a579);
+}
+
+.board-tile--golden_key {
+  color: #493200;
+  background: linear-gradient(145deg, #fff1a8, #e7b934);
+}
+
+.board-tile--bank {
+  color: #f5fbff;
+  background: linear-gradient(145deg, #245a8d, #163b64);
+}
+
+.board-tile--insurance {
+  color: #f4fbff;
+  background: linear-gradient(145deg, #3f7f99, #24576b);
+}
+
+.board-tile--jail {
+  color: #f7f7f7;
+  background: repeating-linear-gradient(
+    -45deg,
+    #4b535c 0,
+    #4b535c 8px,
+    #323941 8px,
+    #323941 16px
+  );
+}
+
+.board-tile--port {
+  color: #effaff;
+  background: linear-gradient(145deg, #1f718e, #16475d);
+}
+
+.board-tile--real_estate {
+  color: #fff9ed;
+  background: linear-gradient(145deg, #a96a2b, #75451a);
+}
+
+.board-tile--auction {
+  color: #fff8f3;
+  background: linear-gradient(145deg, #9b4c32, #642d1d);
+}
+
+.board-tile--news {
+  color: #172431;
+  background: linear-gradient(145deg, #f1f4f4, #c8d1d3);
+}
+
+.board-tile--city_hall {
+  color: #fff9ec;
+  background: linear-gradient(145deg, #617c97, #344e68);
+}
+
+.board-tile--minigame {
+  color: #fff6ff;
+  background: linear-gradient(145deg, #b43d8d, #72285e);
+}
+
+.board-tile--lottery_shop {
+  color: #4a2e00;
+  background:
+    radial-gradient(
+      circle at 76% 24%,
+      rgba(255, 255, 255, 0.5),
+      transparent 18%
+    ),
+    linear-gradient(145deg, #ffe066, #f59f00);
+  box-shadow: inset 0 0 0 2px rgba(157, 92, 0, 0.42);
+}
+
+.board-tile--airport {
+  color: #f5fbff;
+  background: linear-gradient(145deg, #3d8cb4, #225d7a);
+}
+
+.board-tile--free_rest {
+  color: #153726;
+  background: linear-gradient(145deg, #caead5, #8fcaa6);
+}
+
+.board-tile--owned {
+  border-color: color-mix(
+    in srgb,
+    var(--owner-color) 86%,
+    #172430 14%
+  );
+  box-shadow:
+    inset 0 0 0 4px
+      color-mix(in srgb, var(--owner-color) 88%, #ffffff 8%),
+    inset 0 -18px 24px
+      color-mix(in srgb, var(--owner-color) 25%, transparent),
+    0 0 9px
+      color-mix(in srgb, var(--owner-color) 42%, transparent);
+}
+
+.board-tile--owned::before {
+  position: absolute;
+  inset: 16% 0 0;
+  z-index: 0;
+  content: "";
+  pointer-events: none;
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--owner-color) 12%, transparent),
+      transparent 48%
+    );
+}
+
+.board-tile__stage-marker {
+  position: absolute;
+  top: 18%;
+  right: 5%;
+  z-index: 5;
+  width: clamp(24px, min(25cqw, 34cqh), 38px);
+  aspect-ratio: 0.86;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  border-radius: 48% 48% 56% 56%;
+  transform: translateZ(0);
+  filter: drop-shadow(0 4px 5px rgba(0, 0, 0, 0.38));
+}
+
+.board-tile__stage-marker::before {
+  position: absolute;
+  inset: 3px;
+  content: "";
+  border-radius: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.62);
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.52),
+    inset 0 -4px 7px rgba(0, 0, 0, 0.18);
+}
+
+.board-tile__stage-marker::after {
+  position: absolute;
+  top: 16%;
+  left: 19%;
+  width: 34%;
+  height: 18%;
+  content: "";
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.56);
+  filter: blur(0.4px);
+  transform: rotate(-28deg);
+}
+
+.board-tile__stage-marker i {
+  position: relative;
+  z-index: 2;
+  width: 42%;
+  aspect-ratio: 1;
+  display: block;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.26);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.48),
+    0 1px 3px rgba(0, 0, 0, 0.24);
+}
+
+/* 1단계: 동 배지 */
+.board-tile--stage-land .board-tile__stage-marker {
+  background:
+    linear-gradient(145deg, #f1b16e 0%, #a85b2d 45%, #6d341d 100%);
+  border: 2px solid #f4c28c;
+  box-shadow:
+    inset 0 0 0 1px rgba(94, 42, 19, 0.42),
+    0 0 8px rgba(180, 92, 44, 0.32);
+}
+
+.board-tile--stage-land .board-tile__stage-marker i {
+  background:
+    radial-gradient(circle at 35% 30%, #ffd2a2, #a85b2d 58%, #71381f);
+}
+
+/* 2단계: 은 배지 */
+.board-tile--stage-developed .board-tile__stage-marker {
+  background:
+    linear-gradient(145deg, #ffffff 0%, #b9c4ce 43%, #687682 100%);
+  border: 2px solid #f7fbff;
+  box-shadow:
+    inset 0 0 0 1px rgba(66, 78, 88, 0.42),
+    0 0 9px rgba(197, 217, 232, 0.38);
+}
+
+.board-tile--stage-developed .board-tile__stage-marker i {
+  background:
+    radial-gradient(circle at 35% 30%, #ffffff, #c7d2dc 52%, #7d8a96);
+}
+
+/* 3단계: 금 배지 */
+.board-tile--stage-building .board-tile__stage-marker {
+  background:
+    linear-gradient(145deg, #fff3a7 0%, #e1b63c 44%, #8c6715 100%);
+  border: 2px solid #fff5b9;
+  box-shadow:
+    inset 0 0 0 1px rgba(105, 74, 7, 0.42),
+    0 0 11px rgba(235, 191, 57, 0.48);
+}
+
+.board-tile--stage-building .board-tile__stage-marker i {
+  background:
+    radial-gradient(circle at 35% 30%, #fffbd5, #e8bf42 54%, #9b7119);
+}
+
+/* 4단계: 프리즘 배지 */
+.board-tile--stage-landmark .board-tile__stage-marker {
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  background:
+    conic-gradient(
+      from 205deg,
+      #ff6b8a,
+      #ffcf66,
+      #79f2bc,
+      #65c8ff,
+      #b68cff,
+      #ff75d8,
+      #ff6b8a
+    );
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.72),
+    0 0 13px rgba(173, 220, 255, 0.72);
+  animation: board-tile-prism-badge 2.8s linear infinite;
+}
+
+.board-tile--stage-landmark .board-tile__stage-marker::before {
+  inset: 2px;
+  border-color: rgba(255, 255, 255, 0.9);
+  background:
+    linear-gradient(
+      120deg,
+      rgba(255, 255, 255, 0.62),
+      transparent 36% 64%,
+      rgba(255, 255, 255, 0.32)
+    );
+}
+
+.board-tile--stage-landmark .board-tile__stage-marker i {
+  border-radius: 28%;
+  background:
+    conic-gradient(
+      from 45deg,
+      #ffffff,
+      #76e5ff,
+      #ff81de,
+      #ffe56f,
+      #ffffff
+    );
+  transform: rotate(45deg);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.85),
+    0 0 7px rgba(255, 255, 255, 0.82);
+}
+
+@keyframes board-tile-prism-badge {
+  0% {
+    filter:
+      drop-shadow(0 4px 5px rgba(0, 0, 0, 0.38))
+      hue-rotate(0deg);
+  }
+
+  100% {
+    filter:
+      drop-shadow(0 4px 5px rgba(0, 0, 0, 0.38))
+      hue-rotate(360deg);
+  }
+}
+
+.board-tile__owner-marker {
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  bottom: 4%;
+  z-index: 5;
+  min-height: clamp(15px, 24cqh, 22px);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(3px, 4cqw, 6px);
+  padding: 2px 5px;
+  overflow: hidden;
+  color: #ffffff;
+  line-height: 1;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--owner-color) 84%, #ffffff 16%),
+      color-mix(in srgb, var(--owner-color) 88%, #000000 12%)
+    );
+  border: 2px solid rgba(255, 255, 255, 0.92);
+  border-radius: 999px;
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.45),
+    inset 0 1px rgba(255, 255, 255, 0.26);
+}
+
+.board-tile__owner-marker i {
+  min-width: clamp(14px, 18cqh, 20px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  padding: 1px;
+  color: #ffffff;
+  font-size: clamp(7px, min(8cqw, 12cqh), 10px);
+  font-style: normal;
+  font-weight: 950;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.32);
+}
+
+.board-tile__owner-marker b {
+  overflow: hidden;
+  font-size: clamp(7px, min(8cqw, 12cqh), 10px);
+  font-weight: 950;
+  letter-spacing: 0.03em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@keyframes board-tile-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .board-tile--stage-landmark .board-tile__stage-marker {
+    animation: none;
+  }
+}

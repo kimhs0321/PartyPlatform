@@ -1,0 +1,141 @@
+.game-result-modal {
+  position: absolute;
+  inset: 0;
+  z-index: 2010;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(8, 15, 27, 0.82);
+  backdrop-filter: blur(9px);
+  pointer-events: auto;
+}
+
+.game-result-modal__panel {
+  width: min(1080px, 100%);
+  max-height: calc(100% - 20px);
+  overflow: auto;
+  padding: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 20px;
+  background: #ffffff;
+  color: #1f2d3d;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.3);
+}
+
+.game-result-modal__panel header > span {
+  color: #54708f;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.game-result-modal__panel h2 {
+  margin: 6px 0 8px;
+  font-size: 28px;
+}
+
+.game-result-modal__panel header p {
+  margin: 0;
+  color: #607086;
+}
+
+.game-result-modal__table-wrap {
+  margin-top: 22px;
+  overflow-x: auto;
+  border: 1px solid #d8e1eb;
+  border-radius: 14px;
+}
+
+.game-result-modal table {
+  width: 100%;
+  min-width: 900px;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.game-result-modal th,
+.game-result-modal td {
+  padding: 12px 13px;
+  border-bottom: 1px solid #e4eaf1;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.game-result-modal th:nth-child(1),
+.game-result-modal th:nth-child(2),
+.game-result-modal td:nth-child(1),
+.game-result-modal td:nth-child(2) {
+  text-align: left;
+}
+
+.game-result-modal thead {
+  background: #f3f6fa;
+  color: #465a72;
+}
+
+.game-result-modal tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.game-result-modal tbody tr.is-winner {
+  background: #eef7ff;
+}
+
+.game-result-modal__player-mark {
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  margin-right: 7px;
+  border-radius: 999px;
+  vertical-align: 1px;
+}
+
+.game-result-modal__tie-rule {
+  display: block;
+  margin-top: 12px;
+  color: #63748a;
+}
+
+.game-result-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.game-result-modal__actions button {
+  padding: 12px 17px;
+  border-radius: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.game-result-modal__secondary {
+  border: 1px solid #b9c8d8;
+  background: #ffffff;
+  color: #30465f;
+}
+
+.game-result-modal__primary {
+  border: 1px solid #1f5f9d;
+  background: #1f5f9d;
+  color: #ffffff;
+}
+
+@media (max-width: 620px) {
+  .game-result-modal {
+    padding: 12px;
+  }
+
+  .game-result-modal__panel {
+    padding: 20px;
+  }
+
+  .game-result-modal__actions {
+    flex-direction: column-reverse;
+  }
+
+  .game-result-modal__actions button {
+    width: 100%;
+  }
+}

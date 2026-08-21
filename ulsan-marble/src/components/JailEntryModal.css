@@ -1,0 +1,796 @@
+.jail-entry-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1180;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  overflow: auto;
+  background:
+    radial-gradient(
+      circle at 50% 35%,
+      rgba(79, 100, 111, 0.22),
+      transparent 48%
+    ),
+    rgba(2, 7, 11, 0.88);
+  backdrop-filter: blur(8px);
+  pointer-events: auto;
+}
+
+.jail-entry-overlay__warning {
+  position: fixed;
+  top: 34px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(205, 219, 225, 0.3);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.42em;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.jail-entry-modal {
+  position: relative;
+  width: min(
+    720px,
+    calc(100vw - 40px)
+  );
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  color: #e5edf1;
+  border: 1px solid
+    rgba(154, 176, 187, 0.42);
+  border-radius: 18px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(40, 54, 62, 0.98),
+      rgba(13, 21, 26, 0.99) 72%
+    );
+  box-shadow:
+    0 34px 100px
+      rgba(0, 0, 0, 0.72),
+    inset 0 0 0 1px
+      rgba(255, 255, 255, 0.025);
+  opacity: 0;
+  transform:
+    translateY(18px)
+    scale(0.97);
+  transition:
+    opacity 260ms ease,
+    transform 320ms
+      cubic-bezier(0.2, 0.82, 0.2, 1);
+}
+
+.jail-entry-modal.is-ready {
+  opacity: 1;
+  transform:
+    translateY(0)
+    scale(1);
+}
+
+/* 상단 구치소 명칭 */
+
+.jail-entry-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  min-height: 82px;
+  padding: 18px 24px;
+  border-bottom: 1px solid
+    rgba(168, 189, 199, 0.22);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(94, 112, 121, 0.24),
+      rgba(24, 35, 41, 0.34)
+    );
+}
+
+.jail-entry-modal__header > div {
+  display: grid;
+  gap: 4px;
+}
+
+.jail-entry-modal__header span {
+  color: #92a7b1;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+}
+
+.jail-entry-modal__header strong {
+  color: #ffffff;
+  font-size: 25px;
+  font-weight: 950;
+  letter-spacing: -0.03em;
+}
+
+.jail-entry-modal__header > b {
+  flex: 0 0 auto;
+  padding: 8px 13px;
+  color: #d9e7ed;
+  font-size: 13px;
+  font-weight: 950;
+  border: 1px solid
+    rgba(145, 178, 192, 0.48);
+  border-radius: 5px;
+  background:
+    rgba(64, 88, 99, 0.38);
+  box-shadow:
+    inset 0 1px 0
+      rgba(255, 255, 255, 0.07);
+  letter-spacing: 0.08em;
+}
+
+/* 철장 장면 */
+
+.jail-entry-modal__scene {
+  position: relative;
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.35fr)
+    minmax(230px, 0.8fr);
+  min-height: 310px;
+  border-bottom: 1px solid
+    rgba(168, 189, 199, 0.18);
+  background:
+    linear-gradient(
+      90deg,
+      rgba(5, 11, 15, 0.16),
+      rgba(255, 255, 255, 0.018)
+    );
+}
+
+.jail-entry-modal__warning-light {
+  position: absolute;
+  top: 18px;
+  left: 22px;
+  z-index: 5;
+  width: 11px;
+  height: 11px;
+  border: 2px solid
+    rgba(190, 222, 234, 0.86);
+  border-radius: 50%;
+  background: #7fa9bb;
+  box-shadow:
+    0 0 0 5px
+      rgba(127, 169, 187, 0.1),
+    0 0 20px
+      rgba(127, 169, 187, 0.58);
+  animation:
+    jail-warning-light
+    1.5s ease-in-out infinite;
+}
+
+@keyframes jail-warning-light {
+  0%,
+  100% {
+    opacity: 0.46;
+  }
+
+  50% {
+    opacity: 0.9;
+  }
+}
+
+/* 감방 */
+
+.jail-entry-modal__cell {
+  position: relative;
+  min-height: 310px;
+  overflow: hidden;
+  border-right: 1px solid
+    rgba(157, 179, 190, 0.24);
+  background:
+    radial-gradient(
+      circle at 50% 48%,
+      rgba(93, 112, 121, 0.18),
+      transparent 50%
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.022) 0,
+      rgba(255, 255, 255, 0.022) 1px,
+      transparent 1px,
+      transparent 36px
+    ),
+    linear-gradient(
+      180deg,
+      #1c2a31,
+      #0c1419
+    );
+}
+
+.jail-entry-modal__cell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(
+      ellipse at center bottom,
+      transparent 20%,
+      rgba(0, 0, 0, 0.56) 100%
+    );
+  pointer-events: none;
+}
+
+.jail-entry-modal__cell::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  height: 38px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(23, 34, 40, 0),
+      rgba(5, 10, 13, 0.78)
+    );
+}
+
+/* 사람 실루엣 */
+
+.jail-entry-modal__silhouette {
+  position: absolute;
+  left: 50%;
+  bottom: 28px;
+  z-index: 3;
+  width: 132px;
+  height: 232px;
+  transform:
+    translateX(-50%)
+    translateY(8px);
+  filter:
+    drop-shadow(
+      0 14px 16px
+      rgba(0, 0, 0, 0.5)
+    );
+  opacity: 0;
+  transition:
+    opacity 400ms ease 160ms,
+    transform 500ms
+      cubic-bezier(0.2, 0.8, 0.2, 1)
+      160ms;
+}
+
+.jail-entry-modal.is-ready
+.jail-entry-modal__silhouette {
+  opacity: 0.92;
+  transform:
+    translateX(-50%)
+    translateY(0);
+}
+
+.jail-entry-modal__silhouette-head {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  width: 68px;
+  height: 78px;
+  transform: translateX(-50%);
+  border-radius:
+    46% 46% 42% 42%;
+  background:
+    radial-gradient(
+      circle at 38% 28%,
+      rgba(57, 68, 74, 0.9),
+      rgba(12, 18, 22, 0.98) 66%
+    );
+}
+
+.jail-entry-modal__silhouette-head::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -16px;
+  width: 34px;
+  height: 28px;
+  transform: translateX(-50%);
+  border-radius: 7px;
+  background: #11191d;
+}
+
+.jail-entry-modal__silhouette-body {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 128px;
+  height: 148px;
+  transform: translateX(-50%);
+  border-radius:
+    58px 58px 12px 12px;
+  background:
+    radial-gradient(
+      circle at 50% 20%,
+      rgba(45, 56, 62, 0.96),
+      rgba(9, 14, 17, 0.99) 68%
+    );
+}
+
+.jail-entry-modal__silhouette-body::before,
+.jail-entry-modal__silhouette-body::after {
+  content: "";
+  position: absolute;
+  top: 42px;
+  width: 35px;
+  height: 116px;
+  border-radius: 18px;
+  background: #0b1114;
+}
+
+.jail-entry-modal__silhouette-body::before {
+  left: -14px;
+  transform: rotate(7deg);
+}
+
+.jail-entry-modal__silhouette-body::after {
+  right: -14px;
+  transform: rotate(-7deg);
+}
+
+/* 키 측정선 */
+
+.jail-entry-modal__height-lines {
+  position: absolute;
+  top: 48px;
+  right: 22px;
+  bottom: 38px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 66px;
+  color: rgba(198, 213, 220, 0.56);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 800;
+  pointer-events: none;
+}
+
+.jail-entry-modal__height-lines::before {
+  content: "";
+  position: absolute;
+  top: 5px;
+  right: 0;
+  bottom: 5px;
+  width: 1px;
+  background:
+    rgba(192, 208, 215, 0.25);
+}
+
+.jail-entry-modal__height-lines i {
+  position: relative;
+  display: block;
+  font-style: normal;
+}
+
+.jail-entry-modal__height-lines i::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  width: 28px;
+  height: 1px;
+  background:
+    rgba(192, 208, 215, 0.28);
+}
+
+/* 철창 */
+
+.jail-entry-modal__bars {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: flex;
+  justify-content: space-evenly;
+  pointer-events: none;
+}
+
+.jail-entry-modal__bars::before,
+.jail-entry-modal__bars::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 9px;
+  border-top: 1px solid
+    rgba(232, 240, 244, 0.44);
+  border-bottom: 1px solid
+    rgba(0, 0, 0, 0.78);
+  background:
+    linear-gradient(
+      180deg,
+      #9ba8ae,
+      #39484f 45%,
+      #182229
+    );
+  box-shadow:
+    0 3px 8px
+      rgba(0, 0, 0, 0.54);
+}
+
+.jail-entry-modal__bars::before {
+  top: 46px;
+}
+
+.jail-entry-modal__bars::after {
+  bottom: 38px;
+}
+
+.jail-entry-modal__bars i {
+  position: relative;
+  display: block;
+  flex: 0 0 8px;
+  width: 8px;
+  height: 100%;
+
+  border-left: 1px solid
+    rgba(235, 242, 245, 0.34);
+
+  border-right: 1px solid
+    rgba(0, 0, 0, 0.68);
+
+  background:
+    linear-gradient(
+      90deg,
+      #25343b 0%,
+      #8d9ba2 38%,
+      #4a5960 64%,
+      #151f24 100%
+    );
+
+  box-shadow:
+    3px 0 7px
+      rgba(0, 0, 0, 0.4);
+}
+
+.jail-entry-modal__silhouette {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 180px;
+  height: 260px;
+  transform: translateX(-50%);
+  opacity: 0.82;
+}
+
+.jail-entry-modal__silhouette-head {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  width: 64px;
+  height: 78px;
+  transform: translateX(-50%);
+  border-radius: 46% 46% 42% 42%;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(20, 29, 35, 0.96),
+      rgba(3, 8, 12, 0.98)
+    );
+}
+
+.jail-entry-modal__silhouette-neck {
+  position: absolute;
+  top: 82px;
+  left: 50%;
+  width: 28px;
+  height: 30px;
+  transform: translateX(-50%);
+  border-radius: 8px;
+  background: rgba(5, 10, 14, 0.98);
+}
+
+.jail-entry-modal__silhouette-torso {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 170px;
+  height: 172px;
+  transform: translateX(-50%);
+}
+
+.jail-entry-modal__silhouette-chest {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 112px;
+  height: 168px;
+  transform: translateX(-50%);
+  border-radius: 45px 45px 10px 10px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(19, 28, 34, 0.96),
+      rgba(2, 7, 10, 0.99)
+    );
+}
+
+.jail-entry-modal__silhouette-shoulder {
+  position: absolute;
+  top: 10px;
+  width: 86px;
+  height: 120px;
+  border-radius: 55% 55% 15px 15px;
+  background: rgba(4, 9, 13, 0.98);
+}
+
+.jail-entry-modal__silhouette-shoulder--left {
+  left: 3px;
+  transform: rotate(8deg);
+}
+
+.jail-entry-modal__silhouette-shoulder--right {
+  right: 3px;
+  transform: rotate(-8deg);
+}
+
+/* 수감 기록판 */
+
+.jail-entry-modal__booking-board {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  padding: 28px 24px;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.018) 0,
+      rgba(255, 255, 255, 0.018) 1px,
+      transparent 1px,
+      transparent 8px
+    ),
+    rgba(8, 15, 19, 0.58);
+}
+
+.jail-entry-modal__booking-board small {
+  color: #93a8b2;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+}
+
+.jail-entry-modal__booking-board h2 {
+  margin: 9px 0 22px;
+  overflow: hidden;
+  color: #ffffff;
+  font-size: 30px;
+  font-weight: 950;
+  line-height: 1.2;
+  letter-spacing: -0.04em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jail-entry-modal__booking-board dl {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.jail-entry-modal__booking-board dl > div {
+  display: grid;
+  gap: 4px;
+  padding: 12px 13px;
+  border: 1px solid
+    rgba(162, 184, 194, 0.16);
+  border-radius: 6px;
+  background:
+    rgba(255, 255, 255, 0.035);
+}
+
+.jail-entry-modal__booking-board dt {
+  color: #94a8b1;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.jail-entry-modal__booking-board dd {
+  margin: 0;
+  color: #eef5f8;
+  font-size: 17px;
+  font-weight: 950;
+  letter-spacing: 0.03em;
+}
+
+/* 수감 규칙 */
+
+.jail-entry-modal__rules {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  border-bottom: 1px solid
+    rgba(167, 188, 198, 0.18);
+}
+
+.jail-entry-modal__rules > div {
+  display: grid;
+  grid-template-columns:
+    32px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  min-height: 98px;
+  padding: 17px 18px;
+  border-right: 1px solid
+    rgba(167, 188, 198, 0.15);
+  background:
+    rgba(255, 255, 255, 0.018);
+}
+
+.jail-entry-modal__rules > div:last-child {
+  border-right: 0;
+}
+
+.jail-entry-modal__rules span {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  color: #b9c9d0;
+  font-size: 11px;
+  font-weight: 950;
+  border: 1px solid
+    rgba(176, 196, 205, 0.3);
+  border-radius: 50%;
+  background:
+    rgba(255, 255, 255, 0.045);
+}
+
+.jail-entry-modal__rules p {
+  margin: 1px 0 0;
+  color: #c2d0d6;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.55;
+  word-break: keep-all;
+}
+
+.jail-entry-modal__rules strong {
+  color: #ffffff;
+  font-weight: 950;
+}
+
+/* 수감 처리 버튼 */
+
+.jail-entry-modal > button {
+  display: block;
+  width: calc(100% - 48px);
+  min-height: 62px;
+  margin: 22px 24px 24px;
+  padding: 15px 20px;
+  color: #f4fafc;
+  font-size: 18px;
+  font-weight: 950;
+  letter-spacing: -0.01em;
+  border: 1px solid
+    rgba(154, 190, 204, 0.62);
+  border-radius: 10px;
+  background:
+    linear-gradient(
+      180deg,
+      #496b7a,
+      #2d4854
+    );
+  box-shadow:
+    0 0 0 3px
+      rgba(116, 158, 176, 0.1),
+    0 12px 28px
+      rgba(0, 8, 13, 0.4),
+    inset 0 1px 0
+      rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  transition:
+    transform 150ms ease,
+    filter 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.jail-entry-modal > button:hover:not(
+  :disabled
+) {
+  filter: brightness(1.08);
+  border-color:
+    rgba(185, 218, 230, 0.78);
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 0 4px
+      rgba(116, 158, 176, 0.13),
+    0 14px 30px
+      rgba(0, 8, 13, 0.48);
+}
+
+.jail-entry-modal > button:active:not(
+  :disabled
+) {
+  transform: translateY(1px);
+}
+
+.jail-entry-modal > button:disabled {
+  color: #9cabb2;
+  font-size: 15px;
+  border-color:
+    rgba(153, 173, 182, 0.18);
+  background:
+    linear-gradient(
+      180deg,
+      #394950,
+      #26343a
+    );
+  box-shadow: none;
+  cursor: default;
+}
+
+/* 작은 화면 */
+
+@media (max-width: 700px) {
+  .jail-entry-overlay {
+    padding: 14px;
+  }
+
+  .jail-entry-overlay__warning {
+    top: 14px;
+    font-size: 10px;
+  }
+
+  .jail-entry-modal {
+    width: calc(100vw - 28px);
+    max-height: calc(100vh - 28px);
+  }
+
+  .jail-entry-modal__header {
+    min-height: 72px;
+    padding: 15px 18px;
+  }
+
+  .jail-entry-modal__header strong {
+    font-size: 21px;
+  }
+
+  .jail-entry-modal__scene {
+    grid-template-columns: 1fr;
+  }
+
+  .jail-entry-modal__cell {
+    min-height: 270px;
+    border-right: 0;
+    border-bottom: 1px solid
+      rgba(157, 179, 190, 0.24);
+  }
+
+  .jail-entry-modal__booking-board {
+    padding: 20px;
+  }
+
+  .jail-entry-modal__booking-board h2 {
+    margin-bottom: 14px;
+    font-size: 25px;
+  }
+
+  .jail-entry-modal__rules {
+    grid-template-columns: 1fr;
+  }
+
+  .jail-entry-modal__rules > div {
+    min-height: 0;
+    border-right: 0;
+    border-bottom: 1px solid
+      rgba(167, 188, 198, 0.15);
+  }
+
+  .jail-entry-modal__rules > div:last-child {
+    border-bottom: 0;
+  }
+
+  .jail-entry-modal > button {
+    width: calc(100% - 36px);
+    margin: 18px;
+  }
+}

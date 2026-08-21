@@ -1,0 +1,1 @@
+{"root":["./src/App.tsx","./src/main.tsx","./src/types.ts","./src/vite-env.d.ts","./src/board/layout.ts","./src/components/BoardTile.tsx","./src/components/UlsanBoard.tsx"],"version":"5.9.3"}

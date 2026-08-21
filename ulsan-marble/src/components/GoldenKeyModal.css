@@ -1,0 +1,1035 @@
+.golden-key-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1160;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  pointer-events: auto;
+  background:
+    radial-gradient(circle at 50% 36%, rgba(49, 58, 51, 0.3), transparent 34%),
+    rgba(1, 9, 15, 0.86);
+  backdrop-filter: blur(9px);
+}
+
+.golden-key-modal__card {
+  --category-color: #1e7d5b;
+  --category-dark: #0d4c39;
+  --category-soft: #dcefe5;
+  --ink: #3c2a0a;
+  --gold-1: #fff1ad;
+  --gold-2: #d2a843;
+  --gold-3: #7b5512;
+
+  position: relative;
+  width: min(320px, calc(100vw - 24px));
+  max-height: calc(100vh - 32px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 14px 16px 13px;
+  color: var(--ink);
+  text-align: center;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(123, 85, 18, 0.05) 1px, transparent 1px),
+    radial-gradient(circle at 50% 7%, rgba(255, 255, 255, 0.92), transparent 24%),
+    linear-gradient(180deg, #fff9dc 0%, #f7eac0 58%, #ead49c 100%);
+  background-size: 8px 8px, 8px 8px, auto, auto;
+  border: 4px solid var(--gold-2);
+  border-radius: 21px;
+  box-shadow:
+    0 28px 90px rgba(0, 0, 0, 0.62),
+    0 0 0 3px #f9e8a3,
+    0 0 0 6px #67450d,
+    inset 0 0 0 2px rgba(255, 252, 221, 0.9),
+    inset 0 0 28px rgba(126, 83, 12, 0.2);
+}
+
+.golden-key-modal__card::before,
+.golden-key-modal__card::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: 18px;
+}
+
+.golden-key-modal__card::before {
+  inset: 8px;
+  border: 1px solid rgba(102, 68, 9, 0.72);
+}
+
+.golden-key-modal__card::after {
+  inset: 12px;
+  border: 1px solid rgba(193, 151, 52, 0.55);
+}
+
+.golden-key-modal__card--positive {
+  --category-color: #18795a;
+  --category-dark: #0b4734;
+  --category-soft: #d7eee4;
+}
+
+.golden-key-modal__card--situation {
+  --category-color: #326aa0;
+  --category-dark: #183d67;
+  --category-soft: #d9e9f7;
+}
+
+.golden-key-modal__card--negative {
+  --category-color: #a44635;
+  --category-dark: #652116;
+  --category-soft: #f2ddd7;
+}
+
+.golden-key-modal__header,
+.golden-key-modal__divider,
+.golden-key-modal__artwork,
+.golden-key-modal__description-panel,
+.golden-key-modal__result,
+.golden-key-modal__footer {
+  position: relative;
+  z-index: 2;
+}
+
+.golden-key-modal__corner {
+  position: absolute;
+  z-index: 3;
+  width: 34px;
+  height: 34px;
+  pointer-events: none;
+}
+
+.golden-key-modal__corner::before,
+.golden-key-modal__corner::after {
+  content: "";
+  position: absolute;
+  background: var(--gold-3);
+  opacity: 0.62;
+}
+
+.golden-key-modal__corner::before {
+  width: 28px;
+  height: 1px;
+}
+
+.golden-key-modal__corner::after {
+  width: 1px;
+  height: 28px;
+}
+
+.golden-key-modal__corner--tl {
+  top: 15px;
+  left: 15px;
+}
+
+.golden-key-modal__corner--tr {
+  top: 15px;
+  right: 15px;
+  transform: rotate(90deg);
+}
+
+.golden-key-modal__corner--bl {
+  bottom: 15px;
+  left: 15px;
+  transform: rotate(-90deg);
+}
+
+.golden-key-modal__corner--br {
+  right: 15px;
+  bottom: 15px;
+  transform: rotate(180deg);
+}
+
+.golden-key-modal__topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 13px;
+  color: rgba(75, 50, 8, 0.62);
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+}
+
+.golden-key-modal__heading-row {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 44px;
+  gap: 8px;
+  align-items: center;
+  min-height: 70px;
+  margin-top: 3px;
+  padding: 5px 6px 4px;
+}
+
+.golden-key-modal__badge,
+.golden-key-modal__cycle-seal {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+
+.golden-key-modal__badge {
+  color: #fff8d9;
+  background:
+    radial-gradient(circle at 36% 26%, rgba(255, 255, 255, 0.34), transparent 28%),
+    linear-gradient(145deg, var(--category-color), var(--category-dark));
+  border: 3px solid #e7c568;
+  box-shadow:
+    0 0 0 2px #6e4b0d,
+    0 7px 12px rgba(61, 37, 0, 0.28),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.32);
+}
+
+.golden-key-modal__badge span {
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.golden-key-modal__heading-copy {
+  min-width: 0;
+}
+
+.golden-key-modal__heading-copy > span {
+  display: block;
+  color: var(--category-dark);
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.18em;
+}
+
+.golden-key-modal__heading-copy h2 {
+  margin: 5px 0 0;
+  color: #3b2908;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(20px, 4vw, 26px);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.045em;
+  word-break: keep-all;
+  text-shadow: 0 1px 0 #fff9df;
+}
+
+.golden-key-modal__cycle-seal {
+  color: #6d4b0c;
+  background: linear-gradient(145deg, #fff4bd, #d4ae53);
+  border: 2px solid #8a631c;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.36);
+}
+
+.golden-key-modal__cycle-seal strong {
+  margin-top: 6px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.golden-key-modal__cycle-seal span {
+  margin-top: -10px;
+  font-size: 7px;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+}
+
+.golden-key-modal__divider {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 8px;
+  align-items: center;
+  padding: 0 10px;
+  color: var(--category-color);
+}
+
+.golden-key-modal__divider span {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(116, 79, 13, 0.75));
+}
+
+.golden-key-modal__divider span:last-child {
+  background: linear-gradient(90deg, rgba(116, 79, 13, 0.75), transparent);
+}
+
+.golden-key-modal__divider b {
+  font-size: 10px;
+}
+
+.golden-key-modal__artwork {
+  display: grid;
+  place-items: center;
+  min-height: 145px;
+  margin: 8px 4px 0;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255, 247, 190, 0.96), transparent 38%),
+    linear-gradient(145deg, var(--category-dark), #13211e 72%);
+  border: 3px solid #d2ae4d;
+  border-radius: 15px;
+  box-shadow:
+    0 0 0 1px #72500f,
+    inset 0 0 25px rgba(0, 0, 0, 0.36);
+}
+
+.golden-key-modal__sunburst {
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  background: repeating-conic-gradient(
+    from 0deg,
+    rgba(255, 231, 128, 0.26) 0deg 8deg,
+    transparent 8deg 18deg
+  );
+  border-radius: 50%;
+  animation: golden-key-slow-spin 22s linear infinite;
+}
+
+.golden-key-modal__key-ring,
+.golden-key-modal__key-shaft,
+.golden-key-modal__key-tooth {
+  position: absolute;
+  background: linear-gradient(145deg, #fff0a8, #c58f1e 62%, #7e5207);
+  border: 3px solid #6a4305;
+  box-shadow:
+    0 7px 12px rgba(0, 0, 0, 0.25),
+    inset 2px 2px 0 rgba(255, 255, 255, 0.5);
+}
+
+.golden-key-modal__key-ring {
+  width: 62px;
+  height: 62px;
+  transform: translate(-34px, -14px) rotate(-18deg);
+  border-radius: 50%;
+}
+
+.golden-key-modal__key-ring::after {
+  content: "";
+  position: absolute;
+  inset: 14px;
+  background: var(--category-dark);
+  border: 3px solid #6a4305;
+  border-radius: 50%;
+}
+
+.golden-key-modal__key-shaft {
+  width: 90px;
+  height: 20px;
+  transform: translate(31px, 20px) rotate(-18deg);
+  border-radius: 6px;
+}
+
+.golden-key-modal__key-tooth {
+  width: 26px;
+  height: 32px;
+  transform: translate(73px, 36px) rotate(-18deg);
+  clip-path: polygon(0 0, 100% 0, 100% 45%, 64% 45%, 64% 100%, 0 100%);
+}
+
+.golden-key-modal__effect-emblem {
+  position: absolute;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  transform: translate(-34px, -14px) rotate(-18deg);
+  color: #fff7c7;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 22px;
+  font-weight: 950;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.45);
+}
+
+.golden-key-modal__group-ribbon {
+  position: absolute;
+  right: 10px;
+  bottom: 9px;
+  min-width: 70px;
+  padding: 5px 9px;
+  color: #fff8d7;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.05em;
+  background: linear-gradient(145deg, var(--category-color), var(--category-dark));
+  border: 1px solid #e0bd5f;
+  border-radius: 999px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.24);
+}
+
+.golden-key-modal__description-panel {
+  margin: 10px 4px 0;
+  padding: 12px 13px 11px;
+  background: rgba(255, 251, 226, 0.74);
+  border: 1px solid rgba(111, 75, 12, 0.48);
+  box-shadow:
+    inset 0 0 0 3px rgba(255, 255, 255, 0.35),
+    0 6px 12px rgba(80, 49, 0, 0.08);
+  height: 88px;
+  box-sizing: border-box;
+  display: grid;
+  align-content: center;
+  overflow: hidden;  
+}
+
+.golden-key-modal__description-panel--resolved {
+  color: #fff9dc;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.08),
+      transparent
+    ),
+    var(--category-dark);
+
+  border-color: #d6b455;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 6px 14px rgba(0, 0, 0, 0.18);
+
+  animation: golden-key-result-in 180ms ease-out;
+}
+
+.golden-key-modal__description-panel--resolved
+  .golden-key-modal__description-label {
+  color: rgba(255, 248, 208, 0.72);
+}
+
+.golden-key-modal__result-player {
+  margin-top: 3px;
+  color: #fff9dc;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.golden-key-modal__result-text {
+  margin: 2px 0 0;
+  color: #fff9dc;
+  font-size: 13px;
+  font-weight: 850;
+  line-height: 1.32;
+  word-break: keep-all;
+}
+
+@keyframes golden-key-result-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.golden-key-modal__description-label {
+  display: block;
+  color: rgba(82, 54, 8, 0.58);
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.18em;
+}
+
+.golden-key-modal__description {
+  min-height: 36px;
+  margin: 5px 0 0;
+  color: #4a3209;
+  font-size: 14px;
+  font-weight: 850;
+  line-height: 1.42;
+  word-break: keep-all;
+}
+
+.golden-key-modal__footer {
+  margin: 10px 4px 0;
+}
+
+.golden-key-modal__deck-status {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  overflow: hidden;
+  color: rgba(73, 48, 8, 0.72);
+  font-size: 9px;
+  font-weight: 800;
+  background: rgba(138, 99, 28, 0.1);
+  border: 1px solid rgba(114, 77, 12, 0.28);
+  border-radius: 8px;
+}
+
+.golden-key-modal__deck-status span {
+  padding: 7px 4px;
+}
+
+.golden-key-modal__deck-status span + span {
+  border-left: 1px solid rgba(114, 77, 12, 0.24);
+}
+
+.golden-key-modal__deck-status strong {
+  color: var(--category-dark);
+}
+
+.golden-key-modal__action {
+  width: 100%;
+  min-height: 42px;
+  margin-top: 11px;
+  color: #fff9d9;
+  font-size: 14px;
+  font-weight: 950;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.13), transparent 45%),
+    linear-gradient(145deg, var(--category-color), var(--category-dark));
+  border: 1px solid #e0bd5f;
+  border-radius: 9px;
+  box-shadow:
+    0 6px 0 #5f410b,
+    0 10px 18px rgba(62, 37, 0, 0.22),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+  cursor: pointer;
+  transition:
+    transform 120ms ease,
+    filter 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.golden-key-modal__action:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.golden-key-modal__action:active {
+  transform: translateY(4px);
+  box-shadow:
+    0 2px 0 #5f410b,
+    0 5px 10px rgba(62, 37, 0, 0.2);
+}
+
+.golden-key-modal__signature {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding: 0 4px;
+  color: rgba(79, 52, 8, 0.5);
+  font-size: 7px;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+}
+
+@keyframes golden-key-slow-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 520px) {
+  .golden-key-modal {
+    padding: 16px;
+  }
+
+  .golden-key-modal__card {
+    width: min(320px, calc(100vw - 20px));
+    padding: 13px 14px 12px;
+  }
+
+  .golden-key-modal__heading-row {
+    grid-template-columns: 46px minmax(0, 1fr) 42px;
+  }
+
+  .golden-key-modal__artwork {
+    min-height: 138px;
+  }
+
+  .golden-key-modal__key-ring {
+    width: 58px;
+    height: 58px;
+  }
+
+  .golden-key-modal__key-ring::after {
+    inset: 13px;
+  }
+
+  .golden-key-modal__key-shaft {
+    width: 84px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .golden-key-modal__sunburst {
+    animation: none;
+  }
+
+  .golden-key-modal__action {
+    transition: none;
+  }
+}
+
+/* 황금열쇠 더미에서 카드 한 장을 꺼내 뒤집는 연출 */
+.golden-key-modal__scene {
+  position: relative;
+  width: min(320px, calc(100vw - 24px));
+  perspective: 1500px;
+  transform-style: preserve-3d;
+}
+
+.golden-key-modal__draw-card {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  transform-origin: 50% 100%;
+  will-change: transform, opacity, filter;
+}
+
+.golden-key-modal__draw-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  pointer-events: none;
+  opacity: 0;
+  border-radius: 21px;
+  background:
+    linear-gradient(
+      108deg,
+      transparent 27%,
+      rgba(255, 255, 255, 0.08) 38%,
+      rgba(255, 249, 205, 0.95) 50%,
+      rgba(255, 217, 103, 0.38) 59%,
+      transparent 73%
+    );
+  mix-blend-mode: screen;
+}
+
+.golden-key-modal__draw-card-inner {
+  position: relative;
+  width: 100%;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.golden-key-modal__scene .golden-key-modal__card {
+  width: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: rotateY(180deg);
+}
+
+.golden-key-modal__card-back {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 13px;
+  overflow: hidden;
+  box-sizing: border-box;
+  padding: 24px;
+  color: #fff2b2;
+  text-align: center;
+  border: 4px solid #d4ac47;
+  border-radius: 21px;
+  background:
+    linear-gradient(45deg, rgba(255, 239, 158, 0.07) 25%, transparent 25%) 0 0 / 18px 18px,
+    linear-gradient(-45deg, rgba(255, 239, 158, 0.07) 25%, transparent 25%) 0 0 / 18px 18px,
+    radial-gradient(circle at 50% 42%, rgba(255, 222, 103, 0.18), transparent 34%),
+    linear-gradient(145deg, #123d31, #09251f 62%, #061914);
+  box-shadow:
+    0 28px 90px rgba(0, 0, 0, 0.62),
+    0 0 0 3px #f9e8a3,
+    0 0 0 6px #67450d,
+    inset 0 0 0 2px rgba(255, 252, 221, 0.38),
+    inset 0 0 38px rgba(0, 0, 0, 0.48);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.golden-key-modal__card-back::before,
+.golden-key-modal__card-back::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  border-radius: 15px;
+}
+
+.golden-key-modal__card-back::before {
+  inset: 9px;
+  border: 1px solid rgba(255, 226, 125, 0.68);
+}
+
+.golden-key-modal__card-back::after {
+  inset: 14px;
+  border: 1px solid rgba(255, 242, 190, 0.23);
+}
+
+.golden-key-modal__card-back-kicker,
+.golden-key-modal__card-back > strong,
+.golden-key-modal__card-back > small,
+.golden-key-modal__card-back-seal {
+  position: relative;
+  z-index: 2;
+}
+
+.golden-key-modal__card-back-kicker {
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.24em;
+  opacity: 0.72;
+}
+
+.golden-key-modal__card-back > strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 22px;
+  letter-spacing: 0.08em;
+  text-shadow: 0 3px 7px rgba(0, 0, 0, 0.48);
+}
+
+.golden-key-modal__card-back > small {
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  opacity: 0.7;
+}
+
+.golden-key-modal__card-back-seal {
+  width: 126px;
+  height: 126px;
+  border: 2px solid rgba(255, 226, 121, 0.72);
+  border-radius: 50%;
+  background:
+    repeating-conic-gradient(
+      from 0deg,
+      rgba(255, 230, 132, 0.16) 0deg 8deg,
+      transparent 8deg 18deg
+    );
+  box-shadow:
+    0 0 0 8px rgba(122, 85, 17, 0.22),
+    inset 0 0 24px rgba(0, 0, 0, 0.3);
+}
+
+.golden-key-modal__card-back-ring,
+.golden-key-modal__card-back-shaft,
+.golden-key-modal__card-back-tooth {
+  position: absolute;
+  background: linear-gradient(145deg, #fff1a9, #c58f1e 62%, #7e5207);
+  border: 3px solid #6a4305;
+  box-shadow:
+    0 7px 12px rgba(0, 0, 0, 0.25),
+    inset 2px 2px 0 rgba(255, 255, 255, 0.5);
+}
+
+.golden-key-modal__card-back-ring {
+  top: 29px;
+  left: 19px;
+  width: 51px;
+  height: 51px;
+  border-radius: 50%;
+  transform: rotate(-18deg);
+}
+
+.golden-key-modal__card-back-ring::after {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  border: 3px solid #6a4305;
+  border-radius: 50%;
+  background: #0a2d25;
+}
+
+.golden-key-modal__card-back-shaft {
+  top: 67px;
+  left: 58px;
+  width: 72px;
+  height: 18px;
+  border-radius: 5px;
+  transform: rotate(-18deg);
+}
+
+.golden-key-modal__card-back-tooth {
+  top: 83px;
+  left: 99px;
+  width: 24px;
+  height: 28px;
+  transform: rotate(-18deg);
+  clip-path: polygon(0 0, 100% 0, 100% 45%, 64% 45%, 64% 100%, 0 100%);
+}
+
+/* 카드 뭉치: 실제로 뽑히는 .golden-key-modal__draw-card가 맨 윗장이다. */
+.golden-key-modal__deck {
+  position: absolute;
+  z-index: 1;
+  left: 16px;
+  bottom: 16px;
+  width: 88px;
+  height: 132px;
+  pointer-events: none;
+  transform-origin: center bottom;
+  transition:
+    opacity 220ms ease,
+    transform 220ms ease;
+}
+
+/* 아래에 남아 있는 카드 뭉치 본체 */
+.golden-key-modal__deck::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px solid #d5b254;
+  border-radius: 10px;
+  background:
+    radial-gradient(circle at 50% 46%, rgba(255, 224, 119, 0.2), transparent 34%),
+    linear-gradient(145deg, #134538, #08271f);
+  box-shadow:
+    1px 2px 0 #e4ca78,
+    2px 4px 0 #725013,
+    3px 6px 0 #e4ca78,
+    4px 8px 0 #725013,
+    5px 10px 0 #e4ca78,
+    6px 12px 0 #725013,
+    7px 14px 0 #e4ca78,
+    8px 16px 0 #725013,
+    9px 18px 0 #e4ca78,
+    10px 20px 0 #725013,
+    11px 22px 0 #e4ca78,
+    12px 24px 0 #725013,
+    13px 26px 0 #e4ca78,
+    14px 28px 0 #5c3d0b,
+    0 20px 24px rgba(0, 0, 0, 0.42),
+    inset 0 0 0 1px rgba(255, 243, 188, 0.3);
+}
+
+.golden-key-modal__deck::after {
+  content: "◆";
+  position: absolute;
+  inset: 8px;
+  display: grid;
+  place-items: center;
+  color: rgba(242, 207, 108, 0.75);
+  font-size: 20px;
+  border: 1px solid rgba(255, 231, 143, 0.42);
+  border-radius: 6px;
+}
+
+.golden-key-modal__deck > strong {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  bottom: -35px;
+  transform: translateX(-50%);
+  color: #ffe99b;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  white-space: nowrap;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.55);
+}
+
+/* 앞면은 실제 뒤집기 단계 전까지 렌더링하지 않는다. */
+.golden-key-modal__scene .golden-key-modal__card,
+.golden-key-modal__card-back {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.golden-key-modal__scene--deck .golden-key-modal__card,
+.golden-key-modal__scene--drawing .golden-key-modal__card,
+.golden-key-modal__scene--holding .golden-key-modal__card {
+  visibility: hidden;
+}
+
+.golden-key-modal__scene--flipping .golden-key-modal__card,
+.golden-key-modal__scene--revealed .golden-key-modal__card {
+  visibility: visible;
+}
+
+/* 1단계: 실제 뽑힐 카드가 카드 뭉치의 맨 윗장으로 보인다. */
+.golden-key-modal__scene--deck .golden-key-modal__draw-card {
+  opacity: 1;
+  transform: translate3d(-100px, -16px, 0) scale(0.28) rotateZ(-2deg);
+  animation: golden-key-top-card-ready 650ms ease-in-out infinite alternate;
+}
+
+.golden-key-modal__scene--deck .golden-key-modal__draw-card-inner,
+.golden-key-modal__scene--drawing .golden-key-modal__draw-card-inner,
+.golden-key-modal__scene--holding .golden-key-modal__draw-card-inner {
+  transform: rotateY(0deg);
+}
+
+/* 2단계: 맨 윗장 자체가 뭉치에서 빠져나와 중앙으로 이동한다. */
+.golden-key-modal__scene--drawing .golden-key-modal__draw-card {
+  animation: golden-key-card-draw 1300ms cubic-bezier(0.16, 0.72, 0.18, 1) both;
+}
+
+.golden-key-modal__scene--drawing .golden-key-modal__deck {
+  animation: golden-key-deck-recede 1300ms ease-out both;
+}
+
+/* 3단계: 중앙에서 잠시 멈춘 뒤 뒤집는다. */
+.golden-key-modal__scene--holding .golden-key-modal__draw-card {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1) rotateZ(0);
+}
+
+.golden-key-modal__scene--holding .golden-key-modal__deck,
+.golden-key-modal__scene--flipping .golden-key-modal__deck,
+.golden-key-modal__scene--revealed .golden-key-modal__deck {
+  opacity: 0;
+  transform: translateY(12px) scale(0.94);
+}
+
+/* 4단계: 카드 뒷면에서 앞면으로 천천히 뒤집는다. */
+.golden-key-modal__scene--flipping .golden-key-modal__draw-card-inner {
+  animation: golden-key-card-flip 850ms cubic-bezier(0.38, 0.04, 0.2, 1) both;
+}
+
+.golden-key-modal__scene--flipping .golden-key-modal__draw-card::after {
+  animation: golden-key-card-flash 850ms ease-out both;
+}
+
+.golden-key-modal__scene--revealed .golden-key-modal__draw-card-inner {
+  transform: rotateY(180deg);
+}
+
+.golden-key-modal__scene:not(.golden-key-modal__scene--revealed)
+  .golden-key-modal__card {
+  pointer-events: none;
+}
+
+.golden-key-modal__action:disabled {
+  cursor: default;
+  filter: grayscale(0.2) brightness(0.74);
+  transform: none;
+  box-shadow:
+    0 4px 0 #5f410b,
+    0 7px 13px rgba(62, 37, 0, 0.18),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+@keyframes golden-key-top-card-ready {
+  from {
+    transform: translate3d(-100px, -16px, 0) scale(0.28) rotateZ(-2deg);
+  }
+
+  to {
+    transform: translate3d(-100px, -21px, 0) scale(0.28) rotateZ(-1deg);
+  }
+}
+
+@keyframes golden-key-deck-recede {
+  0%,
+  28% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  72%,
+  100% {
+    opacity: 0;
+    transform: translate3d(-12px, 14px, 0) scale(0.92);
+  }
+}
+
+@keyframes golden-key-card-draw {
+  0% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate3d(-100px, -16px, 0) scale(0.28) rotateZ(-7deg);
+  }
+
+  24% {
+    transform: translate3d(-98px, -112px, 0) scale(0.36) rotateZ(-5deg);
+  }
+
+  52% {
+    transform: translate3d(-62px, -150px, 0) scale(0.56) rotateZ(-2deg);
+  }
+
+  82% {
+    transform: translate3d(5px, -12px, 0) scale(1.025) rotateZ(1.2deg);
+  }
+
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate3d(0, 0, 0) scale(1) rotateZ(0);
+  }
+}
+
+@keyframes golden-key-card-flip {
+  0% {
+    transform: rotateY(0deg) scale(1);
+  }
+
+  48% {
+    transform: rotateY(90deg) scale(0.955);
+  }
+
+  100% {
+    transform: rotateY(180deg) scale(1);
+  }
+}
+
+@keyframes golden-key-card-flash {
+  0%,
+  30% {
+    opacity: 0;
+    transform: translateX(-38%);
+  }
+
+  52% {
+    opacity: 0.95;
+  }
+
+  82%,
+  100% {
+    opacity: 0;
+    transform: translateX(38%);
+  }
+}
+
+@media (max-width: 520px) {
+  .golden-key-modal__scene {
+    width: min(320px, calc(100vw - 20px));
+  }
+
+  .golden-key-modal__deck {
+    left: 21px;
+    bottom: 14px;
+    transform: none;
+  }
+
+  .golden-key-modal__scene--deck .golden-key-modal__draw-card {
+    transform: translate3d(-96px, -14px, 0) scale(0.27) rotateZ(-2deg);
+  }
+
+
+  @keyframes golden-key-top-card-ready {
+    from {
+      transform: translate3d(-96px, -14px, 0) scale(0.27) rotateZ(-2deg);
+    }
+
+    to {
+      transform: translate3d(-96px, -19px, 0) scale(0.27) rotateZ(-1deg);
+    }
+  }
+
+  @keyframes golden-key-card-draw {
+    0% {
+      opacity: 1;
+      transform: translate3d(-96px, -14px, 0) scale(0.27) rotateZ(-2deg);
+    }
+
+    24% {
+      transform: translate3d(-94px, -104px, 0) scale(0.35) rotateZ(-5deg);
+    }
+
+    52% {
+      transform: translate3d(-56px, -142px, 0) scale(0.54) rotateZ(-2deg);
+    }
+
+    82% {
+      transform: translate3d(4px, -10px, 0) scale(1.02) rotateZ(1deg);
+    }
+
+    100% {
+      transform: translate3d(0, 0, 0) scale(1) rotateZ(0);
+    }
+  }
+}

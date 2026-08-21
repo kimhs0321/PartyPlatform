@@ -1,0 +1,36 @@
+.bank-activity-notice {
+  position: absolute;
+  top: 78px;
+  left: 50%;
+  z-index: 92;
+  display: grid;
+  min-width: min(420px, calc(100vw - 32px));
+  max-width: 560px;
+  gap: 4px;
+  padding: 12px 16px;
+  transform: translateX(-50%);
+  color: #edf9fd;
+  border: 1px solid rgba(143, 206, 230, 0.34);
+  border-radius: 13px;
+  background: rgba(5, 29, 42, 0.92);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.36);
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+}
+
+.bank-activity-notice strong {
+  font-size: 13px;
+}
+
+.bank-activity-notice span {
+  color: #a9c9d6;
+  font-size: 12px;
+}
+
+.bank-activity-notice--positive {
+  border-color: rgba(111, 220, 162, 0.42);
+}
+
+.bank-activity-notice--negative {
+  border-color: rgba(255, 124, 124, 0.45);
+}

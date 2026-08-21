@@ -1,0 +1,185 @@
+.dice-reroll-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 395;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background:
+    radial-gradient(
+      circle at 50% 22%,
+      rgba(214, 163, 87, 0.16),
+      transparent 34%
+    ),
+    rgba(2, 8, 12, 0.8);
+  backdrop-filter: blur(7px);
+  pointer-events: auto;
+}
+
+.dice-reroll-modal {
+  width: min(470px, calc(100vw - 32px));
+  overflow: hidden;
+  color: #edf5f8;
+  border: 1px solid rgba(212, 162, 95, 0.42);
+  border-radius: 16px;
+  background: #121b20;
+  box-shadow: 0 28px 88px rgba(0, 0, 0, 0.62);
+}
+
+.dice-reroll-modal__header {
+  display: grid;
+  gap: 2px;
+  padding: 14px 17px;
+  border-bottom: 1px solid rgba(212, 162, 95, 0.22);
+  background:
+    linear-gradient(
+      90deg,
+      rgba(103, 56, 31, 0.96),
+      rgba(46, 28, 23, 0.94)
+    );
+}
+
+.dice-reroll-modal__header span {
+  color: #c8a77a;
+  font-size: 8px;
+  font-weight: 950;
+  letter-spacing: 0.15em;
+}
+
+.dice-reroll-modal__header strong {
+  font-size: 16px;
+}
+
+.dice-reroll-modal__ticket {
+  margin: 17px;
+  padding: 19px;
+  color: #302418;
+  text-align: center;
+  border: 3px double #765431;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(108, 78, 43, 0.03) 0 1px,
+      transparent 1px 5px
+    ),
+    #eadfc8;
+  box-shadow:
+    7px 9px 0 rgba(0, 0, 0, 0.15),
+    0 15px 28px rgba(0, 0, 0, 0.3);
+}
+
+.dice-reroll-modal__owner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+}
+
+.dice-reroll-modal__owner > span {
+  width: 34px;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 950;
+  border: 2px solid rgba(255, 255, 255, 0.86);
+  border-radius: 50%;
+  background: var(--player-color);
+}
+
+.dice-reroll-modal__owner > div {
+  display: grid;
+  gap: 1px;
+}
+
+.dice-reroll-modal__owner small {
+  color: #776955;
+  font-size: 7px;
+}
+
+.dice-reroll-modal__owner strong {
+  font-size: 11px;
+}
+
+.dice-reroll-modal h2 {
+  margin: 17px 0 13px;
+  font-size: 18px;
+}
+
+.dice-reroll-modal__dice {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 11px;
+}
+
+.dice-reroll-modal__dice > span {
+  width: 76px;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  color: #1d2428;
+  font-size: 63px;
+  line-height: 1;
+  border: 1px solid rgba(72, 66, 57, 0.48);
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 35% 28%, #ffffff, #d8d8d3);
+  box-shadow:
+    0 9px 14px rgba(0, 0, 0, 0.24),
+    inset 0 -7px 11px rgba(0, 0, 0, 0.08);
+}
+
+.dice-reroll-modal__dice > b {
+  color: #8b6b43;
+  font-size: 17px;
+}
+
+.dice-reroll-modal__total {
+  display: grid;
+  place-items: center;
+  gap: 2px;
+  margin-top: 13px;
+}
+
+.dice-reroll-modal__total span {
+  color: #786a56;
+  font-size: 8px;
+}
+
+.dice-reroll-modal__total strong {
+  font-size: 25px;
+}
+
+.dice-reroll-modal__ticket p {
+  margin: 12px 0 0;
+  color: #6b5e4c;
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+.dice-reroll-modal__actions {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: 8px;
+  padding: 0 17px 17px;
+}
+
+.dice-reroll-modal button {
+  min-height: 42px;
+  color: #dce8ed;
+  font-size: 10px;
+  font-weight: 900;
+  border: 1px solid rgba(145, 168, 178, 0.22);
+  border-radius: 8px;
+  background: #314148;
+  cursor: pointer;
+}
+
+.dice-reroll-modal button.is-primary {
+  color: #30200b;
+  border-color: rgba(242, 204, 135, 0.55);
+  background:
+    linear-gradient(180deg, #edc878, #c78a40);
+}

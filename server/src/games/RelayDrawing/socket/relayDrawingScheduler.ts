@@ -5,67 +5,74 @@ import { endRoomGame } from "../../../socket/common/endRoomGame";
 
 const endingRoomIds = new Set<string>();
 
-export function scheduleRelayPrepareTimeout(
-  io: Server,
-  roomId: string,
-) {
-  const game =
-    relayDrawingGameManager.getGame(roomId);
+  export function scheduleRelayPrepareTimeout(
+    io: Server,
+    roomId: string,
+  ) {
+    const game =
+      relayDrawingGameManager.getGame(roomId);
 
-  if (!game) return;
-  if (game.phase !== "ROUND_PREPARE") return;
-  if (game.turnEndsAt === null) return;
+    if (!game) return;
+    if (game.phase !== "ROUND_PREPARE") return;
+    if (game.turnEndsAt === null) return;
 
-  const scheduledTurnEndsAt =
-    game.turnEndsAt;
+    const scheduledTurnEndsAt =
+      game.turnEndsAt;
 
-  const delayMs = Math.max(
-    0,
-    scheduledTurnEndsAt - Date.now(),
-  );
+    const delayMs = Math.max(
+      0,
+      scheduledTurnEndsAt - Date.now(),
+    );
 
-  setTimeout(() => {
-    try {
-      const latestGame =
-        relayDrawingGameManager.getGame(roomId);
+    setTimeout(() => {
 
-      if (!latestGame) return;
-      if (latestGame.phase !== "FINAL_GUESS") return;
+      try {
+        const latestGame =
+          relayDrawingGameManager.getGame(roomId);
 
-      if (
-        latestGame.turnEndsAt !==
-        scheduledTurnEndsAt
-      ) {
-        return;
+
+        if (!latestGame) return;
+
+        if (
+          latestGame.phase !==
+          "ROUND_PREPARE"
+        ) {
+          return;
+        }
+
+        if (
+          latestGame.turnEndsAt !==
+          scheduledTurnEndsAt
+        ) {
+          return;
+        }
+
+        if (
+          latestGame.gameEndsAt === null ||
+          Date.now() >= latestGame.gameEndsAt
+        ) {
+          finishRelayDrawingGame(io, roomId);
+          return;
+        }
+
+        relayDrawingGameManager.startDrawing(
+          roomId,
+        );
+
+        emitRelayDrawingState(io, roomId);
+
+        scheduleRelayDrawingTurnTimeout(
+          io,
+          roomId,
+        );
+      } catch (error) {
+        console.error(
+          "[Relay] 준비시간 종료 처리 실패",
+          error,
+        );
       }
-
-      if (
-        latestGame.gameEndsAt === null ||
-        Date.now() >= latestGame.gameEndsAt
-      ) {
-        finishRelayDrawingGame(io, roomId);
-        return;
-      }
-
-      relayDrawingGameManager.finishRound(
-        roomId,
-        false,
-      );
-
-      emitRelayDrawingState(io, roomId);
-
-      scheduleRelayRoundResultTimeout(
-        io,
-        roomId,
-      );
-    } catch (error) {
-      console.error(
-        "릴레이 드로잉 최종 정답시간 종료 처리 실패",
-        error,
-      );
-    }
-  }, delayMs);
-}
+    }, delayMs);
+  }
 
 /**
  * 현재 그림 담당자의 턴 종료

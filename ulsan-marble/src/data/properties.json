@@ -1,0 +1,938 @@
+{
+  "id": "ulsan_marble_properties",
+  "version": 3,
+  "currencyUnit": "만원",
+  "rules": {
+    "levels": [
+      "LAND",
+      "DEVELOPED",
+      "BUILDING",
+      "LANDMARK"
+    ],
+    "constructionCostRates": {
+      "DEVELOPED": 0.6,
+      "BUILDING": 1.0,
+      "LANDMARK": 2.5
+    },
+    "tollRates": {
+      "LAND": 0.15,
+      "DEVELOPED": 0.35,
+      "BUILDING": 0.8,
+      "LANDMARK": 1.8
+    },
+    "taxRates": {
+      "LAND": 0.05,
+      "DEVELOPED": 0.08,
+      "BUILDING": 0.12,
+      "LANDMARK": 0.2
+    },
+    "formulas": {
+      "currentPrice": "basePrice * propertyPriceIndex",
+      "constructionCost": "basePrice * constructionCostRate * constructionPriceIndex",
+      "toll": "currentPrice * tollRate * tollMultiplier",
+      "tax": "currentPrice * taxRate",
+      "salePrice": "currentPrice * saleRate"
+    },
+    "saleRate": 0.9,
+    "defaultConstructionPriceIndex": 1.0
+  },
+  "districts": {
+    "NAM": {
+      "name": "남구",
+      "colorKey": "GREEN"
+    },
+    "JUNG": {
+      "name": "중구",
+      "colorKey": "BLUE"
+    },
+    "BUK": {
+      "name": "북구",
+      "colorKey": "ORANGE"
+    },
+    "DONG": {
+      "name": "동구",
+      "colorKey": "PURPLE"
+    },
+    "ULJU": {
+      "name": "울주군",
+      "colorKey": "BROWN"
+    }
+  },
+  "properties": [
+    {
+      "id": "seonam",
+      "boardTileId": 1,
+      "name": "선암동",
+      "district": "NAM",
+      "groupOrder": 1,
+      "tags": [
+        "RESIDENTIAL",
+        "INDUSTRIAL"
+      ],
+      "isLandmark": false,
+      "basePrice": 150,
+      "tollMultiplier": 0.9,
+      "priceSource": {
+        "representativeAddress": "두왕로190번길 4",
+        "officialLandPricePerSqm": 150,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "yaeum",
+      "boardTileId": 2,
+      "name": "야음동",
+      "district": "NAM",
+      "groupOrder": 2,
+      "tags": [
+        "RESIDENTIAL"
+      ],
+      "isLandmark": false,
+      "basePrice": 440,
+      "tollMultiplier": 1.0,
+      "priceSource": {
+        "representativeAddress": "수암로 130",
+        "officialLandPricePerSqm": 435,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "mugeo",
+      "boardTileId": 4,
+      "name": "무거동",
+      "district": "NAM",
+      "groupOrder": 3,
+      "tags": [
+        "RESIDENTIAL",
+        "COMMERCIAL"
+      ],
+      "isLandmark": false,
+      "basePrice": 520,
+      "tollMultiplier": 1.1,
+      "priceSource": {
+        "representativeAddress": "대학로 96",
+        "officialLandPricePerSqm": 517,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "okdong",
+      "boardTileId": 5,
+      "name": "옥동",
+      "district": "NAM",
+      "groupOrder": 4,
+      "tags": [
+        "RESIDENTIAL",
+        "PARK"
+      ],
+      "isLandmark": false,
+      "basePrice": 450,
+      "tollMultiplier": 1.1,
+      "priceSource": {
+        "representativeAddress": "문수로 337",
+        "officialLandPricePerSqm": 450,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "sinjeong",
+      "boardTileId": 7,
+      "name": "신정동",
+      "district": "NAM",
+      "groupOrder": 5,
+      "tags": [
+        "RESIDENTIAL",
+        "COMMERCIAL"
+      ],
+      "isLandmark": false,
+      "basePrice": 590,
+      "tollMultiplier": 1.15,
+      "priceSource": {
+        "representativeAddress": "삼산로 14",
+        "officialLandPricePerSqm": 586,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "daldong",
+      "boardTileId": 8,
+      "name": "달동",
+      "district": "NAM",
+      "groupOrder": 6,
+      "tags": [
+        "COMMERCIAL",
+        "RESIDENTIAL"
+      ],
+      "isLandmark": false,
+      "basePrice": 1260,
+      "tollMultiplier": 1.25,
+      "priceSource": {
+        "representativeAddress": "삼산로 257",
+        "officialLandPricePerSqm": 1257,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "samsan",
+      "boardTileId": 9,
+      "name": "삼산동",
+      "district": "NAM",
+      "groupOrder": 7,
+      "tags": [
+        "COMMERCIAL"
+      ],
+      "isLandmark": false,
+      "basePrice": 1370,
+      "tollMultiplier": 1.4,
+      "priceSource": {
+        "representativeAddress": "삼산로 277",
+        "officialLandPricePerSqm": 1370,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "jangsaengpo",
+      "boardTileId": 10,
+      "name": "장생포",
+      "district": "NAM",
+      "groupOrder": 8,
+      "tags": [
+        "TOURISM",
+        "COAST"
+      ],
+      "isLandmark": false,
+      "basePrice": 180,
+      "tollMultiplier": 1.3,
+      "priceSource": {
+        "representativeAddress": "장생포고래로 221",
+        "officialLandPricePerSqm": 175,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "ulsan_grand_park",
+      "boardTileId": 12,
+      "name": "울산대공원",
+      "district": "NAM",
+      "groupOrder": 9,
+      "tags": [
+        "TOURISM",
+        "PARK"
+      ],
+      "isLandmark": true,
+      "basePrice": 440,
+      "tollMultiplier": 1.35,
+      "priceSource": {
+        "representativeAddress": "문수로 316",
+        "officialLandPricePerSqm": 444,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      },
+      "landmarkScope": "DISTRICT"
+    },
+    {
+      "id": "onsan",
+      "boardTileId": 13,
+      "name": "온산",
+      "district": "ULJU",
+      "groupOrder": 1,
+      "tags": [
+        "INDUSTRIAL",
+        "COAST"
+      ],
+      "isLandmark": false,
+      "basePrice": 270,
+      "tollMultiplier": 0.95,
+      "priceSource": {
+        "representativeAddress": "덕신로 263",
+        "officialLandPricePerSqm": 274,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "onyang",
+      "boardTileId": 15,
+      "name": "온양",
+      "district": "ULJU",
+      "groupOrder": 2,
+      "tags": [
+        "RESIDENTIAL"
+      ],
+      "isLandmark": false,
+      "basePrice": 170,
+      "tollMultiplier": 1.0,
+      "priceSource": {
+        "representativeAddress": "남창3길 11",
+        "officialLandPricePerSqm": 172,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "eonyang",
+      "boardTileId": 16,
+      "name": "언양",
+      "district": "ULJU",
+      "groupOrder": 3,
+      "tags": [
+        "COMMERCIAL",
+        "TOURISM"
+      ],
+      "isLandmark": false,
+      "basePrice": 370,
+      "tollMultiplier": 1.15,
+      "priceSource": {
+        "representativeAddress": "헌양길 50",
+        "officialLandPricePerSqm": 372,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "beomseo",
+      "boardTileId": 17,
+      "name": "범서",
+      "district": "ULJU",
+      "groupOrder": 4,
+      "tags": [
+        "RESIDENTIAL",
+        "COMMERCIAL"
+      ],
+      "isLandmark": false,
+      "basePrice": 410,
+      "tollMultiplier": 1.1,
+      "priceSource": {
+        "representativeAddress": "구영로 94",
+        "officialLandPricePerSqm": 405,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "ganjeolgot",
+      "boardTileId": 20,
+      "name": "간절곶",
+      "district": "ULJU",
+      "groupOrder": 5,
+      "tags": [
+        "TOURISM",
+        "COAST"
+      ],
+      "isLandmark": true,
+      "basePrice": 80,
+      "tollMultiplier": 1.45,
+      "priceSource": {
+        "representativeAddress": "간절곶2길 14",
+        "officialLandPricePerSqm": 81,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      },
+      "landmarkScope": "DISTRICT"
+    },
+    {
+      "id": "byeongyeong",
+      "boardTileId": 21,
+      "name": "병영동",
+      "district": "JUNG",
+      "groupOrder": 1,
+      "tags": [
+        "RESIDENTIAL",
+        "COMMERCIAL"
+      ],
+      "isLandmark": false,
+      "basePrice": 370,
+      "tollMultiplier": 1.0,
+      "priceSource": {
+        "representativeAddress": "번영로 582",
+        "officialLandPricePerSqm": 374,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "bangu",
+      "boardTileId": 22,
+      "name": "반구동",
+      "district": "JUNG",
+      "groupOrder": 2,
+      "tags": [
+        "RESIDENTIAL"
+      ],
+      "isLandmark": false,
+      "basePrice": 320,
+      "tollMultiplier": 1.0,
+      "priceSource": {
+        "representativeAddress": "번영로 478",
+        "officialLandPricePerSqm": 316,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "boksan",
+      "boardTileId": 24,
+      "name": "복산동",
+      "district": "JUNG",
+      "groupOrder": 3,
+      "tags": [
+        "RESIDENTIAL"
+      ],
+      "isLandmark": false,
+      "basePrice": 330,
+      "tollMultiplier": 1.0,
+      "priceSource": {
+        "representativeAddress": "서원1길 2",
+        "officialLandPricePerSqm": 332,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "hakseong",
+      "boardTileId": 25,
+      "name": "학성동",
+      "district": "JUNG",
+      "groupOrder": 4,
+      "tags": [
+        "COMMERCIAL",
+        "RESIDENTIAL"
+      ],
+      "isLandmark": false,
+      "basePrice": 230,
+      "tollMultiplier": 1.05,
+      "priceSource": {
+        "representativeAddress": "학성로 158",
+        "officialLandPricePerSqm": 234,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "ujeong",
+      "boardTileId": 27,
+      "name": "우정동",
+      "district": "JUNG",
+      "groupOrder": 5,
+      "tags": [
+        "RESIDENTIAL",
+        "COMMERCIAL"
+      ],
+      "isLandmark": false,
+      "basePrice": 530,
+      "tollMultiplier": 1.1,
+      "priceSource": {
+        "representativeAddress": "종가로 310",
+        "officialLandPricePerSqm": 525,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "seongnam",
+      "boardTileId": 28,
+      "name": "성남동",
+      "district": "JUNG",
+      "groupOrder": 6,
+      "tags": [
+        "COMMERCIAL",
+        "TOURISM"
+      ],
+      "isLandmark": false,
+      "basePrice": 500,
+      "tollMultiplier": 1.3,
+      "priceSource": {
+        "representativeAddress": "강북로 105",
+        "officialLandPricePerSqm": 500,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "taehwa",
+      "boardTileId": 29,
+      "name": "태화동",
+      "district": "JUNG",
+      "groupOrder": 7,
+      "tags": [
+        "RESIDENTIAL",
+        "TOURISM"
+      ],
+      "isLandmark": false,
+      "basePrice": 380,
+      "tollMultiplier": 1.15,
+      "priceSource": {
+        "representativeAddress": "명륜로 33",
+        "officialLandPricePerSqm": 375,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "jungang_market",
+      "boardTileId": 30,
+      "name": "중앙시장",
+      "district": "JUNG",
+      "groupOrder": 8,
+      "tags": [
+        "COMMERCIAL",
+        "MARKET",
+        "TOURISM"
+      ],
+      "isLandmark": true,
+      "basePrice": 510,
+      "tollMultiplier": 1.35,
+      "priceSource": {
+        "representativeAddress": "중앙시장1길 2",
+        "officialLandPricePerSqm": 513,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      },
+      "landmarkScope": "DISTRICT"
+    },
+    {
+      "id": "taehwagang_national_garden",
+      "boardTileId": 31,
+      "name": "태화강 국가정원",
+      "district": "JUNG",
+      "groupOrder": 9,
+      "tags": [
+        "TOURISM",
+        "PARK"
+      ],
+      "isLandmark": true,
+      "basePrice": 360,
+      "tollMultiplier": 1.4,
+      "priceSource": {
+        "representativeAddress": "유곡로 1",
+        "officialLandPricePerSqm": 356,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      },
+      "landmarkScope": "CITY"
+    },
+    {
+      "id": "nammok",
+      "boardTileId": 34,
+      "name": "남목동",
+      "district": "DONG",
+      "groupOrder": 1,
+      "tags": [
+        "RESIDENTIAL",
+        "INDUSTRIAL"
+      ],
+      "isLandmark": false,
+      "basePrice": 240,
+      "tollMultiplier": 0.95,
+      "priceSource": {
+        "representativeAddress": "동해안로 49",
+        "officialLandPricePerSqm": 242,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "jeonha",
+      "boardTileId": 35,
+      "name": "전하동",
+      "district": "DONG",
+      "groupOrder": 2,
+      "tags": [
+        "RESIDENTIAL",
+        "INDUSTRIAL"
+      ],
+      "isLandmark": false,
+      "basePrice": 320,
+      "tollMultiplier": 1.05,
+      "priceSource": {
+        "representativeAddress": "진성13길 67",
+        "officialLandPricePerSqm": 316,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "hwajeong",
+      "boardTileId": 36,
+      "name": "화정동",
+      "district": "DONG",
+      "groupOrder": 3,
+      "tags": [
+        "RESIDENTIAL"
+      ],
+      "isLandmark": false,
+      "basePrice": 330,
+      "tollMultiplier": 1.0,
+      "priceSource": {
+        "representativeAddress": "방어진순환도로 613",
+        "officialLandPricePerSqm": 327,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "bangeojin",
+      "boardTileId": 38,
+      "name": "방어진",
+      "district": "DONG",
+      "groupOrder": 4,
+      "tags": [
+        "COMMERCIAL",
+        "COAST",
+        "INDUSTRIAL"
+      ],
+      "isLandmark": false,
+      "basePrice": 180,
+      "tollMultiplier": 1.15,
+      "priceSource": {
+        "representativeAddress": "방어진순환도로 478",
+        "officialLandPricePerSqm": 176,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "ilsan",
+      "boardTileId": 39,
+      "name": "일산동",
+      "district": "DONG",
+      "groupOrder": 5,
+      "tags": [
+        "COMMERCIAL",
+        "TOURISM",
+        "COAST"
+      ],
+      "isLandmark": false,
+      "basePrice": 320,
+      "tollMultiplier": 1.25,
+      "priceSource": {
+        "representativeAddress": "방어진순환도로 619",
+        "officialLandPricePerSqm": 324,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "jujeon",
+      "boardTileId": 41,
+      "name": "주전",
+      "district": "DONG",
+      "groupOrder": 6,
+      "tags": [
+        "TOURISM",
+        "COAST"
+      ],
+      "isLandmark": false,
+      "basePrice": 150,
+      "tollMultiplier": 1.25,
+      "priceSource": {
+        "representativeAddress": "동해안로 661-3",
+        "officialLandPricePerSqm": 149,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "daewangam_park",
+      "boardTileId": 43,
+      "name": "대왕암공원",
+      "district": "DONG",
+      "groupOrder": 7,
+      "tags": [
+        "TOURISM",
+        "COAST",
+        "PARK"
+      ],
+      "isLandmark": true,
+      "basePrice": 170,
+      "tollMultiplier": 1.45,
+      "priceSource": {
+        "representativeAddress": "등대로 26",
+        "officialLandPricePerSqm": 173,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      },
+      "landmarkScope": "DISTRICT"
+    },
+    {
+      "id": "yeompo",
+      "boardTileId": 44,
+      "name": "염포동",
+      "district": "BUK",
+      "groupOrder": 1,
+      "tags": [
+        "INDUSTRIAL",
+        "RESIDENTIAL"
+      ],
+      "isLandmark": false,
+      "basePrice": 160,
+      "tollMultiplier": 0.95,
+      "priceSource": {
+        "representativeAddress": "염포로 679",
+        "officialLandPricePerSqm": 161,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "yangjeong",
+      "boardTileId": 45,
+      "name": "양정동",
+      "district": "BUK",
+      "groupOrder": 2,
+      "tags": [
+        "INDUSTRIAL",
+        "RESIDENTIAL"
+      ],
+      "isLandmark": false,
+      "basePrice": 210,
+      "tollMultiplier": 0.95,
+      "priceSource": {
+        "representativeAddress": "염포로 533",
+        "officialLandPricePerSqm": 212,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "cheongok",
+      "boardTileId": 46,
+      "name": "천곡동",
+      "district": "BUK",
+      "groupOrder": 3,
+      "tags": [
+        "RESIDENTIAL"
+      ],
+      "isLandmark": false,
+      "basePrice": 190,
+      "tollMultiplier": 1.0,
+      "priceSource": {
+        "representativeAddress": "아진로 106-2",
+        "officialLandPricePerSqm": 188,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "sincheon",
+      "boardTileId": 47,
+      "name": "신천동",
+      "district": "BUK",
+      "groupOrder": 4,
+      "tags": [
+        "RESIDENTIAL",
+        "COMMERCIAL"
+      ],
+      "isLandmark": false,
+      "basePrice": 70,
+      "tollMultiplier": 1.05,
+      "priceSource": {
+        "representativeAddress": "제내4길 12",
+        "officialLandPricePerSqm": 71,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "hogye",
+      "boardTileId": 48,
+      "name": "호계동",
+      "district": "BUK",
+      "groupOrder": 5,
+      "tags": [
+        "COMMERCIAL",
+        "RESIDENTIAL"
+      ],
+      "isLandmark": false,
+      "basePrice": 320,
+      "tollMultiplier": 1.1,
+      "priceSource": {
+        "representativeAddress": "호계로 292",
+        "officialLandPricePerSqm": 318,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "maegok",
+      "boardTileId": 50,
+      "name": "매곡동",
+      "district": "BUK",
+      "groupOrder": 6,
+      "tags": [
+        "INDUSTRIAL",
+        "RESIDENTIAL"
+      ],
+      "isLandmark": false,
+      "basePrice": 200,
+      "tollMultiplier": 1.0,
+      "priceSource": {
+        "representativeAddress": "신기11길 36",
+        "officialLandPricePerSqm": 200,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "hwabong",
+      "boardTileId": 51,
+      "name": "화봉동",
+      "district": "BUK",
+      "groupOrder": 7,
+      "tags": [
+        "RESIDENTIAL",
+        "COMMERCIAL"
+      ],
+      "isLandmark": false,
+      "basePrice": 140,
+      "tollMultiplier": 1.1,
+      "priceSource": {
+        "representativeAddress": "상방로 88",
+        "officialLandPricePerSqm": 138,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "songjeong",
+      "boardTileId": 54,
+      "name": "송정동",
+      "district": "BUK",
+      "groupOrder": 8,
+      "tags": [
+        "RESIDENTIAL",
+        "COMMERCIAL"
+      ],
+      "isLandmark": false,
+      "basePrice": 340,
+      "tollMultiplier": 1.2,
+      "priceSource": {
+        "representativeAddress": "화산로 101",
+        "officialLandPricePerSqm": 341,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "jeongja",
+      "boardTileId": 55,
+      "name": "정자동",
+      "district": "BUK",
+      "groupOrder": 9,
+      "tags": [
+        "TOURISM",
+        "COAST"
+      ],
+      "isLandmark": false,
+      "basePrice": 210,
+      "tollMultiplier": 1.15,
+      "priceSource": {
+        "representativeAddress": "정자1길 39-1",
+        "officialLandPricePerSqm": 207,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "gangdong",
+      "boardTileId": 57,
+      "name": "강동동",
+      "district": "BUK",
+      "groupOrder": 10,
+      "tags": [
+        "TOURISM",
+        "COAST",
+        "RESIDENTIAL"
+      ],
+      "isLandmark": false,
+      "basePrice": 120,
+      "tollMultiplier": 1.25,
+      "priceSource": {
+        "representativeAddress": "산하동 1001-3(센트럴 플레이스)",
+        "officialLandPricePerSqm": 122,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      }
+    },
+    {
+      "id": "mongdol_beach",
+      "boardTileId": 58,
+      "name": "몽돌해변",
+      "district": "BUK",
+      "groupOrder": 11,
+      "tags": [
+        "TOURISM",
+        "COAST"
+      ],
+      "isLandmark": true,
+      "basePrice": 300,
+      "tollMultiplier": 1.4,
+      "priceSource": {
+        "representativeAddress": "동해안로 1615",
+        "officialLandPricePerSqm": 297,
+        "officialLandPriceUnit": "만원/㎡",
+        "gamePriceConversionRate": 1.0,
+        "roundingUnit": 10
+      },
+      "landmarkScope": "DISTRICT"
+    }
+  ],
+  "pricing": {
+    "status": "PROVISIONAL_2026_FIRST_RESEARCH",
+    "sourceYear": 2026,
+    "method": "REPRESENTATIVE_PARCEL_OFFICIAL_LAND_PRICE_1_TO_1",
+    "gameCurrencyUnit": "만원",
+    "conversionRate": 1.0,
+    "roundingUnit": 10,
+    "priceCompression": false,
+    "note": "대표 필지 공시지가를 1:1 환산한 뒤 10만원 단위로 반올림. 공식 필지별 재검증 후 갱신 가능."
+  }
+}

@@ -1,0 +1,97 @@
+.money-panel {
+  position: absolute;
+  left: clamp(250px, 18vw, 360px);
+  bottom: clamp(104px, 12vh, 140px);
+  z-index: 48;
+  min-width: 225px;
+  padding: 11px 14px;
+  color: #edf8fd;
+  border: 1px solid rgba(143, 201, 226, 0.24);
+  border-radius: 13px;
+  background: rgba(5, 21, 33, 0.82);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(9px);
+  pointer-events: none;
+}
+
+.money-panel__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.money-panel__heading span {
+  color: #a8cfdf;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.money-panel__heading small {
+  max-width: 90px;
+  overflow: hidden;
+  color: #789aad;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.money-panel__balances {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.money-panel__balances > div {
+  min-width: 0;
+}
+
+.money-panel__balances small {
+  display: block;
+  color: #789aad;
+  font-size: 9px;
+}
+
+.money-panel__balances strong {
+  display: block;
+  margin-top: 1px;
+  overflow: hidden;
+  color: #cdebf6;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.money-panel__balance {
+  color: #edf8fd !important;
+  font-size: 20px !important;
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+}
+
+.money-panel__savings {
+  display: block;
+  margin-top: 4px;
+  color: #9fc7d8;
+  font-size: 10px;
+}
+
+.money-panel__transaction {
+  display: block;
+  margin-top: 4px;
+  color: #ffd86b;
+  font-size: 11px;
+}
+
+@media (max-width: 1100px), (max-height: 720px) {
+  .money-panel {
+    left: clamp(170px, 17vw, 250px);
+    min-width: 168px;
+    padding: 9px 11px;
+  }
+
+  .money-panel__balance {
+    font-size: 17px !important;
+  }
+}

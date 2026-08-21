@@ -1,0 +1,1102 @@
+.property-purchase-overlay {
+  --purchase-player-color: #2e8bcb;
+
+  position: absolute;
+  inset: 0;
+  z-index: 1180;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: 22px;
+  pointer-events: auto;
+  background:
+    radial-gradient(
+      circle at 50% 42%,
+      rgba(87, 75, 44, 0.2),
+      transparent 36%
+    ),
+    rgba(1, 9, 15, 0.8);
+  backdrop-filter: blur(7px);
+  animation: property-purchase-overlay-in 180ms ease-out both;
+}
+
+.property-purchase-modal {
+  position: relative;
+  width: min(470px, calc(100vw - 36px));
+  max-height: calc(100vh - 36px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 24px 26px 22px;
+  color: #342714;
+  background:
+    linear-gradient(
+      rgba(116, 91, 45, 0.035) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(116, 91, 45, 0.026) 1px,
+      transparent 1px
+    ),
+    radial-gradient(
+      circle at 16% 8%,
+      rgba(255, 255, 255, 0.88),
+      transparent 24%
+    ),
+    linear-gradient(180deg, #fffdf3 0%, #f6edd3 100%);
+  background-size: 9px 9px, 9px 9px, auto, auto;
+  border: 1px solid #9b7b45;
+  border-radius: 5px;
+  box-shadow:
+    0 30px 90px rgba(0, 0, 0, 0.56),
+    0 0 0 5px rgba(244, 226, 181, 0.82),
+    0 0 0 7px rgba(82, 58, 21, 0.76),
+    inset 0 0 35px rgba(98, 70, 25, 0.13);
+  transform-origin: center 74%;
+}
+
+.property-purchase-modal::before,
+.property-purchase-modal::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.property-purchase-modal::before {
+  inset: 9px;
+  border: 1px solid rgba(120, 87, 34, 0.52);
+}
+
+.property-purchase-modal::after {
+  inset: 13px;
+  border: 1px solid rgba(188, 153, 83, 0.38);
+}
+
+.property-purchase-modal__paper-texture {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.32;
+  background:
+    radial-gradient(
+      circle at 18% 25%,
+      rgba(118, 87, 35, 0.1) 0 1px,
+      transparent 1.6px
+    ),
+    radial-gradient(
+      circle at 76% 68%,
+      rgba(118, 87, 35, 0.08) 0 1px,
+      transparent 1.8px
+    );
+  background-size: 15px 15px, 19px 19px;
+  mix-blend-mode: multiply;
+}
+
+.property-purchase-modal__header,
+.property-purchase-modal__rule,
+.property-purchase-modal__section,
+.property-purchase-modal__clause,
+.property-purchase-modal__signatures,
+.property-purchase-modal__error,
+.property-purchase-modal__footer {
+  position: relative;
+  z-index: 2;
+}
+
+.property-purchase-modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.property-purchase-modal__header > div:first-child {
+  min-width: 0;
+}
+
+.property-purchase-modal__header span {
+  color: rgba(80, 57, 22, 0.6);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+}
+
+.property-purchase-modal__header h2 {
+  margin: 5px 0 0;
+  color: #2f2413;
+  font-family: Georgia, "Times New Roman", "Noto Serif KR", serif;
+  font-size: clamp(25px, 5vw, 32px);
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: -0.055em;
+  word-break: keep-all;
+}
+
+.property-purchase-modal__document-meta {
+  flex: 0 0 auto;
+  min-width: 126px;
+  margin: 0;
+  border-top: 1px solid rgba(84, 61, 24, 0.72);
+  border-bottom: 1px solid rgba(84, 61, 24, 0.72);
+}
+
+.property-purchase-modal__document-meta div {
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  min-height: 25px;
+  align-items: center;
+}
+
+.property-purchase-modal__document-meta div + div {
+  border-top: 1px solid rgba(84, 61, 24, 0.22);
+}
+
+.property-purchase-modal__document-meta dt {
+  color: rgba(70, 50, 20, 0.58);
+  font-size: 8px;
+  font-weight: 850;
+}
+
+.property-purchase-modal__document-meta dd {
+  margin: 0;
+  color: #3b2d17;
+  font-size: 9px;
+  font-weight: 900;
+  text-align: right;
+}
+
+.property-purchase-modal__rule {
+  height: 4px;
+  margin: 16px 0 14px;
+  border-top: 2px solid #4c3719;
+  border-bottom: 1px solid #4c3719;
+}
+
+.property-purchase-modal__section + .property-purchase-modal__section {
+  margin-top: 13px;
+}
+
+.property-purchase-modal__section h3 {
+  margin: 0 0 7px;
+  color: #473317;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: -0.015em;
+}
+
+.property-purchase-modal__contract-table {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 0;
+  border-top: 1px solid rgba(80, 58, 22, 0.68);
+  border-left: 1px solid rgba(80, 58, 22, 0.68);
+}
+
+.property-purchase-modal__contract-table > div {
+  display: grid;
+  grid-template-columns: 82px minmax(0, 1fr);
+  min-height: 37px;
+  align-items: stretch;
+  border-right: 1px solid rgba(80, 58, 22, 0.68);
+  border-bottom: 1px solid rgba(80, 58, 22, 0.68);
+}
+
+.property-purchase-modal__contract-table > div.is-wide {
+  grid-column: 1 / -1;
+}
+
+.property-purchase-modal__contract-table dt,
+.property-purchase-modal__contract-table dd {
+  display: flex;
+  align-items: center;
+}
+
+.property-purchase-modal__contract-table dt {
+  justify-content: center;
+  padding: 6px 7px;
+  color: rgba(58, 41, 17, 0.72);
+  font-size: 9px;
+  font-weight: 900;
+  text-align: center;
+  background: rgba(136, 103, 49, 0.1);
+  border-right: 1px solid rgba(80, 58, 22, 0.42);
+}
+
+.property-purchase-modal__contract-table dd {
+  min-width: 0;
+  margin: 0;
+  padding: 6px 9px;
+  color: #312410;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.35;
+  word-break: keep-all;
+}
+
+.property-purchase-modal__contract-table dd strong {
+  margin-left: 4px;
+  color: #191207;
+  font-size: 12px;
+}
+
+.property-purchase-modal__contract-table .is-price dd {
+  color: #7b251d;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14px;
+  font-weight: 950;
+}
+
+.property-purchase-modal__contract-table dd.is-insufficient,
+.property-purchase-modal__error {
+  color: #b22424;
+}
+
+.property-purchase-modal__clause {
+  margin: 13px 0 0;
+  padding: 10px 11px;
+  color: rgba(55, 40, 18, 0.72);
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.55;
+  text-align: justify;
+  background: rgba(128, 94, 39, 0.06);
+  border-left: 3px solid rgba(100, 70, 27, 0.45);
+  word-break: keep-all;
+}
+
+.property-purchase-modal__signatures {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 14px;
+  border-top: 1px solid rgba(80, 58, 22, 0.58);
+  border-bottom: 1px solid rgba(80, 58, 22, 0.58);
+}
+
+.property-purchase-modal__signatures > div {
+  position: relative;
+  min-height: 72px;
+  padding: 10px 12px;
+  box-sizing: border-box;
+}
+
+.property-purchase-modal__signatures > div + div {
+  border-left: 1px solid rgba(80, 58, 22, 0.45);
+}
+
+.property-purchase-modal__signatures span,
+.property-purchase-modal__signatures small {
+  display: block;
+  color: rgba(70, 50, 19, 0.58);
+  font-size: 8px;
+  font-weight: 850;
+}
+
+.property-purchase-modal__signatures strong {
+  display: block;
+  margin-top: 9px;
+  color: #30230f;
+  font-family: Georgia, "Times New Roman", "Noto Serif KR", serif;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.property-purchase-modal__signatures small {
+  margin-top: 4px;
+}
+
+.property-purchase-modal__buyer-signature::after {
+  content: "(인)";
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  color: rgba(92, 56, 28, 0.5);
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.property-purchase-modal__error {
+  margin: 10px 0 0;
+  font-size: 11px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.property-purchase-modal__footer {
+  margin-top: 15px;
+}
+
+.property-purchase-modal__footer > span {
+  display: block;
+  color: rgba(69, 50, 21, 0.56);
+  font-size: 8px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.property-purchase-modal__actions {
+  display: grid;
+  grid-template-columns: 0.78fr 1.22fr;
+  gap: 9px;
+  margin-top: 9px;
+}
+
+.property-purchase-modal__actions button {
+  min-height: 43px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 950;
+  cursor: pointer;
+  transition:
+    transform 120ms ease,
+    filter 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.property-purchase-modal__decline {
+  color: #49371e;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.68), transparent),
+    #d8c9a7;
+  border: 1px solid #8f7445;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.48);
+}
+
+.property-purchase-modal__purchase {
+  color: #fff8dc;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent 42%),
+    linear-gradient(145deg, #8f3026, #5f1c16);
+  border: 1px solid #ad6f53;
+  box-shadow:
+    0 4px 0 #3c160f,
+    inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.property-purchase-modal__actions button:hover:not(:disabled) {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+
+.property-purchase-modal__actions button:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: none;
+}
+
+.property-purchase-modal__actions button:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+}
+
+/* 계약 체결 도장 */
+
+.property-purchase-modal__stamp-stage {
+  position: absolute;
+  right: 37px;
+  bottom: 87px;
+  z-index: 8;
+  width: 128px;
+  height: 150px;
+  pointer-events: none;
+}
+
+.property-purchase-modal__stamp-handle {
+  position: absolute;
+  left: 31px;
+  top: -12px;
+  z-index: 4;
+  width: 72px;
+  height: 96px;
+  transform-origin: 50% 100%;
+  animation: property-purchase-stamp-drop 950ms
+    cubic-bezier(0.18, 0.82, 0.24, 1) both;
+}
+
+.property-purchase-modal__stamp-handle::before {
+  content: "";
+  position: absolute;
+  left: 19px;
+  top: 0;
+  width: 34px;
+  height: 51px;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.18), transparent 30%),
+    linear-gradient(145deg, #7b4525, #3b1b0d);
+  border: 2px solid #281006;
+  border-radius: 17px 17px 8px 8px;
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 255, 255, 0.08),
+    0 8px 12px rgba(0, 0, 0, 0.32);
+}
+
+.property-purchase-modal__stamp-handle i {
+  position: absolute;
+  left: 6px;
+  bottom: 0;
+  width: 60px;
+  height: 37px;
+  background:
+    linear-gradient(180deg, #8a5733, #3b1b0d);
+  border: 2px solid #281006;
+  border-radius: 8px 8px 4px 4px;
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 255, 255, 0.08),
+    0 6px 10px rgba(0, 0, 0, 0.26);
+}
+
+.property-purchase-modal__stamp-handle span {
+  position: absolute;
+  left: 9px;
+  bottom: 13px;
+  z-index: 2;
+  width: 54px;
+  color: #e9d5aa;
+  font-size: 7px;
+  font-style: normal;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+
+.property-purchase-modal__stamp-mark {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  display: grid;
+  place-content: center;
+  width: 105px;
+  height: 105px;
+  box-sizing: border-box;
+  color: rgba(165, 27, 27, 0.9);
+  text-align: center;
+  border: 5px double rgba(165, 27, 27, 0.86);
+  border-radius: 50%;
+  opacity: 0;
+  transform: rotate(-9deg);
+  filter:
+    drop-shadow(0 0 0.4px rgba(128, 13, 13, 0.5))
+    url("#none");
+  animation: property-purchase-stamp-mark 950ms ease-out both;
+}
+
+.property-purchase-modal__stamp-mark::before,
+.property-purchase-modal__stamp-mark::after {
+  content: "◆";
+  position: absolute;
+  top: 43px;
+  color: rgba(165, 27, 27, 0.72);
+  font-size: 7px;
+}
+
+.property-purchase-modal__stamp-mark::before {
+  left: 7px;
+}
+
+.property-purchase-modal__stamp-mark::after {
+  right: 7px;
+}
+
+.property-purchase-modal__stamp-mark span {
+  display: block;
+  font-size: 8px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+}
+
+.property-purchase-modal__stamp-mark strong {
+  display: block;
+  max-width: 78px;
+  margin: 4px auto;
+  overflow: hidden;
+  font-family: "Noto Serif KR", Georgia, serif;
+  font-size: clamp(11px, 2.4vw, 15px);
+  font-weight: 950;
+  line-height: 1.05;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.property-purchase-modal__impact-ring {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  width: 89px;
+  height: 89px;
+  border: 2px solid rgba(166, 36, 28, 0.52);
+  border-radius: 50%;
+  opacity: 0;
+  animation: property-purchase-impact-ring 950ms ease-out both;
+}
+
+.property-purchase-modal__stamp-stage.is-settled
+  .property-purchase-modal__stamp-handle {
+  display: none;
+}
+
+.property-purchase-modal__stamp-stage.is-settled
+  .property-purchase-modal__stamp-mark {
+  opacity: 0.88;
+  animation: none;
+}
+
+.property-purchase-modal--stamping {
+  animation: property-purchase-paper-impact 950ms ease-out both;
+}
+
+.property-purchase-modal--contract-exit {
+  animation: property-purchase-contract-exit 380ms
+    cubic-bezier(0.55, 0, 0.85, 0.32) both;
+}
+
+/* 구매 카드 발급 및 전달 */
+
+.property-purchase-reward {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto auto;
+  align-content: center;
+  justify-items: center;
+  gap: 18px;
+
+  width: min(410px, calc(100vw - 32px));
+  min-height: min(720px, calc(100vh - 28px));
+  box-sizing: border-box;
+  padding: 0 0 52px;
+
+  perspective: 1400px;
+}
+
+.property-purchase-reward__headline {
+  position: relative;
+  z-index: 4;
+
+  display: grid;
+  gap: 2px;
+  justify-items: center;
+
+  text-align: center;
+  pointer-events: none;
+}
+
+.property-purchase-reward__headline span {
+  color: #e3c76f;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.19em;
+}
+
+.property-purchase-reward__headline strong {
+  color: #fff7d6;
+  font-size: 24px;
+  font-weight: 950;
+  letter-spacing: -0.04em;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.property-purchase-reward__headline small {
+  color: rgba(231, 242, 245, 0.72);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+
+.property-purchase-reward__light {
+  position: absolute;
+  top: 47%;
+  left: 50%;
+  width: 500px;
+  height: 500px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  background:
+    repeating-conic-gradient(
+      from -10deg,
+      rgba(255, 224, 126, 0.15) 0deg 7deg,
+      transparent 7deg 17deg
+    );
+  border-radius: 50%;
+  opacity: 0.72;
+  filter: blur(0.4px);
+  animation: property-purchase-light-spin 14s linear infinite;
+}
+
+.property-purchase-reward__card-shell {
+  position: relative;
+  z-index: 3;
+  grid-row: 2;
+
+  width: min(350px, calc(100vw - 42px));
+  transform-style: preserve-3d;
+  will-change: transform, opacity, filter;
+}
+.property-purchase-reward__card-shell .property-card {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+}
+
+.property-purchase-reward--card-reveal
+  .property-purchase-reward__card-shell {
+  animation: property-purchase-card-reveal 620ms
+    cubic-bezier(0.16, 0.84, 0.24, 1.12) both;
+}
+
+.property-purchase-reward--card-hold
+  .property-purchase-reward__card-shell {
+  animation: property-purchase-card-hold 3000ms ease-in-out both;
+}
+
+.property-purchase-reward--card-handoff
+  .property-purchase-reward__headline {
+  animation: property-purchase-caption-out 300ms ease-in both;
+}
+
+.property-purchase-reward--card-handoff
+  .property-purchase-reward__light {
+  animation: property-purchase-light-out 520ms ease-in both;
+}
+
+.property-purchase-reward--card-handoff.property-purchase-reward--right
+  .property-purchase-reward__card-shell {
+  animation: property-purchase-card-handoff-right 850ms
+    cubic-bezier(0.42, 0, 0.76, 0.26) both;
+}
+
+.property-purchase-reward--card-handoff.property-purchase-reward--left
+  .property-purchase-reward__card-shell {
+  animation: property-purchase-card-handoff-left 850ms
+    cubic-bezier(0.42, 0, 0.76, 0.26) both;
+}
+
+.property-purchase-reward__handoff {
+  position: absolute;
+  bottom: 7px;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 220px;
+  padding: 8px 12px;
+  color: #e9f4f8;
+  background: rgba(3, 17, 26, 0.86);
+  border: 1px solid rgba(211, 189, 111, 0.42);
+  border-radius: 999px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.32);
+}
+
+.property-purchase-reward__player-token {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 950;
+  background:
+    radial-gradient(
+      circle at 32% 24%,
+      rgba(255, 255, 255, 0.42),
+      transparent 30%
+    ),
+    var(--purchase-player-color);
+  border: 2px solid rgba(255, 255, 255, 0.72);
+  border-radius: 50%;
+  box-shadow: 0 4px 9px rgba(0, 0, 0, 0.32);
+}
+
+.property-purchase-reward__handoff div {
+  display: grid;
+  gap: 1px;
+}
+
+.property-purchase-reward__handoff strong {
+  font-size: 11px;
+  font-weight: 950;
+}
+
+.property-purchase-reward__handoff small {
+  color: rgba(218, 234, 241, 0.68);
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.property-purchase-reward--card-handoff
+  .property-purchase-reward__handoff {
+  animation: property-purchase-handoff-label 850ms ease both;
+}
+
+/* 애니메이션 */
+
+@keyframes property-purchase-overlay-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes property-purchase-stamp-drop {
+  0% {
+    opacity: 0;
+    transform: translateY(-180px) rotate(-13deg) scale(1.2);
+  }
+
+  18% {
+    opacity: 1;
+  }
+
+  56% {
+    transform: translateY(7px) rotate(2deg) scale(0.93);
+  }
+
+  66% {
+    transform: translateY(0) rotate(0) scale(1);
+  }
+
+  75% {
+    transform: translateY(-5px) rotate(1deg) scale(1.02);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-55px) rotate(6deg) scale(1.08);
+  }
+}
+
+@keyframes property-purchase-stamp-mark {
+  0%,
+  54% {
+    opacity: 0;
+    transform: rotate(-9deg) scale(1.5);
+    filter: blur(5px);
+  }
+
+  67% {
+    opacity: 0.95;
+    transform: rotate(-9deg) scale(0.9);
+    filter: blur(0);
+  }
+
+  80% {
+    transform: rotate(-9deg) scale(1.04);
+  }
+
+  100% {
+    opacity: 0.88;
+    transform: rotate(-9deg) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes property-purchase-impact-ring {
+  0%,
+  58% {
+    opacity: 0;
+    transform: scale(0.72);
+  }
+
+  68% {
+    opacity: 0.65;
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.42);
+  }
+}
+
+@keyframes property-purchase-paper-impact {
+  0%,
+  54%,
+  100% {
+    transform: translate(0, 0) rotate(0);
+  }
+
+  60% {
+    transform: translate(-3px, 2px) rotate(-0.35deg);
+  }
+
+  64% {
+    transform: translate(3px, -1px) rotate(0.28deg);
+  }
+
+  68% {
+    transform: translate(-1px, 1px) rotate(-0.1deg);
+  }
+}
+
+@keyframes property-purchase-contract-exit {
+  from {
+    opacity: 1;
+    transform: translateY(0) rotateX(0) scale(1);
+    filter: blur(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(130px) rotateX(16deg) scale(0.86);
+    filter: blur(4px);
+  }
+}
+
+@keyframes property-purchase-card-reveal {
+  0% {
+    opacity: 0;
+    transform:
+      translateY(90px)
+      rotateY(-78deg)
+      rotateZ(-6deg)
+      scale(0.62);
+    filter: brightness(0.55) blur(5px);
+  }
+
+  64% {
+    opacity: 1;
+    transform:
+      translateY(-12px)
+      rotateY(7deg)
+      rotateZ(1deg)
+      scale(1.035);
+    filter: brightness(1.16) blur(0);
+  }
+
+  100% {
+    opacity: 1;
+    transform:
+      translateY(0)
+      rotateY(0)
+      rotateZ(0)
+      scale(1);
+    filter: brightness(1) blur(0);
+  }
+}
+
+@keyframes property-purchase-card-hold {
+  0%,
+  100% {
+    transform: translateY(0) rotateZ(0);
+  }
+
+  50% {
+    transform: translateY(-7px) rotateZ(0.25deg);
+  }
+}
+
+@keyframes property-purchase-card-handoff-right {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) rotateZ(0) scale(1);
+    filter: blur(0);
+  }
+
+  35% {
+    transform: translate(-14px, -11px) rotateZ(-2deg) scale(0.88);
+  }
+
+  100% {
+    opacity: 0;
+    transform:
+      translate(calc(50vw - 62px), calc(42vh - 10px))
+      rotateZ(13deg)
+      scale(0.12);
+    filter: blur(3px);
+  }
+}
+
+@keyframes property-purchase-card-handoff-left {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) rotateZ(0) scale(1);
+    filter: blur(0);
+  }
+
+  35% {
+    transform: translate(14px, -11px) rotateZ(2deg) scale(0.88);
+  }
+
+  100% {
+    opacity: 0;
+    transform:
+      translate(calc(-50vw + 62px), calc(42vh - 10px))
+      rotateZ(-13deg)
+      scale(0.12);
+    filter: blur(3px);
+  }
+}
+
+@keyframes property-purchase-light-spin {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes property-purchase-caption-out {
+  to {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes property-purchase-light-out {
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+}
+
+@keyframes property-purchase-handoff-label {
+  0%,
+  58% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+}
+
+@media (max-width: 560px) {
+  .property-purchase-overlay {
+    padding: 12px;
+  }
+
+  .property-purchase-modal {
+    width: min(440px, calc(100vw - 20px));
+    padding: 20px 18px 18px;
+  }
+
+  .property-purchase-modal__header {
+    display: grid;
+    gap: 10px;
+  }
+
+  .property-purchase-modal__document-meta {
+    width: 100%;
+  }
+
+  .property-purchase-modal__contract-table {
+    grid-template-columns: 1fr;
+  }
+
+  .property-purchase-modal__contract-table > div.is-wide {
+    grid-column: auto;
+  }
+
+  .property-purchase-modal__stamp-stage {
+    right: 24px;
+    bottom: 84px;
+    transform: scale(0.88);
+    transform-origin: right bottom;
+  }
+
+  .property-purchase-reward {
+    min-height: calc(100vh - 24px);
+  }
+
+  .property-purchase-reward__card-shell {
+    width: min(330px, calc(100vw - 28px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .property-purchase-modal,
+  .property-purchase-modal__stamp-handle,
+  .property-purchase-modal__stamp-mark,
+  .property-purchase-modal__impact-ring,
+  .property-purchase-reward__card-shell,
+  .property-purchase-reward__light,
+  .property-purchase-reward__headline,
+  .property-purchase-reward__handoff {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+  }
+
+  .property-purchase-modal__actions button {
+    transition: none;
+  }
+}
+
+
+.property-purchase-modal__landmark-requirement {
+  padding: 11px;
+  border: 1px solid rgba(80, 58, 22, 0.52);
+  background: rgba(128, 94, 39, 0.06);
+}
+
+.property-purchase-modal__landmark-requirement header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(80, 58, 22, 0.25);
+}
+
+.property-purchase-modal__landmark-requirement header span {
+  color: rgba(58, 41, 17, 0.68);
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.property-purchase-modal__landmark-requirement header strong {
+  font-size: 10px;
+  font-weight: 950;
+}
+
+.property-purchase-modal__landmark-requirement.is-qualified header strong {
+  color: #236b44;
+}
+
+.property-purchase-modal__landmark-requirement.is-unqualified header strong {
+  color: #a52e28;
+}
+
+.property-purchase-modal__landmark-requirement dl {
+  display: grid;
+  gap: 6px;
+  margin: 9px 0 0;
+}
+
+.property-purchase-modal__landmark-requirement dl > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.property-purchase-modal__landmark-requirement dt {
+  color: rgba(58, 41, 17, 0.66);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.property-purchase-modal__landmark-requirement dd {
+  margin: 0;
+  color: #30220f;
+  font-size: 10px;
+  font-weight: 950;
+}
+
+.property-purchase-modal__requirement-progress {
+  height: 7px;
+  margin-top: 9px;
+  overflow: hidden;
+  border: 1px solid rgba(80, 58, 22, 0.36);
+  background: rgba(80, 58, 22, 0.1);
+}
+
+.property-purchase-modal__requirement-progress i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #9a7b34, #d4b85e);
+}

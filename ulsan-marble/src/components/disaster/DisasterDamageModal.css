@@ -1,0 +1,221 @@
+.disaster-settlement-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 400;
+  display: grid;
+  place-items: center;
+  padding: 22px;
+  background: rgba(3, 10, 16, 0.8);
+  backdrop-filter: blur(7px);
+  pointer-events: auto;
+}
+
+.disaster-settlement-modal {
+  width: min(720px, calc(100vw - 44px));
+  max-height: min(850px, calc(100vh - 44px));
+  overflow: auto;
+  padding: 24px;
+  color: #eef4f7;
+  border: 1px solid rgba(255, 157, 111, 0.3);
+  border-radius: 20px;
+  background: linear-gradient(155deg, #1b2830, #0e171d 70%);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.58);
+}
+
+.disaster-settlement-modal__eyebrow {
+  color: #ffae88;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.disaster-settlement-modal__heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.disaster-settlement-modal__heading h2 {
+  margin: 0;
+  font-size: 25px;
+}
+
+.disaster-settlement-modal__heading p {
+  margin: 6px 0 0;
+  color: #aebec6;
+}
+
+.disaster-settlement-modal__token {
+  display: grid;
+  place-items: center;
+  width: 45px;
+  height: 45px;
+  flex: 0 0 auto;
+  color: #fff;
+  font-weight: 900;
+  border: 3px solid rgba(255, 255, 255, 0.82);
+  border-radius: 50%;
+  background: var(--player-color);
+}
+
+.disaster-settlement-modal__damages {
+  display: grid;
+  gap: 7px;
+  max-height: 180px;
+  margin-top: 16px;
+  overflow: auto;
+}
+
+.disaster-settlement-modal__damages article,
+.disaster-settlement-modal__assets article {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 11px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.disaster-settlement-modal__damages article > div,
+.disaster-settlement-modal__assets article > div:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.disaster-settlement-modal__damages span,
+.disaster-settlement-modal__assets span {
+  color: #9fb0b8;
+  font-size: 11px;
+}
+
+.disaster-settlement-modal__damages b {
+  color: #ffd09e;
+}
+
+.disaster-settlement-modal__summary {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin: 15px 0 0;
+}
+
+.disaster-settlement-modal__summary div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 11px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.disaster-settlement-modal__summary dt {
+  color: #9fb0b8;
+  font-size: 12px;
+}
+
+.disaster-settlement-modal__summary dd {
+  margin: 0;
+  font-weight: 850;
+}
+
+.disaster-settlement-modal__summary .is-repair,
+.disaster-settlement-modal__summary .is-shortfall {
+  color: #ffb18c;
+}
+
+.disaster-settlement-modal__pay,
+.disaster-settlement-modal__bankruptcy {
+  width: 100%;
+  margin-top: 15px;
+  padding: 12px 14px;
+  color: #fff;
+  font-weight: 850;
+  border: 0;
+  border-radius: 11px;
+  cursor: pointer;
+}
+
+.disaster-settlement-modal__pay {
+  background: linear-gradient(135deg, #cf5939, #a93626);
+}
+
+.disaster-settlement-modal__bankruptcy {
+  background: linear-gradient(135deg, #8a2b2b, #5e1e1e);
+}
+
+.disaster-settlement-modal__notice {
+  margin-top: 13px;
+  padding: 10px 12px;
+  color: #cce9d8;
+  font-size: 12px;
+  border-radius: 10px;
+  background: rgba(55, 138, 91, 0.18);
+}
+
+.disaster-settlement-modal__notice.is-bankruptcy-risk {
+  color: #ffd0c2;
+  background: rgba(160, 55, 39, 0.2);
+}
+
+.disaster-settlement-property-section {
+  margin-top: 14px;
+}
+
+.disaster-settlement-property-section__title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 7px;
+}
+
+.disaster-settlement-property-section__title span {
+  color: #8fa4ae;
+  font-size: 11px;
+}
+
+.disaster-settlement-modal__assets {
+  display: grid;
+  gap: 7px;
+}
+
+.disaster-settlement-modal__assets article > div:last-child {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.disaster-settlement-modal__assets button {
+  padding: 7px 11px;
+  color: #fff;
+  font-weight: 800;
+  border: 0;
+  border-radius: 8px;
+  background: #b44b32;
+  cursor: pointer;
+}
+
+.disaster-settlement-modal__empty,
+.disaster-settlement-modal__error {
+  margin-top: 13px;
+  padding: 10px 12px;
+  border-radius: 10px;
+}
+
+.disaster-settlement-modal__empty {
+  color: #aebdc4;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.disaster-settlement-modal__error {
+  color: #ffd0c5;
+  background: rgba(165, 48, 34, 0.23);
+}
+
+@media (max-width: 620px) {
+  .disaster-settlement-modal__summary {
+    grid-template-columns: 1fr;
+  }
+}

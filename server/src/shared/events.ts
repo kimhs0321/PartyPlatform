@@ -67,4 +67,20 @@ export const EVENTS = {
   RELAY_DRAWING_CLEAR_CANVAS: "relayDrawing:clearCanvas",
   RELAY_DRAWING_UNDO: "relayDrawing:undo",
   RELAY_DRAWING_UPDATE_SETTINGS:"relayDrawing:updateSettings",
+  
+// UlsanMarble
+ULSAN_MARBLE_UPDATE_SETTINGS:
+  "ulsanMarble:updateSettings",
+
+ULSAN_MARBLE_GET_STATE:
+  "ulsanMarble:getState",
+
+ULSAN_MARBLE_STATE:
+  "ulsanMarble:state",
+
+ULSAN_MARBLE_COMMAND:
+  "ulsanMarble:command",  
+
+ULSAN_MARBLE_ERROR:
+  "ulsanMarble:error",
 } as const;

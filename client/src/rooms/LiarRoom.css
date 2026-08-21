@@ -130,3 +130,30 @@
 .liar-setting-control input[type="checkbox"]:disabled {
   cursor: not-allowed;
 }
+
+.liar-setting-control select {
+  min-width: 100px;
+  height: 30px;
+  box-sizing: border-box;
+  padding: 0 8px;
+  color: #1f2d3d;
+  font-size: 13px;
+  font-weight: 700;
+  border: 1px solid #b9c8dc;
+  border-radius: 4px;
+  background: #ffffff;
+  outline: none;
+}
+
+.liar-setting-control select:focus {
+  border-color: #245fa8;
+  box-shadow:
+    0 0 0 2px
+    rgba(36, 95, 168, 0.12);
+}
+
+.liar-setting-control select:disabled {
+  color: #7a8798;
+  background: #eef2f7;
+  cursor: not-allowed;
+}

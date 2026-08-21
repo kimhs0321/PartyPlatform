@@ -2,6 +2,8 @@ import type { Room } from "../shared/types/Room";
 import type { Player } from "../shared/types/Player";
 import { DEFAULT_LIAR_GAME_SETTINGS } from "../shared/types/liarGame";
 import { DEFAULT_CATCH_MIND_GAME_SETTINGS } from "../shared/types/catchMindGame";
+import { DEFAULT_RELAY_DRAWING_SETTINGS } from "../shared/types/relayDrawing";
+import { DEFAULT_ULSAN_MARBLE_SETTINGS } from "../shared/types/ulsanMarble";
 
 class RoomManager {
   private rooms = new Map<string, Room>();
@@ -29,6 +31,8 @@ class RoomManager {
       gameSettings: {
         liar: { ...DEFAULT_LIAR_GAME_SETTINGS },
         catchMind: { ...DEFAULT_CATCH_MIND_GAME_SETTINGS },
+        relayDrawing: { ...DEFAULT_RELAY_DRAWING_SETTINGS },
+        ulsanMarble: { ...DEFAULT_ULSAN_MARBLE_SETTINGS },
       },
     };
 
@@ -196,7 +200,46 @@ class RoomManager {
 
     return room;
   }  
-      
+
+  updateRelayDrawingSettings(
+    roomId: string,
+    settings: Partial<
+      Room["gameSettings"]["relayDrawing"]
+    >,
+  ) {
+    const room = this.rooms.get(roomId);
+    if (!room) return null;
+
+    room.gameSettings.relayDrawing = {
+      ...room.gameSettings.relayDrawing,
+      ...settings,
+    };
+
+    this.rooms.set(roomId, room);
+
+    return room;
+  }
+  
+  updateUlsanMarbleSettings(
+    roomId: string,
+    settings: Partial<
+      Room["gameSettings"]["ulsanMarble"]
+    >,
+  ) {
+    const room = this.rooms.get(roomId);
+    if (!room) return null;
+
+    room.gameSettings.ulsanMarble = {
+      ...room.gameSettings.ulsanMarble,
+      ...settings,
+    };
+
+    this.rooms.set(roomId, room);
+
+    return room;
+  }
+  
 }
+
 
 export const roomManager = new RoomManager();

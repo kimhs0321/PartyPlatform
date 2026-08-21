@@ -1,0 +1,709 @@
+.city-hall-project-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 335;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(2, 12, 20, 0.78);
+  backdrop-filter: blur(10px);
+  pointer-events: auto;
+}
+
+.city-hall-project-modal {
+  position: relative;
+  width: min(980px, calc(100vw - 48px));
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  color: #17232d;
+  border: 1px solid rgba(133, 158, 178, 0.72);
+  border-radius: 18px;
+  background: #e9edf0;
+  box-shadow: 0 32px 90px rgba(0, 0, 0, 0.58);
+}
+
+.city-hall-project-modal__official-header {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 15px;
+  padding: 17px 22px;
+  color: #f4f9fc;
+  border-bottom: 3px solid #d9b746;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 36%),
+    #123e61;
+  box-shadow: 0 5px 16px rgba(14, 49, 75, 0.2);
+}
+
+.city-hall-project-modal__seal {
+  width: 54px;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: 2px solid rgba(255, 255, 255, 0.82);
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.12);
+}
+
+.city-hall-project-modal__seal span {
+  font-size: 15px;
+  font-weight: 950;
+  letter-spacing: -0.08em;
+}
+
+.city-hall-project-modal__official-header > div:nth-child(2) {
+  min-width: 0;
+  display: grid;
+  gap: 1px;
+}
+
+.city-hall-project-modal__official-header small {
+  color: #a7c7dd;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+.city-hall-project-modal__official-header strong {
+  font-size: 22px;
+  line-height: 1.05;
+}
+
+.city-hall-project-modal__official-header > div:nth-child(2) > span {
+  color: #d4e5ef;
+  font-size: 11px;
+}
+
+.city-hall-project-modal__official-header dl {
+  min-width: 180px;
+  display: grid;
+  gap: 4px;
+  margin: 0;
+}
+
+.city-hall-project-modal__official-header dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 7px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.city-hall-project-modal__official-header dt,
+.city-hall-project-modal__official-header dd {
+  margin: 0;
+  font-size: 9px;
+}
+
+.city-hall-project-modal__official-header dt {
+  color: #b8d1e0;
+}
+
+.city-hall-project-modal__official-header dd {
+  font-weight: 900;
+}
+
+.city-hall-project-modal__policy-notice {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 5px 20px;
+  margin: 18px 22px 0;
+  padding: 15px 17px;
+  color: #17344a;
+  border: 1px solid #b7c5cf;
+  border-left: 5px solid #1f6f9f;
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      rgba(25, 83, 121, 0.025) 0,
+      rgba(25, 83, 121, 0.025) 5px,
+      transparent 5px,
+      transparent 10px
+    ),
+    #f8fbfd;
+}
+
+.city-hall-project-modal__policy-notice > div {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.city-hall-project-modal__policy-notice span {
+  color: #a33d34;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+}
+
+.city-hall-project-modal__policy-notice small {
+  color: #547184;
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.city-hall-project-modal__policy-notice h2 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.city-hall-project-modal__policy-notice p {
+  grid-column: 1;
+  margin: 0;
+  color: #5b6973;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.city-hall-project-modal__policy-notice strong {
+  grid-column: 2;
+  grid-row: 2 / span 2;
+  align-self: center;
+  max-width: 300px;
+  padding: 9px 12px;
+  color: #fff;
+  font-size: 12px;
+  text-align: center;
+  border-radius: 5px;
+  background: #1d628e;
+}
+
+.city-hall-project-modal__policy-notice em {
+  grid-column: 1 / -1;
+  color: #60798a;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.city-hall-project-modal__document {
+  position: relative;
+  margin: 16px 22px 22px;
+  padding: 21px;
+  border: 1px solid #aeb9c1;
+  background:
+    linear-gradient(rgba(22, 61, 88, 0.025) 1px, transparent 1px),
+    #fffef9;
+  background-size: 100% 31px;
+  box-shadow: 0 5px 15px rgba(27, 48, 62, 0.08);
+}
+
+.city-hall-project-modal__document::before,
+.city-hall-project-modal__document::after {
+  position: absolute;
+  top: 9px;
+  color: #8a969d;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.city-hall-project-modal__document::before {
+  left: 12px;
+  content: "울산광역시 민원행정서식";
+}
+
+.city-hall-project-modal__document::after {
+  right: 12px;
+  content: "보존기간: 게임 종료 시까지";
+}
+
+.city-hall-project-modal__document-title {
+  padding: 16px 0 14px;
+  text-align: center;
+  border-bottom: 2px solid #263b49;
+}
+
+.city-hall-project-modal__document-title span {
+  color: #557282;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.city-hall-project-modal__document-title h2 {
+  margin: 2px 0 4px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 30px;
+  letter-spacing: 0.12em;
+}
+
+.city-hall-project-modal__document-title p {
+  margin: 0;
+  color: #627079;
+  font-size: 10px;
+}
+
+.city-hall-project-modal__applicant {
+  display: grid;
+  grid-template-columns: 1.4fr 0.8fr 1fr;
+  margin: 14px 0 0;
+  border-top: 1px solid #8f9ca4;
+  border-left: 1px solid #8f9ca4;
+}
+
+.city-hall-project-modal__applicant > div {
+  display: grid;
+  grid-template-columns: 78px minmax(0, 1fr);
+  min-height: 42px;
+  border-right: 1px solid #8f9ca4;
+  border-bottom: 1px solid #8f9ca4;
+}
+
+.city-hall-project-modal__applicant dt,
+.city-hall-project-modal__applicant dd {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 7px 9px;
+  font-size: 11px;
+}
+
+.city-hall-project-modal__applicant dt {
+  justify-content: center;
+  color: #344b5a;
+  font-weight: 900;
+  background: #e9eef1;
+  border-right: 1px solid #8f9ca4;
+}
+
+.city-hall-project-modal__applicant dd {
+  gap: 7px;
+  font-weight: 850;
+}
+
+.city-hall-project-modal__applicant i {
+  width: 24px;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 950;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: var(--applicant-color);
+  box-shadow: 0 0 0 1px #73818a;
+}
+
+.city-hall-project-modal__services {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 17px 0 0;
+  padding: 13px;
+  border: 1px solid #8f9ca4;
+}
+
+.city-hall-project-modal__services legend {
+  padding: 0 7px;
+  color: #243e50;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.city-hall-service {
+  position: relative;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-content: start;
+  gap: 8px;
+  padding: 13px;
+  border: 1px solid #bcc6cc;
+  background: #f8fafb;
+  cursor: pointer;
+  transition:
+    border-color 120ms ease,
+    background 120ms ease,
+    transform 120ms ease;
+}
+
+.city-hall-service:hover:not(.is-disabled) {
+  border-color: #4b84a9;
+  transform: translateY(-1px);
+}
+
+.city-hall-service.is-selected {
+  border: 2px solid #246d9a;
+  background: #eef7fc;
+  box-shadow: inset 0 0 0 1px rgba(36, 109, 154, 0.1);
+}
+
+.city-hall-service.is-disabled {
+  opacity: 0.48;
+  cursor: default;
+}
+
+.city-hall-service input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.city-hall-service__check {
+  width: 17px;
+  aspect-ratio: 1;
+  margin-top: 2px;
+  border: 1px solid #748792;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.city-hall-service.is-selected .city-hall-service__check {
+  border: 5px solid #246d9a;
+}
+
+.city-hall-service__body {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.city-hall-service__body small {
+  color: #67808f;
+  font-size: 9px;
+  font-weight: 850;
+}
+
+.city-hall-service__body strong {
+  font-size: 15px;
+}
+
+.city-hall-service__body p {
+  min-height: 46px;
+  margin: 0;
+  color: #5d6970;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.city-hall-service__body b {
+  color: #1a638f;
+  font-size: 11px;
+}
+
+.city-hall-service > em {
+  grid-column: 1 / -1;
+  justify-self: end;
+  color: #7c898f;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.city-hall-project-modal__target {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 16px;
+  margin-top: 15px;
+  padding: 14px;
+  border: 1px solid #8f9ca4;
+}
+
+.city-hall-project-modal__target > div:first-child {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #b8c1c6;
+}
+
+.city-hall-project-modal__target > div:first-child span {
+  color: #243e50;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.city-hall-project-modal__target > div:first-child strong {
+  color: #607785;
+  font-size: 10px;
+}
+
+.city-hall-project-modal__target label {
+  display: grid;
+  gap: 6px;
+}
+
+.city-hall-project-modal__target label > span,
+.city-hall-project-modal__pledge > span {
+  color: #465e6c;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.city-hall-project-modal__target select {
+  width: 100%;
+  min-height: 40px;
+  padding: 0 10px;
+  color: #243640;
+  border: 1px solid #8e9da5;
+  border-radius: 2px;
+  background: #fff;
+}
+
+.city-hall-project-modal__target select:disabled {
+  color: #8c969c;
+  background: #edf0f1;
+}
+
+.city-hall-project-modal__pledge {
+  display: grid;
+  gap: 6px;
+  padding: 9px 11px;
+  border-left: 3px solid #889ca9;
+  background: #f0f3f4;
+}
+
+.city-hall-project-modal__pledge p {
+  margin: 0;
+  color: #647179;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.city-hall-project-modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 17px;
+  padding-top: 15px;
+  border-top: 2px solid #263b49;
+}
+
+.city-hall-project-modal__footer > div {
+  display: grid;
+  gap: 2px;
+}
+
+.city-hall-project-modal__footer span {
+  color: #7a878e;
+  font-size: 9px;
+}
+
+.city-hall-project-modal__footer strong {
+  color: #314a59;
+  font-size: 11px;
+}
+
+.city-hall-project-modal__footer button,
+.city-hall-project-modal__receipt button {
+  min-width: 220px;
+  min-height: 43px;
+  padding: 0 18px;
+  color: #fff;
+  border: 1px solid #174f72;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 950;
+  background: #1e6d9c;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.18);
+  cursor: pointer;
+}
+
+.city-hall-project-modal__footer button:hover:not(:disabled),
+.city-hall-project-modal__receipt button:hover {
+  filter: brightness(1.08);
+}
+
+.city-hall-project-modal__footer button:disabled {
+  color: #89949a;
+  border-color: #b0b8bc;
+  background: #d9dddf;
+  cursor: default;
+}
+
+.city-hall-project-modal__footer button.is-secondary {
+  color: #465963;
+  border-color: #919da3;
+  background: #eef1f2;
+}
+
+.city-hall-project-modal__receipt {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  min-height: 300px;
+  align-content: center;
+  padding: 28px 12px 12px;
+  text-align: center;
+}
+
+.city-hall-project-modal__receipt > span {
+  color: #507082;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.city-hall-project-modal__receipt h3 {
+  margin: 0;
+  color: #173f5a;
+  font-size: 26px;
+}
+
+.city-hall-project-modal__receipt dl {
+  width: min(560px, 100%);
+  margin: 8px 0 10px;
+  border-top: 1px solid #8f9ca4;
+  border-left: 1px solid #8f9ca4;
+}
+
+.city-hall-project-modal__receipt dl > div {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  border-right: 1px solid #8f9ca4;
+  border-bottom: 1px solid #8f9ca4;
+}
+
+.city-hall-project-modal__receipt dt,
+.city-hall-project-modal__receipt dd {
+  margin: 0;
+  padding: 10px 12px;
+  font-size: 11px;
+}
+
+.city-hall-project-modal__receipt dt {
+  font-weight: 900;
+  background: #e9eef1;
+  border-right: 1px solid #8f9ca4;
+}
+
+.city-hall-project-modal__receipt dd {
+  text-align: left;
+  font-weight: 800;
+}
+
+.city-hall-project-modal__approval-stamp {
+  position: absolute;
+  right: 62px;
+  bottom: 72px;
+  z-index: 4;
+  width: 118px;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 1px;
+  color: rgba(166, 42, 36, 0.9);
+  border: 5px double rgba(166, 42, 36, 0.82);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.55);
+  transform: rotate(-13deg) scale(1);
+  animation: city-hall-stamp 380ms cubic-bezier(0.2, 1.4, 0.4, 1) both;
+  pointer-events: none;
+}
+
+.city-hall-project-modal__approval-stamp span,
+.city-hall-project-modal__approval-stamp small {
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.05em;
+}
+
+.city-hall-project-modal__approval-stamp strong {
+  font-size: 28px;
+  line-height: 1;
+}
+
+@keyframes city-hall-stamp {
+  from {
+    opacity: 0;
+    transform: rotate(-13deg) scale(1.8);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(-13deg) scale(1);
+  }
+}
+
+@media (max-width: 900px) {
+  .city-hall-project-modal__official-header {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .city-hall-project-modal__official-header dl {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .city-hall-project-modal__policy-notice {
+    grid-template-columns: 1fr;
+  }
+
+  .city-hall-project-modal__policy-notice strong,
+  .city-hall-project-modal__policy-notice p,
+  .city-hall-project-modal__policy-notice em {
+    grid-column: 1;
+    grid-row: auto;
+    max-width: none;
+  }
+
+  .city-hall-project-modal__services {
+    grid-template-columns: 1fr;
+  }
+
+  .city-hall-service__body p {
+    min-height: 0;
+  }
+
+  .city-hall-project-modal__target {
+    grid-template-columns: 1fr;
+  }
+
+  .city-hall-project-modal__applicant {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 620px), (max-height: 720px) {
+  .city-hall-project-overlay {
+    padding: 12px;
+  }
+
+  .city-hall-project-modal {
+    width: calc(100vw - 24px);
+    max-height: calc(100vh - 24px);
+  }
+
+  .city-hall-project-modal__official-header,
+  .city-hall-project-modal__document {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  .city-hall-project-modal__policy-notice,
+  .city-hall-project-modal__document {
+    margin-left: 12px;
+    margin-right: 12px;
+  }
+
+  .city-hall-project-modal__footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .city-hall-project-modal__footer button,
+  .city-hall-project-modal__receipt button {
+    width: 100%;
+  }
+
+  .city-hall-project-modal__approval-stamp {
+    right: 30px;
+    bottom: 92px;
+    width: 96px;
+  }
+}

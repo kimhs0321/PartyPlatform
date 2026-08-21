@@ -12,7 +12,11 @@ import RelayDrawingGame from "../games/RelayDrawingGame.tsx";
 import type {
   ClientRelayDrawingGameState,
 } from "../../../server/src/shared/types/relayDrawing";
-
+import UlsanMarbleGame from "../../../ulsan-marble/src/App";
+import type {
+  ClientUlsanMarbleGameState,
+  UlsanMarbleGameError,
+} from "../../../server/src/games/ulsanMarble/types/ulsanMarbleGame";
 
 type RoomPlayerDto = {
   id: string;
@@ -29,6 +33,14 @@ type RoomDto = {
   game: string;
   players: RoomPlayerDto[];
   status: "waiting" | "playing" | "paused";
+
+  gameSettings: {
+    ulsanMarble: {
+      startingMoney: number;
+      salary: number;
+      roundLimit: 30 | 50 | 70 | null;
+    };
+  };
 };
 
 export default function GamePage() {
@@ -39,8 +51,9 @@ export default function GamePage() {
   const [catchMindGameState, setCatchMindGameState] = useState<ClientCatchMindGameState | null>(null);
   const [room, setRoom] = useState<RoomDto | null>(
     location.state?.room ?? null );
-  const [relayDrawingGameState,setRelayDrawingGameState,] = useState<ClientRelayDrawingGameState | null>(null);  
-  
+  const [relayDrawingGameState,setRelayDrawingGameState,] = useState<ClientRelayDrawingGameState | null>(null); 
+  const [ulsanMarbleGameState, setUlsanMarbleGameState,] =useState<ClientUlsanMarbleGameState | null>(null,); 
+    
   useEffect(() => {
     if (!socket.connected) {
       socket.connect();
@@ -78,12 +91,34 @@ export default function GamePage() {
     const handleRelayDrawingState = (state: ClientRelayDrawingGameState,) => {setRelayDrawingGameState(state);};
     socket.on(EVENTS.RELAY_DRAWING_STATE,handleRelayDrawingState,);
 
+    const handleUlsanMarbleState = (state: ClientUlsanMarbleGameState,) => {setUlsanMarbleGameState(state);};
+
+    const handleUlsanMarbleError = (error: UlsanMarbleGameError,) => {console.error("[UlsanMarble]",error.message,);};
+
+    socket.on(
+      EVENTS.ULSAN_MARBLE_STATE,
+      handleUlsanMarbleState,
+    );
+
+    socket.on(
+      EVENTS.ULSAN_MARBLE_ERROR,
+      handleUlsanMarbleError,
+    );
+
+    if (roomId) {
+      socket.emit(
+        EVENTS.ULSAN_MARBLE_GET_STATE,
+      );
+    }
+    
     return () => {
       socket.off(EVENTS.ROOM_INFO, handleRoomInfo);
       socket.off(EVENTS.GAME_ENDED, handleGameEnded);
       socket.off(EVENTS.LIAR_GAME_STATE, handleLiarGameState);
       socket.off(EVENTS.CATCH_MIND_STATE, handleCatchMindGameState);
       socket.off(EVENTS.RELAY_DRAWING_STATE,handleRelayDrawingState,);
+      socket.off(EVENTS.ULSAN_MARBLE_STATE,handleUlsanMarbleState,);
+      socket.off(EVENTS.ULSAN_MARBLE_ERROR,handleUlsanMarbleError,);
     };
 
   }, [roomId, navigate]);
@@ -114,19 +149,47 @@ export default function GamePage() {
 
     switch (room.game) {
       case "라이어 게임":
-       return <LiarGame state={liarGameState} />;
+        return <LiarGame state={liarGameState} />;
 
       case "캐치마인드":
         return <CatchMindGame state={catchMindGameState} />;
-      
+
       case "릴레이 드로잉":
-        return ( <RelayDrawingGame state={relayDrawingGameState}  /> );  
+        return <RelayDrawingGame state={relayDrawingGameState} />;
 
       default:
         return <UnknownGame />;
     }
   };
 
+  if (room?.game === "울산마블") {
+    return (
+      <UlsanMarbleGame
+        participants={room.players.map(
+          (player) => ({
+            id: player.id,
+            nickname: player.nickname,
+          }),
+        )}
+        localPlayerId={socket.id}
+        settings={
+          room.gameSettings.ulsanMarble
+        }
+        network={{
+          state: ulsanMarbleGameState,
+
+          sendCommand: (command) => {
+            socket.emit(
+              EVENTS.ULSAN_MARBLE_COMMAND,
+              command,
+            );
+          },
+        }}
+      />
+    );
+  }
+
+  /* 기존 플랫폼 게임 화면 */
   return (
     <div className="game-page">
       <div className="game-shell">
@@ -139,12 +202,17 @@ export default function GamePage() {
 
           <div className="game-header-actions">
             {isHost && (
-              <button className="danger-button" onClick={handleEndGame}>
+              <button
+                className="danger-button"
+                onClick={handleEndGame}
+              >
                 게임 종료
               </button>
             )}
 
-            <button onClick={handleLeaveRoom}>나가기</button>
+            <button onClick={handleLeaveRoom}>
+              나가기
+            </button>
           </div>
         </header>
 
@@ -152,4 +220,5 @@ export default function GamePage() {
       </div>
     </div>
   );
+  
 }

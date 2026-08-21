@@ -1,0 +1,550 @@
+.jail-fine-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1190;
+  display: grid;
+  place-items: center;
+  padding: 22px;
+  overflow: auto;
+  background:
+    radial-gradient(
+      circle at 50% 16%,
+      rgba(123, 151, 163, 0.13),
+      transparent 34%
+    ),
+    rgba(2, 7, 10, 0.88);
+  backdrop-filter: blur(8px);
+  pointer-events: auto;
+}
+
+.jail-fine-modal {
+  position: relative;
+  width: min(830px, calc(100vw - 32px));
+  max-height: calc(100vh - 44px);
+  overflow: auto;
+  color: #eaf2f6;
+  border: 1px solid rgba(167, 198, 214, 0.35);
+  border-radius: 15px;
+  background:
+    linear-gradient(
+      145deg,
+      #25343c,
+      #0d171c 72%
+    );
+  box-shadow:
+    0 34px 105px rgba(0, 0, 0, 0.7),
+    inset 0 1px rgba(255, 255, 255, 0.07);
+}
+
+.jail-fine-modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  padding: 15px 20px;
+  border-bottom: 1px solid rgba(165, 192, 203, 0.2);
+  background:
+    linear-gradient(
+      90deg,
+      rgba(70, 86, 94, 0.9),
+      rgba(30, 43, 49, 0.9)
+    );
+}
+
+.jail-fine-modal__header > div {
+  display: grid;
+  gap: 2px;
+}
+
+.jail-fine-modal__header span {
+  color: #90a8b3;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+}
+
+.jail-fine-modal__header strong {
+  font-size: 16px;
+}
+
+.jail-fine-modal__header > b {
+  font-family: monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+.jail-fine-modal__document {
+  position: relative;
+  margin: 18px;
+  padding: 23px;
+  overflow: hidden;
+  color: #29251f;
+  border: 1px solid rgba(77, 65, 49, 0.52);
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(102, 78, 48, 0.034) 0 1px,
+      transparent 1px 5px
+    ),
+    #e8dfca;
+  box-shadow:
+    8px 10px 0 rgba(0, 0, 0, 0.18),
+    0 16px 30px rgba(0, 0, 0, 0.34);
+}
+
+.jail-fine-modal__document::before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 12px;
+  width: 1px;
+  content: "";
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(110, 81, 48, 0.4) 0 8px,
+      transparent 8px 14px
+    );
+}
+
+.jail-fine-modal__document-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 15px;
+  border-bottom: 3px double #665640;
+}
+
+.jail-fine-modal__document-heading small {
+  color: #a33d31;
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+}
+
+.jail-fine-modal__document-heading h2 {
+  margin: 4px 0 5px;
+  font-size: 27px;
+  letter-spacing: -0.045em;
+}
+
+.jail-fine-modal__document-heading p {
+  margin: 0;
+  color: #6f6251;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.jail-fine-modal__player-token {
+  flex: 0 0 auto;
+  width: 42px;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 950;
+  border: 3px solid rgba(255, 255, 255, 0.88);
+  border-radius: 50%;
+  background: var(--player-color);
+  box-shadow:
+    0 6px 12px rgba(0, 0, 0, 0.26),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+
+.jail-fine-modal__summary {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin: 14px 0 0;
+  border: 1px solid #7a674a;
+}
+
+.jail-fine-modal__summary > div {
+  min-width: 0;
+  padding: 9px 10px;
+  border-right: 1px solid rgba(122, 103, 74, 0.72);
+}
+
+.jail-fine-modal__summary > div:last-child {
+  border-right: 0;
+}
+
+.jail-fine-modal__summary dt {
+  color: #746754;
+  font-size: 8px;
+}
+
+.jail-fine-modal__summary dd {
+  overflow: hidden;
+  margin: 4px 0 0;
+  font-size: 11px;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jail-fine-modal__summary .is-fine {
+  background: rgba(159, 52, 44, 0.08);
+}
+
+.jail-fine-modal__summary .is-fine dd,
+.jail-fine-modal__summary .is-shortfall {
+  color: #9e352e;
+}
+
+.jail-fine-modal__payment-ready {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 0.7fr);
+  align-items: center;
+  gap: 14px;
+  margin-top: 14px;
+  padding: 13px;
+  border: 1px solid rgba(63, 106, 76, 0.42);
+  background: rgba(73, 126, 88, 0.08);
+}
+
+.jail-fine-modal__payment-ready > div {
+  display: grid;
+  gap: 3px;
+}
+
+.jail-fine-modal__payment-ready span {
+  color: #4d8060;
+  font-size: 8px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+}
+
+.jail-fine-modal__payment-ready strong {
+  font-size: 15px;
+}
+
+.jail-fine-modal__payment-ready p {
+  margin: 0;
+  color: #706553;
+  font-size: 9px;
+}
+
+.jail-fine-modal__pay {
+  min-height: 45px;
+  color: #f6f8f7;
+  font-size: 12px;
+  font-weight: 950;
+  border: 1px solid rgba(177, 209, 188, 0.45);
+  background:
+    linear-gradient(180deg, #5c8068, #34523f);
+  cursor: pointer;
+}
+
+.jail-fine-modal__pay:disabled {
+  color: #9aa39e;
+  border-color: rgba(0, 0, 0, 0.14);
+  background: #5f6962;
+  cursor: default;
+}
+
+.jail-fine-modal__notice {
+  display: grid;
+  gap: 3px;
+  margin-top: 14px;
+  padding: 11px 13px;
+  color: #366247;
+  border: 1px solid rgba(67, 116, 82, 0.35);
+  background: rgba(75, 133, 91, 0.08);
+}
+
+.jail-fine-modal__notice strong {
+  font-size: 11px;
+}
+
+.jail-fine-modal__notice span {
+  font-size: 9px;
+}
+
+.jail-fine-modal__notice.is-bankruptcy-risk {
+  color: #9e352e;
+  border-color: rgba(159, 52, 44, 0.38);
+  background: rgba(159, 52, 44, 0.08);
+}
+
+.jail-fine-modal__liquidation {
+  margin-top: 13px;
+}
+
+.jail-fine-modal__section-title {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 13px 0 7px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgba(112, 93, 65, 0.48);
+}
+
+.jail-fine-modal__section-title strong {
+  font-size: 11px;
+}
+
+.jail-fine-modal__section-title span {
+  color: #746754;
+  font-size: 8px;
+}
+
+.jail-fine-modal__assets {
+  display: grid;
+  gap: 6px;
+}
+
+.jail-fine-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 9px 11px;
+  border: 1px solid rgba(117, 96, 67, 0.4);
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.jail-fine-card > div:first-child {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.jail-fine-card > div:first-child strong {
+  font-size: 10px;
+}
+
+.jail-fine-card > div:first-child span {
+  overflow: hidden;
+  color: #746653;
+  font-size: 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jail-fine-card__action {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 9px;
+  font-weight: 850;
+}
+
+.jail-fine-card__action button {
+  padding: 6px 10px;
+  color: #f8f9f8;
+  font-size: 9px;
+  font-weight: 900;
+  border: 0;
+  background: #5a6d74;
+  cursor: pointer;
+}
+
+.jail-fine-modal__empty {
+  margin-top: 14px;
+  padding: 13px;
+  color: #746754;
+  font-size: 9px;
+  text-align: center;
+  border: 1px dashed rgba(110, 92, 66, 0.42);
+}
+
+.jail-fine-modal__bankruptcy {
+  width: 100%;
+  min-height: 42px;
+  margin-top: 12px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 950;
+  border: 0;
+  background: #953932;
+  cursor: pointer;
+}
+
+.jail-fine-modal__error {
+  margin: 12px 0 0;
+  padding: 9px 11px;
+  color: #99352f;
+  font-size: 9px;
+  font-weight: 850;
+  text-align: center;
+  border: 1px solid rgba(159, 52, 44, 0.32);
+  background: rgba(159, 52, 44, 0.08);
+}
+
+.jail-fine-modal__release-stamp {
+  position: absolute;
+  right: 48px;
+  bottom: 35px;
+  z-index: 5;
+  width: 122px;
+  aspect-ratio: 1.18;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 1px;
+  color: rgba(47, 116, 69, 0.82);
+  border: 4px double rgba(47, 116, 69, 0.72);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  transform: rotate(-11deg) scale(1.8);
+  mix-blend-mode: multiply;
+}
+
+.jail-fine-modal__release-stamp::before {
+  position: absolute;
+  inset: 5px;
+  content: "";
+  border: 1px solid rgba(47, 116, 69, 0.58);
+  border-radius: 50%;
+}
+
+.jail-fine-modal__release-stamp span {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+}
+
+.jail-fine-modal__release-stamp strong {
+  font-size: 19px;
+}
+
+.jail-fine-modal__release-stamp small {
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.jail-fine-modal.is-processing
+  .jail-fine-modal__release-stamp,
+.jail-fine-modal.is-approved
+  .jail-fine-modal__release-stamp {
+  animation: jail-release-stamp 520ms
+    cubic-bezier(0.16, 0.85, 0.2, 1.14) both;
+}
+
+.jail-fine-modal__door {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: space-around;
+  padding: 0 12px;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.jail-fine-modal__door::before,
+.jail-fine-modal__door::after {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 20px;
+  content: "";
+  background:
+    linear-gradient(180deg, #758892, #26343a 50%, #657983);
+}
+
+.jail-fine-modal__door::before {
+  top: 70px;
+}
+
+.jail-fine-modal__door::after {
+  bottom: 42px;
+}
+
+.jail-fine-modal__door i {
+  width: 17px;
+  height: 100%;
+  background:
+    linear-gradient(
+      90deg,
+      #1c272c,
+      #7c9099 42%,
+      #a2b2b9 55%,
+      #2c3a40
+    );
+  box-shadow:
+    4px 0 8px rgba(0, 0, 0, 0.4);
+}
+
+.jail-fine-modal.is-approved .jail-fine-modal__door {
+  opacity: 1;
+  animation: jail-door-open 720ms ease 150ms both;
+}
+
+@keyframes jail-release-stamp {
+  0% {
+    opacity: 0;
+    transform: rotate(-11deg) scale(1.8);
+    filter: blur(2px);
+  }
+
+  65% {
+    opacity: 0.9;
+    transform: rotate(-11deg) scale(0.92);
+    filter: blur(0);
+  }
+
+  100% {
+    opacity: 0.84;
+    transform: rotate(-11deg) scale(1);
+  }
+}
+
+@keyframes jail-door-open {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(110%);
+  }
+}
+
+@media (max-width: 760px) {
+  .jail-fine-overlay {
+    padding: 12px;
+  }
+
+  .jail-fine-modal {
+    width: calc(100vw - 24px);
+    max-height: calc(100vh - 24px);
+  }
+
+  .jail-fine-modal__document {
+    margin: 12px;
+    padding: 17px;
+  }
+
+  .jail-fine-modal__summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .jail-fine-modal__summary > div {
+    border-bottom: 1px solid rgba(122, 103, 74, 0.72);
+  }
+
+  .jail-fine-modal__payment-ready {
+    grid-template-columns: 1fr;
+  }
+
+  .jail-fine-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jail-fine-modal__release-stamp,
+  .jail-fine-modal__door {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

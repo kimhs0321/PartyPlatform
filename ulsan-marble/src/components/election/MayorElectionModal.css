@@ -1,0 +1,716 @@
+.mayor-election-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 340;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(18, 20, 22, 0.84);
+  backdrop-filter: blur(9px);
+  pointer-events: auto;
+}
+
+.mayor-election-modal {
+  width: min(1180px, calc(100vw - 48px));
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  color: #211d18;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 18px;
+  background:
+    linear-gradient(rgba(255, 254, 248, 0.975), rgba(245, 240, 225, 0.985)),
+    repeating-linear-gradient(
+      0deg,
+      rgba(75, 65, 45, 0.025) 0,
+      rgba(75, 65, 45, 0.025) 1px,
+      transparent 1px,
+      transparent 5px
+    );
+  box-shadow: 0 34px 100px rgba(0, 0, 0, 0.62);
+}
+
+.mayor-election-modal__header {
+  position: sticky;
+  top: 0;
+  z-index: 8;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 25px;
+  color: #f9fbff;
+  border-bottom: 4px double rgba(255, 255, 255, 0.32);
+  background: #173d62;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
+}
+
+.mayor-election-modal__header span,
+.mayor-election-result__winner small {
+  color: #b9d8ee;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.mayor-election-modal__header h2 {
+  margin: 3px 0 0;
+  font-size: 26px;
+}
+
+.mayor-election-modal__header > strong {
+  flex: 0 0 auto;
+  padding: 8px 12px;
+  color: #fff;
+  font-size: 12px;
+  border: 1px solid color-mix(in srgb, var(--voter-color), white 38%);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--voter-color), #173d62 62%);
+}
+
+.mayor-ballot {
+  padding: 20px 24px 24px;
+}
+
+.mayor-ballot__heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 0 4px 13px;
+  border-bottom: 3px double #29251f;
+}
+
+.mayor-ballot__heading > div {
+  display: grid;
+  gap: 4px;
+}
+
+.mayor-ballot__heading small {
+  color: #5a554c;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.mayor-ballot__heading strong {
+  font-size: 24px;
+  letter-spacing: 0.04em;
+}
+
+.mayor-ballot__heading > span {
+  flex: 0 0 auto;
+  padding: 6px 10px;
+  color: #3e3a33;
+  font-size: 12px;
+  font-weight: 900;
+  border: 1px solid #777065;
+}
+
+.mayor-ballot__instruction {
+  margin: 10px 4px 0;
+  color: #5b554b;
+  font-size: 12px;
+}
+
+.mayor-election-candidates {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 17px;
+}
+
+.mayor-ballot-paper {
+  position: relative;
+  min-width: 0;
+  display: grid;
+ grid-template-rows: auto 270px auto 1fr auto;
+  overflow: hidden;
+  border: 2px solid #302c26;
+  background:
+    linear-gradient(rgba(255, 254, 247, 0.94), rgba(255, 252, 238, 0.98)),
+    repeating-linear-gradient(
+      90deg,
+      rgba(77, 68, 49, 0.025) 0,
+      rgba(77, 68, 49, 0.025) 1px,
+      transparent 1px,
+      transparent 6px
+    );
+  box-shadow: 0 9px 22px rgba(58, 47, 26, 0.14);
+}
+
+.mayor-ballot-paper.is-stamped {
+  animation: mayor-paper-impact 520ms ease both;
+}
+
+.mayor-ballot-paper__number {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  color: #fff;
+  border-bottom: 2px solid #302c26;
+  background: #25231f;
+}
+
+.mayor-ballot-paper__number span {
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.mayor-ballot-paper__number strong {
+  font-size: 25px;
+  line-height: 1;
+}
+
+.mayor-candidate-portrait {
+  position: relative;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: 10px 18px;
+  box-sizing: border-box;
+  border-bottom: 1px solid #8d877d;
+  background:
+    radial-gradient(circle at 50% 52%, #f7f4ea 0 42%, #dfd9c9 100%);
+}
+
+.mayor-candidate-portrait > span {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  z-index: 0;
+  color: rgba(39, 47, 55, 0.1);
+  font-size: 92px;
+  font-weight: 950;
+  transform: translate(-50%, -50%);
+}
+
+.mayor-candidate-portrait img {
+  position: relative;
+  z-index: 1;
+  width: auto;
+  height: 92%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: center;
+  user-select: none;
+}
+
+.mayor-candidate-portrait--compact {
+  width: 42px;
+  height: 48px;
+  min-height: 48px;
+  flex: 0 0 auto;
+  border: 1px solid rgba(47, 43, 35, 0.24);
+  border-radius: 6px;
+}
+
+.mayor-candidate-portrait--compact > span {
+  font-size: 24px;
+}
+
+.mayor-ballot-paper__identity {
+  min-height: 102px;
+  padding: 12px 13px;
+  text-align: center;
+  border-bottom: 1px solid #8d877d;
+}
+
+.mayor-ballot-paper__identity small {
+  color: #686156;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.mayor-ballot-paper__identity h3 {
+  margin: 3px 0;
+  font-size: 23px;
+}
+
+.mayor-ballot-paper__identity p {
+  margin: 0;
+  color: #514b42;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.mayor-ballot-paper__policy {
+  padding: 13px;
+}
+
+.mayor-ballot-paper__policy > span {
+  display: inline-block;
+  padding: 3px 7px;
+  color: #173d62;
+  font-size: 9px;
+  font-weight: 900;
+  border: 1px solid rgba(23, 61, 98, 0.35);
+  border-radius: 999px;
+}
+
+.mayor-ballot-paper__policy > strong {
+  display: block;
+  margin: 7px 0 5px;
+  font-size: 16px;
+}
+
+.mayor-ballot-paper__policy > p {
+  margin: 0;
+  color: #5d564b;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.mayor-ballot-paper__effects {
+  display: grid;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.mayor-ballot-paper__effects div {
+  display: grid;
+  gap: 3px;
+}
+
+.mayor-ballot-paper__effects small {
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.mayor-ballot-paper__effects .is-benefit,
+.mayor-election-result__effects .is-benefit {
+  color: #17633d;
+}
+
+.mayor-ballot-paper__effects .is-tradeoff,
+.mayor-election-result__effects .is-tradeoff {
+  color: #9d352d;
+}
+
+.mayor-ballot-paper__vote {
+  position: relative;
+  min-height: 72px;
+  display: grid;
+  grid-template-columns: 1fr 52px;
+  align-items: center;
+  margin: 0;
+  padding: 9px 12px;
+  color: #2f2b25;
+  border: 0;
+  border-top: 2px solid #302c26;
+  background: rgba(244, 239, 222, 0.78);
+  cursor: pointer;
+}
+
+.mayor-ballot-paper__vote > span {
+  font-size: 12px;
+  font-weight: 900;
+  text-align: left;
+}
+
+.mayor-ballot-paper__vote > b {
+  display: grid;
+  width: 43px;
+  height: 43px;
+  place-items: center;
+  color: #33302a;
+  font-size: 29px;
+  border: 1px dashed #5c574f;
+}
+
+.mayor-ballot-paper__vote:hover:not(:disabled) {
+  background: #eee4c7;
+}
+
+.mayor-ballot-paper__vote:disabled {
+  cursor: default;
+}
+
+.mayor-ballot-paper__vote:disabled:not(:has(.mayor-election-stamp)) {
+  opacity: 0.7;
+}
+
+.mayor-election-stamp {
+  position: absolute;
+  right: 14px;
+  top: 7px;
+  z-index: 5;
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-content: center;
+  color: #c51f29;
+  font-style: normal;
+  text-align: center;
+  border: 3px double currentColor;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px rgba(197, 31, 41, 0.12);
+  transform: rotate(-13deg);
+  animation: mayor-stamp-impact 650ms cubic-bezier(0.16, 0.92, 0.25, 1.22)
+    both;
+  mix-blend-mode: multiply;
+}
+
+.mayor-election-stamp::before,
+.mayor-election-stamp::after {
+  content: "";
+  position: absolute;
+  border: 1px solid rgba(197, 31, 41, 0.62);
+  border-radius: 50%;
+}
+
+.mayor-election-stamp::before {
+  inset: 4px;
+}
+
+.mayor-election-stamp::after {
+  inset: 8px;
+}
+
+.mayor-election-stamp span,
+.mayor-election-stamp strong {
+  position: relative;
+  z-index: 1;
+  display: block;
+}
+
+.mayor-election-stamp span {
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+}
+
+.mayor-election-stamp strong {
+  font-size: 15px;
+  line-height: 1;
+}
+
+.mayor-election-progress {
+  padding: 16px 4px 0;
+}
+
+.mayor-election-progress > div {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(45, 41, 34, 0.14);
+}
+
+.mayor-election-progress i {
+  display: block;
+  height: 100%;
+  background: #173d62;
+  transition: width 240ms ease;
+}
+
+.mayor-election-result {
+  display: grid;
+  justify-items: center;
+  padding: 28px 25px 24px;
+}
+
+.mayor-election-result__winner {
+  width: min(720px, 100%);
+  display: grid;
+  grid-template-columns: 230px 1fr;
+  align-items: center;
+  overflow: hidden;
+  color: #fff;
+  border: 1px solid #153858;
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 12% 45%, rgba(126, 190, 229, 0.26), transparent 34%),
+    #173d62;
+  box-shadow: 0 18px 38px rgba(13, 39, 62, 0.26);
+  animation: mayor-winner-reveal 650ms ease both;
+}
+
+.mayor-election-result__winner .mayor-candidate-portrait {
+  width: 230px;
+  height: 255px;
+  min-height: 255px;
+  border: 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.mayor-election-result__winner > div:last-child {
+  padding: 24px;
+}
+
+.mayor-election-result__winner h3 {
+  margin: 5px 0 0;
+  font-size: 40px;
+}
+
+.mayor-election-result__winner > div:last-child > span {
+  color: #bad5e8;
+  font-size: 12px;
+}
+
+.mayor-election-result__winner blockquote {
+  margin: 17px 0 0;
+  color: #f4fbff;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.mayor-election-result__policy {
+  width: min(720px, 100%);
+  margin-top: 15px;
+  padding: 16px 18px;
+  border: 1px solid rgba(23, 61, 98, 0.32);
+  border-radius: 12px;
+  background: rgba(255, 253, 244, 0.82);
+}
+
+.mayor-election-result__policy small {
+  color: #173d62;
+  font-weight: 900;
+}
+
+.mayor-election-result__policy strong {
+  display: block;
+  margin: 4px 0 5px;
+  font-size: 19px;
+}
+
+.mayor-election-result__policy p {
+  margin: 0;
+  color: #595248;
+  font-size: 11px;
+}
+
+.mayor-election-result__effects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  margin-top: 10px;
+}
+
+.mayor-election-result__effects span {
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.mayor-election-result__votes {
+  width: min(720px, 100%);
+  display: grid;
+  gap: 7px;
+  margin-top: 15px;
+}
+
+.mayor-election-result__votes > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border: 1px solid rgba(65, 58, 47, 0.14);
+  border-radius: 9px;
+  background: rgba(255, 254, 248, 0.84);
+}
+
+.mayor-election-result__votes > div.is-winner {
+  border-color: rgba(23, 61, 98, 0.48);
+  background: #edf5fa;
+}
+
+.mayor-election-result__votes > div > span {
+  min-width: 0;
+  display: grid;
+}
+
+.mayor-election-result__votes > div > span small {
+  color: #70695f;
+  font-size: 9px;
+}
+
+.mayor-election-result__votes > div > span strong {
+  font-size: 13px;
+}
+
+.mayor-election-result__votes > div > b {
+  margin-left: auto;
+  color: #173d62;
+  font-size: 15px;
+}
+
+.mayor-election-result__tie {
+  margin: 13px 0 0;
+  color: #6b6358;
+  font-size: 11px;
+}
+
+.mayor-election-result footer {
+  margin-top: 20px;
+}
+
+.mayor-election-result footer button {
+  min-width: 210px;
+  min-height: 44px;
+  padding: 10px 18px;
+  color: #fff;
+  font-weight: 900;
+  border: 0;
+  border-radius: 9px;
+  background: #173d62;
+  cursor: pointer;
+}
+
+.mayor-election-result footer button:hover {
+  filter: brightness(1.08);
+}
+
+@keyframes mayor-stamp-impact {
+  0% {
+    opacity: 0;
+    transform: translateY(-58px) scale(2.25) rotate(-28deg);
+  }
+  58% {
+    opacity: 1;
+    transform: translateY(2px) scale(0.86) rotate(-10deg);
+  }
+  74% {
+    transform: translateY(-2px) scale(1.06) rotate(-14deg);
+  }
+  100% {
+    opacity: 0.88;
+    transform: translateY(0) scale(1) rotate(-13deg);
+  }
+}
+
+@keyframes mayor-paper-impact {
+  0%,
+  44% {
+    transform: translateY(0) rotate(0);
+  }
+  58% {
+    transform: translateY(2px) rotate(-0.35deg);
+  }
+  75% {
+    transform: translateY(-1px) rotate(0.2deg);
+  }
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+}
+
+@keyframes mayor-winner-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 930px) {
+  .mayor-election-candidates {
+    grid-template-columns: 1fr;
+  }
+
+  .mayor-ballot-paper {
+    grid-template-columns: 120px minmax(0, 1fr) 92px;
+    grid-template-rows: auto auto auto;
+  }
+
+  .mayor-ballot-paper__number {
+    grid-column: 1 / -1;
+  }
+
+  .mayor-candidate-portrait {
+    grid-column: 1;
+    grid-row: 2 / 4;
+    height: 220px;
+  }
+
+  .mayor-ballot-paper__identity {
+    grid-column: 2;
+    grid-row: 2;
+    min-height: 0;
+    text-align: left;
+  }
+
+  .mayor-ballot-paper__policy {
+    grid-column: 2;
+    grid-row: 3;
+  }
+
+  .mayor-ballot-paper__vote {
+    grid-column: 3;
+    grid-row: 2 / 4;
+    min-height: 100%;
+    grid-template-columns: 1fr;
+    align-content: center;
+    justify-items: center;
+    border-top: 0;
+    border-left: 2px solid #302c26;
+  }
+}
+
+@media (max-width: 650px) {
+  .mayor-election-overlay {
+    padding: 10px;
+  }
+
+  .mayor-election-modal {
+    width: calc(100vw - 20px);
+    max-height: calc(100vh - 20px);
+  }
+
+  .mayor-election-modal__header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .mayor-ballot {
+    padding: 14px;
+  }
+
+  .mayor-ballot__heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .mayor-ballot-paper {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mayor-candidate-portrait {
+    width: 100%;
+    height: 240px;
+  }
+
+  .mayor-ballot-paper__identity {
+    text-align: center;
+  }
+
+  .mayor-ballot-paper__vote {
+    min-height: 70px;
+    grid-template-columns: 1fr 52px;
+    border-top: 2px solid #302c26;
+    border-left: 0;
+  }
+
+  .mayor-election-result__winner {
+    grid-template-columns: 1fr;
+  }
+
+  .mayor-election-result__winner .mayor-candidate-portrait {
+    width: 100%;
+    height: 260px;
+    border-right: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mayor-ballot-paper.is-stamped,
+  .mayor-election-stamp,
+  .mayor-election-result__winner {
+    animation-duration: 1ms;
+  }
+}

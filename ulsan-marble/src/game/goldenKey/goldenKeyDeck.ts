@@ -1,0 +1,430 @@
+import type {
+  GoldenKeyCard,
+  GoldenKeyPoolGroup,
+} from "./goldenKeyTypes";
+
+export const GOLDEN_KEY_GROUP_QUOTAS: Record<GoldenKeyPoolGroup, number> = {
+  CASH_SUPPORT: 6,
+  COST_LOSS: 5,
+  MOVEMENT: 6,
+  PROPERTY: 5,
+  STOCK: 6,
+};
+
+export const GOLDEN_KEY_GAME_DECK_SIZE = Object.values(
+  GOLDEN_KEY_GROUP_QUOTAS,
+).reduce((total, count) => total + count, 0);
+
+export const GOLDEN_KEY_CARDS: GoldenKeyCard[] = [
+  // 현금·지원 9장
+  {
+    id: "city_reward",
+    category: "POSITIVE",
+    poolGroup: "CASH_SUPPORT",
+    title: "울산시 특별지원금",
+    description: "지역경제 활성화 지원금 300만원을 받습니다.",
+    effect: { type: "CASH", amount: 300 },
+  },
+  {
+    id: "tourism_award",
+    category: "POSITIVE",
+    poolGroup: "CASH_SUPPORT",
+    title: "관광도시 우수상",
+    description: "관광산업 기여 보상금 500만원을 받습니다.",
+    effect: { type: "CASH", amount: 500 },
+  },
+  {
+    id: "jail_escape_card",
+    category: "POSITIVE",
+    poolGroup: "CASH_SUPPORT",
+    title: "구치소 탈출권",
+    description: "구치소 수감 중 즉시 출소할 수 있는 탈출권 1장을 보관합니다.",
+    effect: { type: "JAIL_ESCAPE_CARD", quantity: 1 },
+  },
+  {
+    id: "disaster_relief",
+    category: "POSITIVE",
+    poolGroup: "CASH_SUPPORT",
+    title: "재난복구 지원금",
+    description: "재난대응 보조금 350만원을 받습니다.",
+    effect: { type: "CASH", amount: 350 },
+  },
+  {
+    id: "local_cashback",
+    category: "POSITIVE",
+    poolGroup: "CASH_SUPPORT",
+    title: "지역상권 캐시백",
+    description: "지역 소비 캐시백 200만원을 받습니다.",
+    effect: { type: "CASH", amount: 200 },
+  },
+  {
+    id: "stock_dividend_bonus",
+    category: "POSITIVE",
+    poolGroup: "CASH_SUPPORT",
+    title: "특별 배당금",
+    description:
+      "보유 주식 평가액의 5%를 배당으로 받습니다. 최소 100만원, 최대 500만원입니다.",
+    effect: {
+      type: "PORTFOLIO_REWARD",
+      rate: 0.05,
+      minimumAmount: 100,
+      maximumAmount: 500,
+    },
+  },
+  {
+    id: "property_support",
+    category: "POSITIVE",
+    poolGroup: "CASH_SUPPORT",
+    title: "도시개발 보조금",
+    description:
+      "보유 부동산 평가액의 2%를 지원받습니다. 최소 100만원, 최대 500만원입니다.",
+    effect: {
+      type: "PROPERTY_REWARD",
+      rate: 0.02,
+      minimumAmount: 100,
+      maximumAmount: 500,
+    },
+  },
+  {
+    id: "collect_civic_bonus",
+    category: "POSITIVE",
+    poolGroup: "CASH_SUPPORT",
+    title: "시민 인기상",
+    description: "다른 정상 플레이어마다 50만원씩 축하금을 받습니다.",
+    effect: {
+      type: "EACH_PLAYER_TRANSFER",
+      direction: "FROM_OTHERS",
+      amountPerPlayer: 50,
+    },
+  },
+  {
+    id: "festival_bonus",
+    category: "POSITIVE",
+    poolGroup: "CASH_SUPPORT",
+    title: "울산 시민축제",
+    description: "파산하지 않은 모든 플레이어가 100만원씩 받습니다.",
+    effect: { type: "ALL_PLAYERS_CASH", amount: 100 },
+  },
+
+  // 비용·손실 7장
+  {
+    id: "community_donation",
+    category: "SITUATION",
+    poolGroup: "COST_LOSS",
+    title: "지역사회 기부",
+    description: "다른 정상 플레이어마다 최대 30만원씩 기부합니다.",
+    effect: {
+      type: "EACH_PLAYER_TRANSFER",
+      direction: "TO_OTHERS",
+      amountPerPlayer: 30,
+    },
+  },
+  {
+    id: "administrative_fine",
+    category: "NEGATIVE",
+    poolGroup: "COST_LOSS",
+    title: "행정 과태료",
+    description: "현재 현금의 10%를 납부합니다. 최대 300만원입니다.",
+    effect: { type: "CASH_PERCENT", rate: 0.1, maximumAmount: 300 },
+  },
+  {
+    id: "road_maintenance_charge",
+    category: "NEGATIVE",
+    poolGroup: "COST_LOSS",
+    title: "도로 정비 분담금",
+    description: "현재 현금의 8%를 납부합니다. 최대 250만원입니다.",
+    effect: { type: "CASH_PERCENT", rate: 0.08, maximumAmount: 250 },
+  },
+  {
+    id: "environment_charge",
+    category: "NEGATIVE",
+    poolGroup: "COST_LOSS",
+    title: "환경개선 부담금",
+    description: "현재 현금의 12%를 납부합니다. 최대 350만원입니다.",
+    effect: { type: "CASH_PERCENT", rate: 0.12, maximumAmount: 350 },
+  },
+  {
+    id: "emergency_expense",
+    category: "NEGATIVE",
+    poolGroup: "COST_LOSS",
+    title: "긴급 시설보수",
+    description: "현재 현금의 15%를 납부합니다. 최대 400만원입니다.",
+    effect: { type: "CASH_PERCENT", rate: 0.15, maximumAmount: 400 },
+  },
+  {
+    id: "public_service_charge",
+    category: "NEGATIVE",
+    poolGroup: "COST_LOSS",
+    title: "공공서비스 분담금",
+    description: "현재 현금의 6%를 납부합니다. 최대 180만원입니다.",
+    effect: { type: "CASH_PERCENT", rate: 0.06, maximumAmount: 180 },
+  },
+  {
+    id: "safety_inspection_penalty",
+    category: "NEGATIVE",
+    poolGroup: "COST_LOSS",
+    title: "안전점검 시정명령",
+    description: "현재 현금의 10%를 납부합니다. 최대 280만원입니다.",
+    effect: { type: "CASH_PERCENT", rate: 0.1, maximumAmount: 280 },
+  },
+
+  // 이동 8장
+  {
+    id: "return_to_start",
+    category: "SITUATION",
+    poolGroup: "MOVEMENT",
+    title: "출발지로 이동",
+    description: "출발지로 이동하고 현재 시장 정책이 반영된 월급을 받습니다.",
+    effect: { type: "MOVE_TO_TILE", tileId: 0, grantSalary: true },
+  },
+  {
+    id: "forward_five",
+    category: "SITUATION",
+    poolGroup: "MOVEMENT",
+    title: "급행버스 탑승",
+    description: "앞으로 5칸 이동합니다. 이동 중 출발지를 지나도 월급은 없습니다.",
+    effect: { type: "MOVE_RELATIVE", steps: 5 },
+  },
+  {
+    id: "back_three",
+    category: "SITUATION",
+    poolGroup: "MOVEMENT",
+    title: "도로 통제",
+    description: "뒤로 3칸 이동합니다.",
+    effect: { type: "MOVE_RELATIVE", steps: -3 },
+  },
+  {
+    id: "random_property_trip",
+    category: "SITUATION",
+    poolGroup: "MOVEMENT",
+    title: "현장 시찰",
+    description: "무작위 일반 부동산으로 이동하고 도착 효과를 처리합니다.",
+    effect: { type: "MOVE_RANDOM_PROPERTY", unownedOnly: false },
+  },
+  {
+    id: "unowned_property_trip",
+    category: "SITUATION",
+    poolGroup: "MOVEMENT",
+    title: "신규 분양 안내",
+    description: "무작위 미소유 부동산으로 이동하고 구매 기회를 얻습니다.",
+    effect: { type: "MOVE_RANDOM_PROPERTY", unownedOnly: true },
+  },
+  {
+    id: "lottery_shop_trip",
+    category: "SITUATION",
+    poolGroup: "MOVEMENT",
+    title: "행운의 초대권",
+    description: "진행 방향에서 가장 가까운 복권판매소로 이동합니다.",
+    effect: {
+      type: "MOVE_NEAREST_TILE_TYPE",
+      tileType: "LOTTERY_SHOP",
+    },
+  },
+  {
+    id: "insurance_trip",
+    category: "SITUATION",
+    poolGroup: "MOVEMENT",
+    title: "재난안전 상담",
+    description: "진행 방향에서 가장 가까운 보험사로 이동합니다.",
+    effect: { type: "MOVE_NEAREST_TILE_TYPE", tileType: "INSURANCE" },
+  },
+  {
+    id: "swap_positions",
+    category: "SITUATION",
+    poolGroup: "MOVEMENT",
+    title: "도시교통 재배치",
+    description:
+      "다음 정상 플레이어와 현재 위치를 서로 교환합니다. 교환한 칸의 효과는 발생하지 않습니다.",
+    effect: { type: "SWAP_WITH_NEXT_PLAYER" },
+  },
+
+  // 부동산 8장
+  {
+    id: "property_market_boom",
+    category: "POSITIVE",
+    poolGroup: "PROPERTY",
+    title: "부동산 경기 회복",
+    description: "모든 부동산의 현재 시세가 즉시 4% 상승합니다.",
+    effect: { type: "PROPERTY_MARKET", rate: 0.04, scope: "ALL" },
+  },
+  {
+    id: "property_market_correction",
+    category: "NEGATIVE",
+    poolGroup: "PROPERTY",
+    title: "부동산 조정",
+    description: "모든 부동산의 현재 시세가 즉시 4% 하락합니다.",
+    effect: { type: "PROPERTY_MARKET", rate: -0.04, scope: "ALL" },
+  },
+  {
+    id: "district_redevelopment",
+    category: "POSITIVE",
+    poolGroup: "PROPERTY",
+    title: "권역 재개발 확정",
+    description: "무작위 권역 하나의 부동산 시세가 즉시 8% 상승합니다.",
+    effect: {
+      type: "PROPERTY_MARKET",
+      rate: 0.08,
+      scope: "RANDOM_GROUP",
+    },
+  },
+  {
+    id: "district_oversupply",
+    category: "NEGATIVE",
+    poolGroup: "PROPERTY",
+    title: "권역 공급 과잉",
+    description: "무작위 권역 하나의 부동산 시세가 즉시 8% 하락합니다.",
+    effect: {
+      type: "PROPERTY_MARKET",
+      rate: -0.08,
+      scope: "RANDOM_GROUP",
+    },
+  },
+  {
+    id: "landmark_interest",
+    category: "POSITIVE",
+    poolGroup: "PROPERTY",
+    title: "개발 호재 발표",
+    description: "무작위 부동산 3곳의 시세가 즉시 10% 상승합니다.",
+    effect: {
+      type: "PROPERTY_MARKET",
+      rate: 0.1,
+      scope: "RANDOM_ITEMS",
+      count: 3,
+    },
+  },
+  {
+    id: "local_slump",
+    category: "NEGATIVE",
+    poolGroup: "PROPERTY",
+    title: "지역 경기 침체",
+    description: "무작위 부동산 3곳의 시세가 즉시 10% 하락합니다.",
+    effect: {
+      type: "PROPERTY_MARKET",
+      rate: -0.1,
+      scope: "RANDOM_ITEMS",
+      count: 3,
+    },
+  },
+  {
+    id: "owner_property_boost",
+    category: "POSITIVE",
+    poolGroup: "PROPERTY",
+    title: "보유자산 가치 상승",
+    description: "본인이 보유한 모든 부동산 시세가 즉시 6% 상승합니다.",
+    effect: {
+      type: "PROPERTY_MARKET",
+      rate: 0.06,
+      scope: "PLAYER_OWNED",
+    },
+  },
+  {
+    id: "owner_property_reassessment",
+    category: "NEGATIVE",
+    poolGroup: "PROPERTY",
+    title: "보유자산 재평가",
+    description: "본인이 보유한 모든 부동산 시세가 즉시 6% 하락합니다.",
+    effect: {
+      type: "PROPERTY_MARKET",
+      rate: -0.06,
+      scope: "PLAYER_OWNED",
+    },
+  },
+
+  // 주식 8장
+  {
+    id: "stock_market_boom",
+    category: "POSITIVE",
+    poolGroup: "STOCK",
+    title: "산업 호황",
+    description: "모든 상장 종목의 주가가 즉시 5% 상승합니다.",
+    effect: { type: "STOCK_MARKET", rate: 0.05, scope: "ALL" },
+  },
+  {
+    id: "stock_market_correction",
+    category: "NEGATIVE",
+    poolGroup: "STOCK",
+    title: "증시 급락",
+    description: "모든 상장 종목의 주가가 즉시 5% 하락합니다.",
+    effect: { type: "STOCK_MARKET", rate: -0.05, scope: "ALL" },
+  },
+  {
+    id: "industry_contract",
+    category: "POSITIVE",
+    poolGroup: "STOCK",
+    title: "산업 대형수주",
+    description: "무작위 산업 테마 하나의 모든 종목이 즉시 8% 상승합니다.",
+    effect: {
+      type: "STOCK_MARKET",
+      rate: 0.08,
+      scope: "RANDOM_GROUP",
+    },
+  },
+  {
+    id: "industry_regulation",
+    category: "NEGATIVE",
+    poolGroup: "STOCK",
+    title: "산업 규제 강화",
+    description: "무작위 산업 테마 하나의 모든 종목이 즉시 8% 하락합니다.",
+    effect: {
+      type: "STOCK_MARKET",
+      rate: -0.08,
+      scope: "RANDOM_GROUP",
+    },
+  },
+  {
+    id: "company_breakthrough",
+    category: "POSITIVE",
+    poolGroup: "STOCK",
+    title: "기술혁신 발표",
+    description: "무작위 종목 4개의 주가가 즉시 12% 상승합니다.",
+    effect: {
+      type: "STOCK_MARKET",
+      rate: 0.12,
+      scope: "RANDOM_ITEMS",
+      count: 4,
+    },
+  },
+  {
+    id: "company_scandal",
+    category: "NEGATIVE",
+    poolGroup: "STOCK",
+    title: "기업 악재 발생",
+    description: "무작위 종목 4개의 주가가 즉시 12% 하락합니다.",
+    effect: {
+      type: "STOCK_MARKET",
+      rate: -0.12,
+      scope: "RANDOM_ITEMS",
+      count: 4,
+    },
+  },
+  {
+    id: "portfolio_tailwind",
+    category: "POSITIVE",
+    poolGroup: "STOCK",
+    title: "내 종목 호재",
+    description: "본인이 보유한 모든 종목의 주가가 즉시 6% 상승합니다.",
+    effect: {
+      type: "STOCK_MARKET",
+      rate: 0.06,
+      scope: "PLAYER_OWNED",
+    },
+  },
+  {
+    id: "portfolio_headwind",
+    category: "NEGATIVE",
+    poolGroup: "STOCK",
+    title: "내 종목 악재",
+    description: "본인이 보유한 모든 종목의 주가가 즉시 6% 하락합니다.",
+    effect: {
+      type: "STOCK_MARKET",
+      rate: -0.06,
+      scope: "PLAYER_OWNED",
+    },
+  },
+];
+
+export const GOLDEN_KEY_POOL_SIZE = GOLDEN_KEY_CARDS.length;
+
+export const GOLDEN_KEY_CARD_MAP = new Map(
+  GOLDEN_KEY_CARDS.map((card) => [card.id, card]),
+);

@@ -1,0 +1,30 @@
+@import "./CatchMindGame.css";
+
+.relay-role-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 12px 16px;
+  background: #f7f8fa;
+  border: 1px solid #d9dee5;
+  border-radius: 10px;
+}
+
+.relay-role-summary strong {
+  color: #1971c2;
+}
+
+.relay-order-player {
+  display: inline-block;
+  margin-right: 10px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #eef2f7;
+}
+
+.relay-order-player.active {
+  background: #1971c2;
+  color: #ffffff;
+  font-weight: 700;
+}

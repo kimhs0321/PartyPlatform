@@ -1,0 +1,47 @@
+:root {
+  font-family:
+    Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", Inter, system-ui,
+    -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #eaf3f8;
+  background: #07131f;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+
+  --district-nam: #2e9e5b;
+  --district-jung: #2f76c7;
+  --district-buk: #e3862f;
+  --district-dong: #7756b5;
+  --district-ulju: #91633d;
+  --district-city: #18a7b5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  margin: 0;
+}
+
+body {
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 35%, rgba(40, 95, 128, 0.22), transparent 40%),
+    linear-gradient(145deg, #081725 0%, #06101b 55%, #091b2a 100%);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+}

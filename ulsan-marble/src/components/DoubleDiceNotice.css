@@ -1,0 +1,51 @@
+.double-dice-notice {
+  position: absolute;
+  left: 50%;
+  top: clamp(210px, 25vh, 280px);
+  z-index: 92;
+  display: flex;
+  min-width: 300px;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 13px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 14px;
+  color: #f8fbfd;
+  text-align: center;
+  transform: translateX(-50%);
+  pointer-events: none;
+  animation: double-dice-notice-in 180ms ease-out;
+}
+
+.double-dice-notice strong {
+  font-size: 17px;
+  font-weight: 900;
+}
+
+.double-dice-notice span {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.double-dice-notice--extra_roll {
+  background: rgba(18, 105, 78, 0.96);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.34);
+}
+
+.double-dice-notice--jail {
+  background: rgba(116, 35, 35, 0.97);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.38);
+}
+
+@keyframes double-dice-notice-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -10px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}

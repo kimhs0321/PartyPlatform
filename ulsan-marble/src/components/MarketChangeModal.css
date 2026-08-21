@@ -1,0 +1,201 @@
+.market-change-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 95;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(1, 9, 15, 0.56);
+  backdrop-filter: blur(4px);
+  pointer-events: auto;
+}
+
+.market-change-modal {
+  width: min(720px, calc(100vw - 36px));
+  max-height: calc(100vh - 36px);
+  overflow-y: auto;
+  padding: 24px;
+  color: #edf9ff;
+  border: 1px solid rgba(139, 210, 237, 0.34);
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(36, 118, 154, 0.2), transparent 40%),
+    linear-gradient(180deg, rgba(9, 37, 54, 0.98), rgba(4, 20, 31, 0.99));
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.58);
+}
+
+.market-change-modal__eyebrow {
+  color: #7fd0ed;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.market-change-modal h2 {
+  margin: 5px 0 0;
+  font-size: 24px;
+  letter-spacing: -0.04em;
+}
+
+.market-change-modal__description {
+  margin: 7px 0 18px;
+  color: #9dbdcb;
+  font-size: 13px;
+}
+
+.market-change-modal__districts {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.market-district-change {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 9px 10px;
+  border: 1px solid rgba(143, 201, 226, 0.16);
+  border-radius: 10px;
+  background: rgba(9, 29, 43, 0.74);
+}
+
+.market-district-change span {
+  overflow: hidden;
+  color: #96b9c8;
+  font-size: 10px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.market-district-change strong {
+  font-size: 14px;
+}
+
+.market-district-change.is-up strong,
+.market-property-change.is-up b {
+  color: #ff8f8f;
+}
+
+.market-district-change.is-down strong,
+.market-property-change.is-down b {
+  color: #76bfff;
+}
+
+.market-district-change.is-flat strong {
+  color: #c4d4dc;
+}
+
+.market-change-modal__highlights {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.market-change-modal__highlights > section {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid rgba(143, 201, 226, 0.16);
+  border-radius: 13px;
+  background: rgba(5, 22, 34, 0.72);
+}
+
+.market-change-modal__highlights h3 {
+  margin: 0 0 8px;
+  color: #cbe5ef;
+  font-size: 12px;
+}
+
+.market-property-change {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 0;
+  border-top: 1px solid rgba(143, 201, 226, 0.11);
+}
+
+.market-property-change:first-of-type {
+  border-top: 0;
+}
+
+.market-property-change > div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.market-property-change > div:last-child {
+  flex: 0 0 auto;
+  align-items: flex-end;
+}
+
+.market-property-change strong {
+  overflow: hidden;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.market-property-change span,
+.market-property-change small {
+  color: #7fa5b5;
+  font-size: 9px;
+}
+
+.market-property-change b {
+  font-size: 13px;
+}
+
+.market-change-modal__empty {
+  margin: 0;
+  padding: 15px 0;
+  color: #688d9d;
+  font-size: 11px;
+  text-align: center;
+}
+
+.market-change-modal__note {
+  margin: 16px 0 0;
+  padding: 10px 12px;
+  color: #9bbbc9;
+  font-size: 11px;
+  line-height: 1.5;
+  border-radius: 9px;
+  background: rgba(15, 53, 72, 0.58);
+}
+
+.market-change-modal__confirm {
+  width: 100%;
+  min-height: 45px;
+  margin-top: 14px;
+  color: #f2fbff;
+  font-size: 14px;
+  font-weight: 900;
+  border: 1px solid rgba(117, 205, 239, 0.46);
+  border-radius: 11px;
+  background: linear-gradient(180deg, #247ca3, #185a7a);
+  cursor: pointer;
+}
+
+.market-change-modal__confirm:hover {
+  filter: brightness(1.08);
+}
+
+@media (max-width: 700px), (max-height: 760px) {
+  .market-change-modal {
+    padding: 18px;
+  }
+
+  .market-change-modal__districts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .market-change-modal__highlights {
+    grid-template-columns: 1fr;
+  }
+}

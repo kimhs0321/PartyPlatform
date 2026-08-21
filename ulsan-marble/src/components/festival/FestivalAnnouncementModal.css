@@ -1,0 +1,355 @@
+.festival-announcement {
+  --festival-accent: #18a7b5;
+  --festival-accent-soft: rgba(24, 167, 181, 0.2);
+  position: absolute;
+  inset: 0;
+  z-index: 6200;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+  pointer-events: auto;
+  overflow: hidden;
+}
+
+.festival-announcement--whale {
+  --festival-accent: #18a8d8;
+  --festival-accent-soft: rgba(24, 168, 216, 0.23);
+}
+
+.festival-announcement--tradition {
+  --festival-accent: #e34a4a;
+  --festival-accent-soft: rgba(227, 74, 74, 0.2);
+}
+
+.festival-announcement--fire {
+  --festival-accent: #ff6b16;
+  --festival-accent-soft: rgba(255, 107, 22, 0.23);
+}
+
+.festival-announcement--ocean {
+  --festival-accent: #1d82c4;
+  --festival-accent-soft: rgba(29, 130, 196, 0.23);
+}
+
+.festival-announcement--onggi {
+  --festival-accent: #a65e35;
+  --festival-accent-soft: rgba(166, 94, 53, 0.23);
+}
+
+.festival-announcement__backdrop {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 42%, var(--festival-accent-soft), transparent 44%),
+    rgba(2, 10, 18, 0.86);
+  backdrop-filter: blur(8px);
+  animation: festival-backdrop-in 420ms ease-out both;
+}
+
+.festival-announcement__panel {
+  position: relative;
+  width: min(920px, calc(100vw - 56px));
+  min-height: 520px;
+  display: grid;
+  grid-template-columns: minmax(280px, 0.95fr) minmax(330px, 1.05fr);
+  grid-template-rows: auto 1fr auto;
+  column-gap: 24px;
+  padding: 28px 30px 24px;
+  overflow: hidden;
+  color: #f7fbff;
+  border: 1px solid color-mix(in srgb, var(--festival-accent) 58%, #ffffff 18%);
+  border-radius: 28px;
+  background:
+    linear-gradient(145deg, rgba(14, 30, 43, 0.97), rgba(6, 17, 28, 0.98)),
+    #0c1b28;
+  box-shadow:
+    0 30px 90px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  animation: festival-panel-in 760ms cubic-bezier(0.18, 0.9, 0.24, 1.15) both;
+}
+
+.festival-announcement__panel::before,
+.festival-announcement__panel::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.festival-announcement__panel::before {
+  width: 420px;
+  height: 420px;
+  left: -190px;
+  bottom: -230px;
+  background: var(--festival-accent-soft);
+}
+
+.festival-announcement__panel::after {
+  width: 260px;
+  height: 260px;
+  right: -110px;
+  top: -120px;
+  border: 38px solid var(--festival-accent-soft);
+}
+
+.festival-announcement__symbol {
+  position: absolute;
+  right: 26px;
+  top: 28px;
+  width: 126px;
+  max-height: 96px;
+  object-fit: contain;
+  opacity: 0.11;
+  filter: grayscale(0.2);
+}
+
+.festival-announcement__header {
+  grid-column: 1 / -1;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.festival-announcement__header span {
+  color: color-mix(in srgb, var(--festival-accent) 70%, #ffffff 30%);
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.18em;
+}
+
+.festival-announcement__header strong {
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 11px;
+  letter-spacing: 0.26em;
+}
+
+.festival-announcement__mascot-stage {
+  position: relative;
+  z-index: 2;
+  min-height: 370px;
+  align-self: center;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 28px 8px 4px;
+}
+
+.festival-announcement__mascot {
+  position: relative;
+  display: block;
+  width: min(250px, 25vw);
+  max-height: 350px;
+  object-fit: contain;
+  filter: drop-shadow(0 18px 22px rgba(0, 0, 0, 0.34));
+  animation: festival-mascot-pop 780ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(430ms + var(--mascot-index) * 140ms);
+}
+
+.festival-announcement__mascot--sub {
+  width: min(150px, 16vw);
+  margin-left: -36px;
+  z-index: 2;
+}
+
+.festival-announcement__mascot--small {
+  width: min(105px, 11vw);
+  margin-left: -24px;
+  z-index: 3;
+}
+
+.festival-announcement__mascot--scene {
+  position: absolute;
+  inset: auto 0 8px;
+  width: 100%;
+  max-height: 280px;
+  opacity: 0.55;
+  z-index: 0;
+}
+
+.festival-announcement__copy {
+  position: relative;
+  z-index: 2;
+  align-self: center;
+  display: grid;
+  gap: 10px;
+  padding: 24px 4px 10px;
+  animation: festival-copy-in 650ms ease-out 700ms both;
+}
+
+.festival-announcement__logo {
+  width: min(260px, 72%);
+  max-height: 92px;
+  object-fit: contain;
+  object-position: left center;
+  margin-bottom: 6px;
+}
+
+.festival-announcement__copy > p {
+  margin: 0;
+  color: color-mix(in srgb, var(--festival-accent) 70%, #ffffff 30%);
+  font-size: 13px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+}
+
+.festival-announcement__copy h2 {
+  margin: 0;
+  font-size: clamp(34px, 4vw, 58px);
+  line-height: 1.04;
+  letter-spacing: -0.07em;
+}
+
+.festival-announcement__copy > span {
+  color: #b9cbd7;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.festival-announcement__effect,
+.festival-announcement__departure {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 10px;
+  padding: 13px 16px;
+  border: 1px solid color-mix(in srgb, var(--festival-accent) 45%, transparent);
+  border-radius: 15px;
+  background: var(--festival-accent-soft);
+}
+
+.festival-announcement__effect {
+  justify-content: space-between;
+}
+
+.festival-announcement__effect small,
+.festival-announcement__departure small {
+  color: #a9bdc9;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.festival-announcement__effect strong {
+  color: #ffffff;
+  font-size: 17px;
+}
+
+.festival-announcement__departure img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  border-radius: 14px;
+}
+
+.festival-announcement__departure div {
+  display: grid;
+  gap: 3px;
+}
+
+.festival-announcement__departure strong {
+  font-size: 15px;
+}
+
+.festival-announcement__panel > button {
+  grid-column: 2;
+  position: relative;
+  z-index: 3;
+  min-height: 48px;
+  align-self: end;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 950;
+  border: 0;
+  border-radius: 14px;
+  background: var(--festival-accent);
+  box-shadow: 0 12px 26px color-mix(in srgb, var(--festival-accent) 34%, transparent);
+  cursor: pointer;
+}
+
+.festival-announcement__panel > button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.festival-announcement__confetti {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.festival-announcement__confetti i {
+  position: absolute;
+  left: calc((var(--confetti-index) + 1) * 5.2%);
+  top: -20px;
+  width: 8px;
+  height: 18px;
+  border-radius: 4px;
+  background: var(--festival-accent);
+  transform: rotate(calc(var(--confetti-index) * 31deg));
+  animation: festival-confetti-fall 2.8s linear infinite;
+  animation-delay: calc(var(--confetti-index) * -170ms);
+}
+
+@keyframes festival-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes festival-panel-in {
+  from { opacity: 0; transform: translateY(34px) scale(0.92); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes festival-mascot-pop {
+  from { opacity: 0; transform: translateY(70px) scale(0.72) rotate(-5deg); }
+  70% { opacity: 1; transform: translateY(-10px) scale(1.04) rotate(2deg); }
+  to { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
+}
+
+@keyframes festival-copy-in {
+  from { opacity: 0; transform: translateX(32px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes festival-confetti-fall {
+  from { transform: translateY(-20px) rotate(0deg); opacity: 0; }
+  12% { opacity: 0.9; }
+  to { transform: translateY(105vh) rotate(720deg); opacity: 0; }
+}
+
+@media (max-width: 760px) {
+  .festival-announcement {
+    padding: 14px;
+  }
+
+  .festival-announcement__panel {
+    width: min(560px, calc(100vw - 28px));
+    min-height: auto;
+    grid-template-columns: 1fr;
+    padding: 20px;
+  }
+
+  .festival-announcement__mascot-stage {
+    min-height: 230px;
+  }
+
+  .festival-announcement__mascot {
+    width: min(190px, 45vw);
+    max-height: 230px;
+  }
+
+  .festival-announcement__copy {
+    padding-top: 8px;
+  }
+
+  .festival-announcement__panel > button {
+    grid-column: 1;
+    margin-top: 14px;
+  }
+}

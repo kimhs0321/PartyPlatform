@@ -5,6 +5,8 @@ import { roomManager } from "../../../managers/RoomManager";
 import { gameManager } from "../../../managers/GameManager";
 import { emitRooms } from "../../common/roomEmitter";
 import { findGameModuleByName } from "../../../games/common/GameRegistry";
+import { ulsanMarbleGameManager } from "../../../games/ulsanMarble/UlsanMarbleGameManager";
+import { emitUlsanMarbleState } from "../../../games/ulsanMarble/socket/ulsanMarbleEmitter";
 
 export function startGame(io: Server, socket: Socket) {
   return async () => {
@@ -28,20 +30,36 @@ export function startGame(io: Server, socket: Socket) {
       return;
     }
 
-    gameManager.startGame(startedRoom);
+  gameManager.startGame(startedRoom);
 
-    await gameModule.startGame(io, startedRoom);
+  await gameModule.startGame(io, startedRoom);
 
-    const roomDto = roomManager.toRoomDto(startedRoom.id, (playerId) =>
-      playerManager.getPlayer(playerId)
+  if (startedRoom.game === "울산마블") {
+    ulsanMarbleGameManager.createGame(
+      startedRoom.id,
+      startedRoom.playerIds,
+      startedRoom.gameSettings
+        .ulsanMarble
+        .roundLimit,
     );
 
-    if (!roomDto) return;
+    emitUlsanMarbleState(
+      io,
+      startedRoom.id,
+    );
+  }
 
-    startedRoom.playerIds.forEach((playerId) => {
-      io.to(playerId).emit(EVENTS.GAME_STARTED, roomDto);
-      io.to(playerId).emit(EVENTS.ROOM_INFO, roomDto);
-    });
+  const roomDto = roomManager.toRoomDto(
+    startedRoom.id,
+    (playerId) => playerManager.getPlayer(playerId),
+  );
+
+  if (!roomDto) return;
+
+  startedRoom.playerIds.forEach((playerId) => {
+    io.to(playerId).emit(EVENTS.GAME_STARTED, roomDto);
+    io.to(playerId).emit(EVENTS.ROOM_INFO, roomDto);
+  });
 
     emitRooms(io);
 

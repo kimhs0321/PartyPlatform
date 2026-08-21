@@ -1,0 +1,138 @@
+.game-setup-modal {
+  position: absolute;
+  inset: 0;
+  z-index: 2000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(8, 15, 27, 0.76);
+  backdrop-filter: blur(8px);
+  pointer-events: auto;
+}
+
+.game-setup-modal__panel {
+  width: min(560px, 100%);
+  padding: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 20px;
+  background: #ffffff;
+  color: #1f2d3d;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+}
+
+.game-setup-modal__panel header > span {
+  color: #54708f;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.game-setup-modal__panel h2 {
+  margin: 6px 0 8px;
+  font-size: 26px;
+}
+
+.game-setup-modal__panel header p {
+  margin: 0;
+  color: #607086;
+  line-height: 1.55;
+}
+
+.game-setup-modal__options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.game-setup-modal__options button {
+  min-height: 116px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 5px;
+  padding: 16px;
+  border: 1px solid #cbd7e5;
+  border-radius: 14px;
+  background: #f8fafc;
+  color: #25364a;
+  cursor: pointer;
+  text-align: left;
+}
+
+.game-setup-modal__options button:hover {
+  border-color: #7d9fc4;
+}
+
+.game-setup-modal__options button.is-selected {
+  border: 2px solid #2769aa;
+  background: #edf6ff;
+}
+
+.game-setup-modal__options strong {
+  font-size: 16px;
+}
+
+.game-setup-modal__options span {
+  color: #4f6278;
+  font-size: 14px;
+}
+
+.game-setup-modal__options small {
+  margin-top: 4px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: #2769aa;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.game-setup-modal__rule {
+  display: grid;
+  gap: 4px;
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #f2f5f9;
+}
+
+.game-setup-modal__rule span {
+  color: #607086;
+  font-size: 14px;
+}
+
+.game-setup-modal__start {
+  width: 100%;
+  margin-top: 20px;
+  padding: 14px 18px;
+  border: 0;
+  border-radius: 12px;
+  background: #1f5f9d;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.game-setup-modal__start:hover {
+  background: #174f84;
+}
+
+@media (max-width: 620px) {
+  .game-setup-modal {
+    padding: 14px;
+  }
+
+  .game-setup-modal__panel {
+    padding: 20px;
+  }
+
+  .game-setup-modal__options {
+    grid-template-columns: 1fr;
+  }
+
+  .game-setup-modal__options button {
+    min-height: 76px;
+  }
+}

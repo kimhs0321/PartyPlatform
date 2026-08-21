@@ -1,0 +1,255 @@
+.tax-liquidation-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 87;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(1, 8, 14, 0.56);
+  backdrop-filter: blur(4px);
+  pointer-events: auto;
+}
+
+.tax-liquidation-modal {
+  width: min(620px, calc(100vw - 40px));
+  max-height: min(760px, calc(100vh - 40px));
+  overflow: auto;
+  padding: 24px;
+  color: #eef7fb;
+  border: 1px solid rgba(255, 135, 135, 0.34);
+  border-radius: 20px;
+  background:
+    linear-gradient(180deg, rgba(50, 24, 30, 0.98), rgba(24, 16, 21, 0.98));
+  box-shadow:
+    0 28px 84px rgba(0, 0, 0, 0.6),
+    inset 0 1px rgba(255, 255, 255, 0.07);
+}
+
+.tax-liquidation-modal__eyebrow {
+  color: #ffa8a8;
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+}
+
+.tax-liquidation-modal h2 {
+  margin: 5px 0 8px;
+  font-size: 28px;
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+}
+
+.tax-liquidation-modal__description {
+  margin: 0 0 17px;
+  color: #cbbbc0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.tax-liquidation-modal__description strong {
+  color: #fff;
+}
+
+.tax-liquidation-modal__summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.tax-liquidation-modal__summary > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 38px;
+  padding: 0 11px;
+  border: 1px solid rgba(255, 196, 196, 0.12);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.tax-liquidation-modal__summary dt {
+  color: #bfa9b0;
+  font-size: 12px;
+}
+
+.tax-liquidation-modal__summary dd {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.tax-liquidation-modal__summary .is-shortfall,
+.tax-liquidation-modal__error {
+  color: #ff8787;
+}
+
+.tax-liquidation-modal__notice {
+  margin-top: 13px;
+  padding: 10px 12px;
+  color: #ffe8a1;
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.45;
+  border: 1px solid rgba(255, 212, 59, 0.2);
+  border-radius: 10px;
+  background: rgba(255, 212, 59, 0.06);
+}
+
+.tax-liquidation-modal__notice.is-bankruptcy-risk {
+  color: #ffc9c9;
+  border-color: rgba(255, 107, 107, 0.24);
+  background: rgba(255, 107, 107, 0.07);
+}
+
+.tax-liquidation-modal__assets {
+  max-height: 290px;
+  overflow: auto;
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+  padding-right: 2px;
+}
+
+.tax-liquidation-modal__empty {
+  padding: 22px;
+  color: #bbaeb2;
+  font-size: 13px;
+  text-align: center;
+  border: 1px dashed rgba(255, 196, 196, 0.2);
+  border-radius: 11px;
+}
+
+.tax-liquidation-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 10px 11px;
+  border: 1px solid rgba(255, 196, 196, 0.13);
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.tax-liquidation-card__info {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.tax-liquidation-card__info strong {
+  font-size: 14px;
+}
+
+.tax-liquidation-card__info span {
+  overflow: hidden;
+  color: #bfaeb3;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tax-liquidation-card__action {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.tax-liquidation-card__action span {
+  color: #ffd8d8;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.tax-liquidation-card__action button,
+.tax-liquidation-modal__bankruptcy {
+  min-height: 34px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 850;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.tax-liquidation-card__action button {
+  padding: 0 12px;
+  border: 1px solid rgba(255, 168, 168, 0.4);
+  background: #7d323b;
+}
+
+.tax-liquidation-card__action button:hover:not(:disabled) {
+  background: #963d47;
+}
+
+.tax-liquidation-modal__bankruptcy:hover:not(:disabled) {
+  background: #952f3b;
+}
+
+.tax-liquidation-card__action button:disabled,
+.tax-liquidation-modal__bankruptcy:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.tax-liquidation-modal__error {
+  margin: 12px 0 0;
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.tax-liquidation-modal__bankruptcy {
+  width: 100%;
+  margin-top: 14px;
+  border: 1px solid rgba(255, 107, 107, 0.48);
+  background: #7b2530;
+}
+
+.tax-liquidation-modal__bankruptcy:hover {
+  background: #952f3b;
+}
+
+@media (max-width: 620px), (max-height: 720px) {
+  .tax-liquidation-modal {
+    padding: 18px;
+  }
+
+  .tax-liquidation-modal__summary {
+    grid-template-columns: 1fr;
+  }
+
+  .tax-liquidation-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .tax-liquidation-card__action {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+.tax-liquidation-property-section {
+  margin-top: 15px;
+}
+
+.tax-liquidation-property-section__title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.tax-liquidation-property-section__title strong {
+  color: #f8f9fa;
+  font-size: 14px;
+}
+
+.tax-liquidation-property-section__title span {
+  color: #bfaeb3;
+  font-size: 11px;
+}

@@ -31,6 +31,9 @@ export const EVENTS = {
   GET_GAME_STATE: "get-game-state",
   GAME_STATE: "game-state",
 
+  ROOM_SEND_CHAT: "ROOM_SEND_CHAT",
+  ROOM_CHAT_MESSAGE: "ROOM_CHAT_MESSAGE",
+
   LIAR_START_GAME: "liar:start-game",
   LIAR_GAME_STATE: "liar:game-state",
   LIAR_SUBMIT_DESCRIPTION: "liar:submit-description",
@@ -46,7 +49,7 @@ export const EVENTS = {
   LIAR_TOGGLE_PAUSE: "liar:togglePause",
   LIAR_UPDATE_SETTINGS: "liar:update-settings",
 
-    // CatchMind
+  // CatchMind
   CATCH_MIND_STATE: "catchMind:state",
   CATCH_MIND_SELECT_WORD: "catchMind:selectWord",
   CATCH_MIND_DRAW: "catchMind:draw",
@@ -56,7 +59,7 @@ export const EVENTS = {
   CATCH_MIND_UPDATE_SETTINGS: "catchMind:updateSettings",
   CATCH_MIND_SKIP: "catchMind:skip",
 
-    // RelayDrawing
+  // RelayDrawing
   RELAY_DRAWING_STATE: "relayDrawing:state",
   RELAY_DRAWING_START_GAME: "relayDrawing:startGame", 
   RELAY_DRAWING_DRAW: "relayDrawing:draw",
@@ -64,4 +67,20 @@ export const EVENTS = {
   RELAY_DRAWING_CLEAR_CANVAS: "relayDrawing:clearCanvas",
   RELAY_DRAWING_UNDO: "relayDrawing:undo",
   RELAY_DRAWING_UPDATE_SETTINGS:"relayDrawing:updateSettings",
+  
+// UlsanMarble
+ULSAN_MARBLE_UPDATE_SETTINGS:
+  "ulsanMarble:updateSettings",
+
+ULSAN_MARBLE_GET_STATE:
+  "ulsanMarble:getState",
+
+ULSAN_MARBLE_STATE:
+  "ulsanMarble:state",
+
+ULSAN_MARBLE_COMMAND:
+  "ulsanMarble:command",  
+
+ULSAN_MARBLE_ERROR:
+  "ulsanMarble:error",
 } as const;

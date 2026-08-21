@@ -7,6 +7,9 @@ import LiarRoom from "../rooms/LiarRoom";
 import RoomChat from "../rooms/RoomChat";
 import CatchMindRoom from "../rooms/CatchMindRoom";
 import RelayDrawingRoom from "../rooms/RelayDrawingRoom";
+import UlsanMarbleRoom, {
+  type UlsanMarbleSettings,
+} from "../rooms/UlsanMarbleRoom";
 
 type RoomPlayerDto = {
   id: string;
@@ -54,10 +57,11 @@ type RoomDto = {
   players: RoomPlayerDto[];
   status: "waiting" | "playing" | "paused";
   gameSettings: {
-  liar: LiarSettings;
-  catchMind: CatchMindSettings;
-  relayDrawing: RelayDrawingSettings;
-};
+    liar: LiarSettings;
+    catchMind: CatchMindSettings;
+    relayDrawing: RelayDrawingSettings;
+    ulsanMarble?: UlsanMarbleSettings;
+  };
 };
 
 const statusText = {
@@ -65,6 +69,12 @@ const statusText = {
   playing: "게임 중",
   paused: "일시정지",
 } as const;
+
+const DEFAULT_ULSAN_MARBLE_SETTINGS: UlsanMarbleSettings = {
+  startingMoney: 20_000_000,
+  salary: 2_000_000,
+  roundLimit: 50,
+};
 
 export default function RoomPage() {
   const { roomId } = useParams();
@@ -119,8 +129,13 @@ export default function RoomPage() {
               gameDuration: 300,
               prepareTime: 3,
               turnDuration: 12,
-              finalGuessTime: 10,
+              finalGuessTime: 5,
               wordVisibility: "ALL_DRAWERS",
+            },
+            ulsanMarble: {
+              startingMoney: 20_000_000,
+              salary: 2_000_000,
+              roundLimit: 50,
             },
           },
         };
@@ -202,7 +217,7 @@ export default function RoomPage() {
 
   const handleUpdateCatchMindSetting = (
     key: keyof CatchMindSettings,
-    value: number | boolean
+    value: number | boolean,
   ) => {
     if (!room || !isHost) return;
 
@@ -221,9 +236,50 @@ export default function RoomPage() {
       };
     });
 
-    socket.emit(EVENTS.CATCH_MIND_UPDATE_SETTINGS, {
-      [key]: value,
+    socket.emit(
+      EVENTS.CATCH_MIND_UPDATE_SETTINGS,
+      {
+        [key]: value,
+      },
+    );
+  };
+
+  const handleUpdateUlsanMarbleSetting = <
+    K extends keyof UlsanMarbleSettings,
+  >(
+    key: K,
+    value: UlsanMarbleSettings[K],
+  ) => {
+    if (!room || !isHost) return;
+
+    setRoom((prev) => {
+      if (!prev) return prev;
+
+      const currentSettings =
+        prev.gameSettings.ulsanMarble ??
+        DEFAULT_ULSAN_MARBLE_SETTINGS;
+
+      const nextSettings = {
+        ...currentSettings,
+      };
+
+      nextSettings[key] = value;
+
+      return {
+        ...prev,
+        gameSettings: {
+          ...prev.gameSettings,
+          ulsanMarble: nextSettings,
+        },
+      };
     });
+
+    socket.emit(
+      EVENTS.ULSAN_MARBLE_UPDATE_SETTINGS,
+      {
+        [key]: value,
+      },
+    );
   };
 
   const handleUpdateRelayDrawingSetting = (
@@ -310,13 +366,20 @@ export default function RoomPage() {
 
               {room.game === "릴레이 드로잉" && (
                 <RelayDrawingRoom
+                  settings={room.gameSettings.relayDrawing}
+                  isHost={isHost}
+                  onUpdateSetting={handleUpdateRelayDrawingSetting}
+                />
+              )}
+
+              {room.game === "울산마블" && (
+                <UlsanMarbleRoom
                   settings={
-                    room.gameSettings.relayDrawing
+                    room.gameSettings.ulsanMarble ??
+                    DEFAULT_ULSAN_MARBLE_SETTINGS
                   }
                   isHost={isHost}
-                  onUpdateSetting={
-                    handleUpdateRelayDrawingSetting
-                  }
+                  onUpdateSetting={handleUpdateUlsanMarbleSetting}
                 />
               )}
 

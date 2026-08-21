@@ -1,0 +1,490 @@
+{
+  "id": "ulsan_marble_main",
+  "name": "울산마블 기본 맵",
+  "version": 6,
+  "tileCount": 60,
+  "layout": {
+    "shape": "SQUARE_PERIMETER",
+    "tilesPerSide": 15,
+    "startTileId": 0,
+    "direction": "CLOCKWISE"
+  },
+  "placementRules": {
+    "goldenKeyCount": 3,
+    "auctionCount": 2,
+    "minigameCount": 2,
+    "lotteryShopCount": 2,
+    "insuranceCount": 2,
+    "notes": [
+      "동일 특수칸은 서로 떨어뜨려 배치",
+      "황금열쇠 3개는 3번·19번·49번에 분산 배치",
+      "복권판매소 2개는 서로 약 29칸 떨어져 배치",
+      "자연재해는 보드 칸이 아닌 확률형 전역 이벤트로 처리",
+      "시민투표는 보드 칸이 아닌 10턴 주기 시장선거로 처리",
+      "부동산은 남구 → 울주군 → 중구 → 동구 → 북구 순으로 연속 배치"
+    ]
+  },
+  "tiles": [
+    {
+      "id": 0,
+      "side": 1,
+      "sideIndex": 0,
+      "name": "시작",
+      "type": "START"
+    },
+    {
+      "id": 1,
+      "side": 1,
+      "sideIndex": 1,
+      "name": "선암동",
+      "type": "PROPERTY",
+      "propertyId": "seonam"
+    },
+    {
+      "id": 2,
+      "side": 1,
+      "sideIndex": 2,
+      "name": "야음동",
+      "type": "PROPERTY",
+      "propertyId": "yaeum"
+    },
+    {
+      "id": 3,
+      "side": 1,
+      "sideIndex": 3,
+      "name": "황금열쇠",
+      "type": "GOLDEN_KEY"
+    },
+    {
+      "id": 4,
+      "side": 1,
+      "sideIndex": 4,
+      "name": "무거동",
+      "type": "PROPERTY",
+      "propertyId": "mugeo"
+    },
+    {
+      "id": 5,
+      "side": 1,
+      "sideIndex": 5,
+      "name": "옥동",
+      "type": "PROPERTY",
+      "propertyId": "okdong"
+    },
+    {
+      "id": 6,
+      "side": 1,
+      "sideIndex": 6,
+      "name": "은행",
+      "type": "BANK"
+    },
+    {
+      "id": 7,
+      "side": 1,
+      "sideIndex": 7,
+      "name": "신정동",
+      "type": "PROPERTY",
+      "propertyId": "sinjeong"
+    },
+    {
+      "id": 8,
+      "side": 1,
+      "sideIndex": 8,
+      "name": "달동",
+      "type": "PROPERTY",
+      "propertyId": "daldong"
+    },
+    {
+      "id": 9,
+      "side": 1,
+      "sideIndex": 9,
+      "name": "삼산동",
+      "type": "PROPERTY",
+      "propertyId": "samsan"
+    },
+    {
+      "id": 10,
+      "side": 1,
+      "sideIndex": 10,
+      "name": "장생포",
+      "type": "PROPERTY",
+      "propertyId": "jangsaengpo"
+    },
+    {
+      "id": 11,
+      "side": 1,
+      "sideIndex": 11,
+      "name": "복권판매소",
+      "type": "LOTTERY_SHOP"
+    },
+    {
+      "id": 12,
+      "side": 1,
+      "sideIndex": 12,
+      "name": "울산대공원",
+      "type": "PROPERTY",
+      "propertyId": "ulsan_grand_park"
+    },
+    {
+      "id": 13,
+      "side": 1,
+      "sideIndex": 13,
+      "name": "온산",
+      "type": "PROPERTY",
+      "propertyId": "onsan"
+    },
+    {
+      "id": 14,
+      "side": 1,
+      "sideIndex": 14,
+      "name": "구치소",
+      "type": "JAIL"
+    },
+    {
+      "id": 15,
+      "side": 2,
+      "sideIndex": 0,
+      "name": "온양",
+      "type": "PROPERTY",
+      "propertyId": "onyang"
+    },
+    {
+      "id": 16,
+      "side": 2,
+      "sideIndex": 1,
+      "name": "언양",
+      "type": "PROPERTY",
+      "propertyId": "eonyang"
+    },
+    {
+      "id": 17,
+      "side": 2,
+      "sideIndex": 2,
+      "name": "범서",
+      "type": "PROPERTY",
+      "propertyId": "beomseo"
+    },
+    {
+      "id": 18,
+      "side": 2,
+      "sideIndex": 3,
+      "name": "울산항",
+      "type": "PORT"
+    },
+    {
+      "id": 19,
+      "side": 2,
+      "sideIndex": 4,
+      "name": "황금열쇠",
+      "type": "GOLDEN_KEY"
+    },
+    {
+      "id": 20,
+      "side": 2,
+      "sideIndex": 5,
+      "name": "간절곶",
+      "type": "PROPERTY",
+      "propertyId": "ganjeolgot"
+    },
+    {
+      "id": 21,
+      "side": 2,
+      "sideIndex": 6,
+      "name": "병영동",
+      "type": "PROPERTY",
+      "propertyId": "byeongyeong"
+    },
+    {
+      "id": 22,
+      "side": 2,
+      "sideIndex": 7,
+      "name": "반구동",
+      "type": "PROPERTY",
+      "propertyId": "bangu"
+    },
+    {
+      "id": 23,
+      "side": 2,
+      "sideIndex": 8,
+      "name": "경매장",
+      "type": "AUCTION"
+    },
+    {
+      "id": 24,
+      "side": 2,
+      "sideIndex": 9,
+      "name": "복산동",
+      "type": "PROPERTY",
+      "propertyId": "boksan"
+    },
+    {
+      "id": 25,
+      "side": 2,
+      "sideIndex": 10,
+      "name": "학성동",
+      "type": "PROPERTY",
+      "propertyId": "hakseong"
+    },
+    {
+      "id": 26,
+      "side": 2,
+      "sideIndex": 11,
+      "name": "울산경제신문",
+      "type": "NEWS"
+    },
+    {
+      "id": 27,
+      "side": 2,
+      "sideIndex": 12,
+      "name": "우정동",
+      "type": "PROPERTY",
+      "propertyId": "ujeong"
+    },
+    {
+      "id": 28,
+      "side": 2,
+      "sideIndex": 13,
+      "name": "성남동",
+      "type": "PROPERTY",
+      "propertyId": "seongnam"
+    },
+    {
+      "id": 29,
+      "side": 2,
+      "sideIndex": 14,
+      "name": "태화동",
+      "type": "PROPERTY",
+      "propertyId": "taehwa"
+    },
+    {
+      "id": 30,
+      "side": 3,
+      "sideIndex": 0,
+      "name": "중앙시장",
+      "type": "PROPERTY",
+      "propertyId": "jungang_market"
+    },
+    {
+      "id": 31,
+      "side": 3,
+      "sideIndex": 1,
+      "name": "태화강 국가정원",
+      "type": "PROPERTY",
+      "propertyId": "taehwagang_national_garden"
+    },
+    {
+      "id": 32,
+      "side": 3,
+      "sideIndex": 2,
+      "name": "울산시청",
+      "type": "CITY_HALL"
+    },
+    {
+      "id": 33,
+      "side": 3,
+      "sideIndex": 3,
+      "name": "보험사",
+      "type": "INSURANCE"
+    },
+    {
+      "id": 34,
+      "side": 3,
+      "sideIndex": 4,
+      "name": "남목동",
+      "type": "PROPERTY",
+      "propertyId": "nammok"
+    },
+    {
+      "id": 35,
+      "side": 3,
+      "sideIndex": 5,
+      "name": "전하동",
+      "type": "PROPERTY",
+      "propertyId": "jeonha"
+    },
+    {
+      "id": 36,
+      "side": 3,
+      "sideIndex": 6,
+      "name": "화정동",
+      "type": "PROPERTY",
+      "propertyId": "hwajeong"
+    },
+    {
+      "id": 37,
+      "side": 3,
+      "sideIndex": 7,
+      "name": "미니게임",
+      "type": "MINIGAME"
+    },
+    {
+      "id": 38,
+      "side": 3,
+      "sideIndex": 8,
+      "name": "방어진",
+      "type": "PROPERTY",
+      "propertyId": "bangeojin"
+    },
+    {
+      "id": 39,
+      "side": 3,
+      "sideIndex": 9,
+      "name": "일산동",
+      "type": "PROPERTY",
+      "propertyId": "ilsan"
+    },
+    {
+      "id": 40,
+      "side": 3,
+      "sideIndex": 10,
+      "name": "복권판매소",
+      "type": "LOTTERY_SHOP"
+    },
+    {
+      "id": 41,
+      "side": 3,
+      "sideIndex": 11,
+      "name": "주전",
+      "type": "PROPERTY",
+      "propertyId": "jujeon"
+    },
+    {
+      "id": 42,
+      "side": 3,
+      "sideIndex": 12,
+      "name": "보험사",
+      "type": "INSURANCE"
+    },
+    {
+      "id": 43,
+      "side": 3,
+      "sideIndex": 13,
+      "name": "대왕암공원",
+      "type": "PROPERTY",
+      "propertyId": "daewangam_park"
+    },
+    {
+      "id": 44,
+      "side": 3,
+      "sideIndex": 14,
+      "name": "염포동",
+      "type": "PROPERTY",
+      "propertyId": "yeompo"
+    },
+    {
+      "id": 45,
+      "side": 4,
+      "sideIndex": 0,
+      "name": "양정동",
+      "type": "PROPERTY",
+      "propertyId": "yangjeong"
+    },
+    {
+      "id": 46,
+      "side": 4,
+      "sideIndex": 1,
+      "name": "천곡동",
+      "type": "PROPERTY",
+      "propertyId": "cheongok"
+    },
+    {
+      "id": 47,
+      "side": 4,
+      "sideIndex": 2,
+      "name": "신천동",
+      "type": "PROPERTY",
+      "propertyId": "sincheon"
+    },
+    {
+      "id": 48,
+      "side": 4,
+      "sideIndex": 3,
+      "name": "호계동",
+      "type": "PROPERTY",
+      "propertyId": "hogye"
+    },
+    {
+      "id": 49,
+      "side": 4,
+      "sideIndex": 4,
+      "name": "황금열쇠",
+      "type": "GOLDEN_KEY"
+    },
+    {
+      "id": 50,
+      "side": 4,
+      "sideIndex": 5,
+      "name": "매곡동",
+      "type": "PROPERTY",
+      "propertyId": "maegok"
+    },
+    {
+      "id": 51,
+      "side": 4,
+      "sideIndex": 6,
+      "name": "화봉동",
+      "type": "PROPERTY",
+      "propertyId": "hwabong"
+    },
+    {
+      "id": 52,
+      "side": 4,
+      "sideIndex": 7,
+      "name": "울산공항",
+      "type": "AIRPORT"
+    },
+    {
+      "id": 53,
+      "side": 4,
+      "sideIndex": 8,
+      "name": "미니게임",
+      "type": "MINIGAME"
+    },
+    {
+      "id": 54,
+      "side": 4,
+      "sideIndex": 9,
+      "name": "송정동",
+      "type": "PROPERTY",
+      "propertyId": "songjeong"
+    },
+    {
+      "id": 55,
+      "side": 4,
+      "sideIndex": 10,
+      "name": "정자동",
+      "type": "PROPERTY",
+      "propertyId": "jeongja"
+    },
+    {
+      "id": 56,
+      "side": 4,
+      "sideIndex": 11,
+      "name": "경매장",
+      "type": "AUCTION"
+    },
+    {
+      "id": 57,
+      "side": 4,
+      "sideIndex": 12,
+      "name": "강동동",
+      "type": "PROPERTY",
+      "propertyId": "gangdong"
+    },
+    {
+      "id": 58,
+      "side": 4,
+      "sideIndex": 13,
+      "name": "몽돌해변",
+      "type": "PROPERTY",
+      "propertyId": "mongdol_beach"
+    },
+    {
+      "id": 59,
+      "side": 4,
+      "sideIndex": 14,
+      "name": "무료휴식",
+      "type": "FREE_REST"
+    }
+  ]
+}
