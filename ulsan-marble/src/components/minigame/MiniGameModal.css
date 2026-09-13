@@ -122,6 +122,7 @@
 
 .minigame-arena__title h2 {
   margin: 2px 0 3px;
+  color: #eef8fc;
   font-size: 24px;
   letter-spacing: -0.04em;
 }
@@ -639,8 +640,7 @@
   place-content: center;
   justify-items: center;
   gap: 3px;
-  color: #a9bfca;
-  border: 1px solid rgba(137, 178, 197, 0.2);
+  color: #dcecf3;
   border-radius: 14px;
   background: rgba(9, 29, 42, 0.78);
   cursor: pointer;

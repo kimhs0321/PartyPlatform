@@ -38,6 +38,7 @@ import type {
   CityHallState,
   PendingCityHallSelection,
 } from "./cityHallTypes";
+import type {NetworkGameEventApplyResult,} from "../network/useNetworkGameEvents";
 
 type ValueRef<T> = {
   current: T;
@@ -67,6 +68,7 @@ interface UseCityHallResolutionOptions {
 
   turnNumber: number;
   turnSequence: number;
+  isTileResolutionReady: boolean;
 
   commitCityHallState: (state: CityHallState) => void;
   commitDevelopmentRestrictions: (
@@ -100,7 +102,7 @@ export function useCityHallResolution({
   commitDevelopmentRestrictions,
 
   completeTileResolution,
-
+  isTileResolutionReady,
   onNetworkGameEventRequest,
 }: UseCityHallResolutionOptions) {
   const pendingRef = useRef<PendingCityHallSelection | null>(
@@ -122,14 +124,33 @@ export function useCityHallResolution({
   );
 
   const applyCityHallActionDecided = useCallback(
-    (
-      payload: UlsanMarbleCityHallActionDecidedPayload,
-    ): boolean => {
+    (payload: UlsanMarbleCityHallActionDecidedPayload,): NetworkGameEventApplyResult => {
       if (
-        payload.turnNumber !== turnNumber ||
-        payload.turnSequence !== turnSequence
+        payload.turnSequence !==
+        turnSequence
       ) {
-        return false;
+        if (
+          turnSequence <
+          payload.turnSequence
+        ) {
+          return "WAIT";
+        }
+
+        return "INVALID";
+      }
+
+      if (
+        payload.turnNumber !==
+        turnNumber
+      ) {
+        if (
+          turnNumber <
+          payload.turnNumber
+        ) {
+          return "WAIT";
+        }
+
+        return "INVALID";
       }
 
       if (payload.action === "START") {
@@ -140,13 +161,13 @@ export function useCityHallResolution({
           currentPending.turnSequence === payload.turnSequence
         ) {
           publishingActionIdsRef.current.delete(payload.actionId);
-          return true;
+          return "ALREADY_APPLIED";
         }
 
         const project = CITY_HALL_PROJECTS.find(
           (candidate) => candidate.id === payload.projectId,
         );
-        if (!project) return false;
+        if (!project) return "INVALID";
 
         if (
           payload.selectedTurn !== payload.turnNumber ||
@@ -154,14 +175,14 @@ export function useCityHallResolution({
           payload.expiresAfterTurn !==
             payload.activeFromTurn + project.durationTurns - 1
         ) {
-          return false;
+          return "INVALID";
         }
 
         if (
           project.targetType === "NONE" &&
           payload.targetIndustryId !== null
         ) {
-          return false;
+          return "INVALID";
         }
 
         if (
@@ -169,7 +190,7 @@ export function useCityHallResolution({
           payload.targetIndustryId !== null &&
           !stockIndustryIds.includes(payload.targetIndustryId)
         ) {
-          return false;
+          return "INVALID";
         }
 
         const term: CityHallProjectTerm = {
@@ -202,7 +223,7 @@ export function useCityHallResolution({
         });
 
         publishingActionIdsRef.current.delete(payload.actionId);
-        return true;
+        return "APPLIED";
       }
 
       const currentPending = pendingRef.current;
@@ -213,11 +234,11 @@ export function useCityHallResolution({
         currentPending.visitId !== payload.visitId ||
         currentPending.turnSequence !== payload.turnSequence
       ) {
-        return false;
+        return "INVALID";
       }
 
       if (payload.action === "APPLY") {
-        if (currentPending.stage !== "APPLICATION") return false;
+        if (currentPending.stage !== "APPLICATION") return "INVALID";
 
         const ownership =
           propertyOwnershipsRef.current[payload.propertyId];
@@ -226,13 +247,13 @@ export function useCityHallResolution({
           !ownership ||
           ownership.ownerPlayerId !== payload.playerId
         ) {
-          return false;
+          return "INVALID";
         }
 
         const property = properties.find(
           (candidate) => candidate.id === payload.propertyId,
         );
-        if (!property) return false;
+        if (!property) return "INVALID";
 
         const applicationType =
           payload.applicationType as CityHallApplicationType;
@@ -241,7 +262,7 @@ export function useCityHallResolution({
 
         if (applicationType === "DEVELOPMENT_PERMIT") {
           if (!developmentRestrictionsRef.current[payload.propertyId]) {
-            return false;
+            return "INVALID";
           }
 
           commitDevelopmentRestrictions(
@@ -255,7 +276,7 @@ export function useCityHallResolution({
             `${property.name} 개발 제한 해제 승인`;
         } else if (applicationType === "DEVELOPMENT_SUPPORT") {
           if (isMaxDevelopmentStage(ownership.stage)) {
-            return false;
+            return "INVALID";
           }
 
           commitCityHallState(
@@ -282,7 +303,7 @@ export function useCityHallResolution({
           resultText =
             `${property.name} 다음 부동산세 30% 지원 승인`;
         } else {
-          return false;
+          return "INVALID";
         }
 
         commitPending({
@@ -294,17 +315,29 @@ export function useCityHallResolution({
         });
 
         publishingActionIdsRef.current.delete(payload.actionId);
-        return true;
+        return "APPLIED";
       }
 
       if (payload.action === "CLOSE") {
+        if (!isTileResolutionReady) {
+          console.log(
+            "[CITY HALL CLOSE WAIT TILE]",
+            "visitId =",
+            payload.visitId,
+          );
+
+          return "WAIT";
+        }
+
         commitPending(null);
         publishingActionIdsRef.current.delete(payload.actionId);
+
         completeTileResolution();
-        return true;
+
+        return "APPLIED";
       }
 
-      return false;
+      return "INVALID";
     },
     [
       cityHallStateRef,
@@ -318,6 +351,7 @@ export function useCityHallResolution({
       stockIndustryIds,
       turnNumber,
       turnSequence,
+      isTileResolutionReady,
     ],
   );
 
@@ -339,13 +373,21 @@ export function useCityHallResolution({
         return true;
       }
 
-      const applied = applyCityHallActionDecided(payload);
+      const result =
+        applyCityHallActionDecided(payload);
 
-      if (!applied) {
-        publishingActionIdsRef.current.delete(payload.actionId);
+      if (
+        result === "WAIT" ||
+        result === "INVALID"
+      ) {
+        publishingActionIdsRef.current.delete(
+          payload.actionId,
+        );
+
+        return false;
       }
 
-      return applied;
+      return true;
     },
     [applyCityHallActionDecided, onNetworkGameEventRequest],
   );

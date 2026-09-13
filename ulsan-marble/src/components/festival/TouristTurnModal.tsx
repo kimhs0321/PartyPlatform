@@ -3,11 +3,6 @@ import "./TouristTurnModal.css";
 import { getFestivalDefinition } from "../../game/festival/festivalData";
 import type { PendingTouristTurnResult } from "../../game/festival/festivalTypes";
 
-interface TouristTurnModalProps {
-  result: PendingTouristTurnResult | null;
-  onConfirm: () => void;
-}
-
 const DICE_FACE: Record<number, string> = {
   1: "⚀",
   2: "⚁",
@@ -17,8 +12,18 @@ const DICE_FACE: Record<number, string> = {
   6: "⚅",
 };
 
+interface TouristTurnModalProps {
+  result:
+    PendingTouristTurnResult | null;
+
+  canConfirm: boolean;
+
+  onConfirm: () => void;
+}
+
 export function TouristTurnModal({
   result,
+  canConfirm,
   onConfirm,
 }: TouristTurnModalProps) {
   if (!result) return null;
@@ -90,8 +95,14 @@ export function TouristTurnModal({
           </div>
         )}
 
-        <button type="button" onClick={onConfirm}>
-          확인
+        <button
+          type="button"
+          disabled={!canConfirm}
+          onClick={onConfirm}
+        >
+          {canConfirm
+            ? "확인"
+            : "현재 플레이어 확인 대기…"}
         </button>
       </article>
     </section>

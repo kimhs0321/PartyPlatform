@@ -7,15 +7,18 @@ import {
 import type { ActiveEconomicNews } from "../game/economicNews/economicNewsTypes";
 import type { CityHallProjectTerm } from "../game/cityHall/cityHallTypes";
 import type { StockIndustryData } from "../game/stock/stockTypes";
+import type {InterestRateLevel,MacroEconomyReport,} from "../game/economy/macroEconomyTypes";
 import "./EconomicNewsIndicator.css";
 
 const PRIORITY_DISPLAY_MS = 5_000;
 const ROTATION_INTERVAL_MS = 4_000;
+const MACRO_REPORT_VISIBLE_TURNS = 3;
 
 type InformationKind =
   | "ECONOMIC"
   | "CITY_HALL"
-  | "DISASTER";
+  | "DISASTER"
+  | "MACRO";
 
 type InformationTone =
   | "POSITIVE"
@@ -40,6 +43,10 @@ interface EconomicNewsIndicatorProps {
   cityHallTerm: CityHallProjectTerm | null;
   disasterPenalties: readonly unknown[];
   industries: StockIndustryData[];
+
+  interestRateLevel: InterestRateLevel;
+  macroReports: readonly MacroEconomyReport[];
+
   turnNumber: number;
 }
 
@@ -257,114 +264,303 @@ function createDisasterItems(
   });
 }
 
+function getInterestRateLabel(
+  level: InterestRateLevel,
+): string {
+  switch (level) {
+    case "LOW":
+      return "저금리";
+
+    case "HIGH":
+      return "고금리";
+
+    case "BASE":
+    default:
+      return "기준금리";
+  }
+}
+
+function createMacroReportItems(
+  reports: readonly MacroEconomyReport[],
+  turnNumber: number,
+): InformationItem[] {
+  return reports
+    .filter(
+      (report) =>
+        turnNumber >= report.publishedTurn &&
+        turnNumber <
+          report.publishedTurn +
+            MACRO_REPORT_VISIBLE_TURNS,
+    )
+    .map((report) => {
+      const tone: InformationTone =
+        report.regime === "BOOM"
+          ? "POSITIVE"
+          : report.regime === "RECESSION"
+            ? "NEGATIVE"
+            : "NEUTRAL";
+
+      return {
+        key: `macro:${report.reportId}`,
+        kind: "MACRO",
+        label: "경기 분석",
+        headline: report.headline,
+        effect: report.summary,
+        meta: `${report.publishedTurn}턴 발표`,
+        tone,
+        sortTurn: report.publishedTurn,
+      };
+    });
+}
+
+function createInterestRateFallbackItem(
+  interestRateLevel: InterestRateLevel,
+): InformationItem {
+  return {
+    key: "macro-interest-rate",
+    kind: "MACRO",
+    label: "금리 정보",
+    headline:
+      getInterestRateLabel(
+        interestRateLevel,
+      ),
+    effect:
+      "현재 공개된 금리 수준입니다.",
+    meta: null,
+    tone: "NEUTRAL",
+    sortTurn: 0,
+  };
+}
+
 export function EconomicNewsIndicator({
   news,
   cityHallTerm,
   disasterPenalties,
   industries,
+  interestRateLevel,
+  macroReports,
   turnNumber,
 }: EconomicNewsIndicatorProps) {
   const items = useMemo(() => {
     const combined: InformationItem[] = [
-      ...createEconomicItems(news, turnNumber),
-      ...createDisasterItems(disasterPenalties, turnNumber),
+      ...createEconomicItems(
+        news,
+        turnNumber,
+      ),
+
+      ...createDisasterItems(
+        disasterPenalties,
+        turnNumber,
+      ),
+
+      ...createMacroReportItems(
+        macroReports,
+        turnNumber,
+      ),
     ];
 
-    const cityHallItem = createCityHallItem(
-      cityHallTerm,
-      industries,
-      turnNumber,
-    );
-    if (cityHallItem) combined.push(cityHallItem);
+    const cityHallItem =
+      createCityHallItem(
+        cityHallTerm,
+        industries,
+        turnNumber,
+      );
+
+    if (cityHallItem) {
+      combined.push(cityHallItem);
+    }
 
     return combined.sort(
       (first, second) =>
-        second.sortTurn - first.sortTurn ||
-        first.key.localeCompare(second.key),
+        second.sortTurn -
+          first.sortTurn ||
+        first.key.localeCompare(
+          second.key,
+        ),
     );
   }, [
     cityHallTerm,
     disasterPenalties,
     industries,
+    macroReports,
     news,
     turnNumber,
   ]);
 
   const itemKeys = useMemo(
-    () => items.map((item) => item.key),
+    () =>
+      items.map(
+        (item) => item.key,
+      ),
     [items],
   );
-  const keySignature = itemKeys.join("|");
-  const knownKeysRef = useRef<Set<string>>(new Set());
-  const [activeKey, setActiveKey] = useState<string | null>(null);
-  const [priorityKey, setPriorityKey] = useState<string | null>(null);
+
+  const keySignature =
+    itemKeys.join("|");
+
+  const knownKeysRef =
+    useRef<Set<string>>(
+      new Set(),
+    );
+
+  const [
+    activeKey,
+    setActiveKey,
+  ] = useState<string | null>(
+    null,
+  );
+
+  const [
+    priorityKey,
+    setPriorityKey,
+  ] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
-    const currentKeySet = new Set(itemKeys);
+    const currentKeySet =
+      new Set(itemKeys);
 
-    if (itemKeys.length === 0) {
-      knownKeysRef.current = currentKeySet;
+    if (
+      itemKeys.length === 0
+    ) {
+      knownKeysRef.current =
+        currentKeySet;
+
       setActiveKey(null);
       setPriorityKey(null);
+
       return;
     }
 
-    const newestItem = items.find(
-      (item) => !knownKeysRef.current.has(item.key),
-    );
-    knownKeysRef.current = currentKeySet;
+    const newestItem =
+      items.find(
+        (item) =>
+          !knownKeysRef.current.has(
+            item.key,
+          ),
+      );
+
+    knownKeysRef.current =
+      currentKeySet;
 
     if (newestItem) {
-      setActiveKey(newestItem.key);
-      setPriorityKey(newestItem.key);
+      setActiveKey(
+        newestItem.key,
+      );
+
+      setPriorityKey(
+        newestItem.key,
+      );
+
       return;
     }
 
-    setActiveKey((currentKey) =>
-      currentKey && currentKeySet.has(currentKey)
-        ? currentKey
-        : itemKeys[0],
+    setActiveKey(
+      (currentKey) =>
+        currentKey &&
+        currentKeySet.has(
+          currentKey,
+        )
+          ? currentKey
+          : itemKeys[0],
     );
-  }, [items, itemKeys, keySignature]);
+  }, [
+    items,
+    itemKeys,
+    keySignature,
+  ]);
 
   useEffect(() => {
     if (!priorityKey) return;
 
-    const timeoutId = window.setTimeout(() => {
-      setPriorityKey((currentKey) =>
-        currentKey === priorityKey ? null : currentKey,
-      );
-    }, PRIORITY_DISPLAY_MS);
+    const timeoutId =
+      window.setTimeout(() => {
+        setPriorityKey(
+          (currentKey) =>
+            currentKey ===
+            priorityKey
+              ? null
+              : currentKey,
+        );
+      }, PRIORITY_DISPLAY_MS);
 
-    return () => window.clearTimeout(timeoutId);
+    return () =>
+      window.clearTimeout(
+        timeoutId,
+      );
   }, [priorityKey]);
 
   useEffect(() => {
-    if (priorityKey || itemKeys.length <= 1) return;
+    if (
+      priorityKey ||
+      itemKeys.length <= 1
+    ) {
+      return;
+    }
 
-    const intervalId = window.setInterval(() => {
-      setActiveKey((currentKey) => {
-        const currentIndex = currentKey
-          ? itemKeys.indexOf(currentKey)
-          : -1;
-        return itemKeys[(currentIndex + 1) % itemKeys.length];
-      });
-    }, ROTATION_INTERVAL_MS);
+    const intervalId =
+      window.setInterval(() => {
+        setActiveKey(
+          (currentKey) => {
+            const currentIndex =
+              currentKey
+                ? itemKeys.indexOf(
+                    currentKey,
+                  )
+                : -1;
 
-    return () => window.clearInterval(intervalId);
-  }, [itemKeys, keySignature, priorityKey]);
+            return itemKeys[
+              (currentIndex + 1) %
+                itemKeys.length
+            ];
+          },
+        );
+      }, ROTATION_INTERVAL_MS);
+
+    return () =>
+      window.clearInterval(
+        intervalId,
+      );
+  }, [
+    itemKeys,
+    keySignature,
+    priorityKey,
+  ]);
+
+  /*
+   * 별도 뉴스가 하나도 없어도
+   * 금리는 항상 공개한다.
+   */
+  const fallbackItem =
+    createInterestRateFallbackItem(
+      interestRateLevel,
+    );
 
   const activeItem =
-    items.find((item) => item.key === activeKey) ??
+    items.find(
+      (item) =>
+        item.key === activeKey,
+    ) ??
     items[0] ??
-    null;
+    fallbackItem;
 
-  if (!activeItem) return null;
+  const activeIndex =
+    items.length > 0
+      ? Math.max(
+          0,
+          items.findIndex(
+            (item) =>
+              item.key ===
+              activeItem.key,
+          ),
+        )
+      : 0;
 
-  const activeIndex = Math.max(
-    0,
-    items.findIndex((item) => item.key === activeItem.key),
-  );
+  const interestRateLabel =
+    getInterestRateLabel(
+      interestRateLevel,
+    );
 
   return (
     <aside
@@ -386,8 +582,13 @@ export function EconomicNewsIndicator({
         </strong>
 
         <div className="economic-news-indicator__message">
-          <b>{activeItem.headline}</b>
-          <span>{activeItem.effect}</span>
+          <b>
+            {activeItem.headline}
+          </b>
+
+          <span>
+            {activeItem.effect}
+          </span>
         </div>
 
         {activeItem.meta && (
@@ -397,11 +598,14 @@ export function EconomicNewsIndicator({
         )}
       </div>
 
-      {items.length > 1 && (
-        <small className="economic-news-indicator__count">
-          {activeIndex + 1}/{items.length}
-        </small>
-      )}
+      <small className="economic-news-indicator__count">
+        금리 {interestRateLabel}
+        {items.length > 1
+          ? ` · ${
+              activeIndex + 1
+            }/${items.length}`
+          : ""}
+      </small>
     </aside>
   );
 }

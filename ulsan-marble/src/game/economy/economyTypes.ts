@@ -10,6 +10,7 @@ export type TransactionReason =
   | "SALE"
   | "STOCK_PURCHASE"
   | "STOCK_SALE"
+  | "STOCK_DIVIDEND"
   | "LOTTERY_PURCHASE"
   | "LOTTERY_PRIZE"
   | "DISASTER_REPAIR"

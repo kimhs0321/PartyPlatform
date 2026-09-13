@@ -19,6 +19,8 @@ import type {
   UlsanMarbleJailTurnActionDecidedPayload,
   UlsanMarbleStockMarketSettlementConfirmedPayload,
   UlsanMarbleStockMarketResolvedPayload,
+  UlsanMarbleMacroEconomyResolvedPayload,
+  UlsanMarbleCompanyDividendEventResolvedPayload,
   UlsanMarbleAuctionActionDecidedPayload,
   UlsanMarbleMiniGameActionDecidedPayload,
   UlsanMarbleInsuranceActionDecidedPayload,
@@ -33,19 +35,32 @@ import type {
   UlsanMarbleCityHallActionDecidedPayload,
   UlsanMarbleDisasterResolvedPayload,
   UlsanMarbleDisasterActionDecidedPayload,
+  UlsanMarbleFestivalTriggerResolvedPayload,
+  UlsanMarbleFestivalAnnouncementConfirmedPayload,
+  UlsanMarbleTouristTurnResolvedPayload,
+  UlsanMarbleTouristTurnConfirmedPayload,
+  UlsanMarbleFestivalDevEndedPayload,
+  UlsanMarbleMayorElectionStartedPayload,
+  UlsanMarbleMayorElectionVoteCastPayload,
+  UlsanMarbleMayorElectionResultResolvedPayload,
+  UlsanMarbleMayorElectionResultConfirmedPayload,
 } from "../../../../shared/ulsanMarbleProtocol";
 
-
+export type NetworkGameEventApplyResult =
+  | "APPLIED"
+  | "WAIT"
+  | "ALREADY_APPLIED"
+  | "INVALID";
 
 interface UlsanMarbleGameEventHandlers {
-  TOLL_PAID: (payload: UlsanMarbleTollPaidPayload,) => boolean;
+  TOLL_PAID: (payload: UlsanMarbleTollPaidPayload,) => NetworkGameEventApplyResult;
   GOLDEN_KEY_DRAWN: (payload: UlsanMarbleGoldenKeyDrawnPayload,) => boolean;
   GOLDEN_KEY_APPLIED: (payload:UlsanMarbleGoldenKeyAppliedPayload,) => boolean;
   GOLDEN_KEY_CONFIRMED: (payload: UlsanMarbleGoldenKeyConfirmedPayload) => boolean;  
   PROPERTY_DEVELOPMENT_DECIDED: (payload:UlsanMarblePropertyDevelopmentDecidedPayload,) => boolean;
   AIRPORT_TRAVEL_DECIDED: (payload:UlsanMarbleAirportTravelDecidedPayload,) => boolean;
-  BANK_ACTION_DECIDED: (payload:UlsanMarbleBankActionDecidedPayload,) => boolean;
-  LOTTERY_ACTION_DECIDED: (payload:UlsanMarbleLotteryActionDecidedPayload,) => boolean;
+  BANK_ACTION_DECIDED: (payload: UlsanMarbleBankActionDecidedPayload,) => NetworkGameEventApplyResult;
+  LOTTERY_ACTION_DECIDED: (payload:UlsanMarbleLotteryActionDecidedPayload,) => NetworkGameEventApplyResult;
   LOTTO_DRAW_RESOLVED: (payload:UlsanMarbleLottoDrawResolvedPayload,) => boolean;
   LOTTO_DRAW_CONFIRMED: (payload:UlsanMarbleLottoDrawConfirmedPayload,) => boolean;
   PORT_ACTION_DECIDED: (payload:UlsanMarblePortActionDecidedPayload,) => boolean;
@@ -60,22 +75,37 @@ interface UlsanMarbleGameEventHandlers {
   PROPERTY_MARKET_SETTLEMENT_CONFIRMED: (payload: UlsanMarblePropertyMarketSettlementConfirmedPayload,) => boolean;
   STOCK_MARKET_RESOLVED: (payload: UlsanMarbleStockMarketResolvedPayload,) => boolean;
   STOCK_MARKET_SETTLEMENT_CONFIRMED: (payload: UlsanMarbleStockMarketSettlementConfirmedPayload,) => boolean;
-  AUCTION_ACTION_DECIDED: (payload: UlsanMarbleAuctionActionDecidedPayload,) => boolean;
-  MINI_GAME_ACTION_DECIDED: (payload: UlsanMarbleMiniGameActionDecidedPayload,) => boolean;
+  MACRO_ECONOMY_RESOLVED: (payload: UlsanMarbleMacroEconomyResolvedPayload,) => boolean;
+  COMPANY_DIVIDEND_EVENT_RESOLVED: (payload:UlsanMarbleCompanyDividendEventResolvedPayload,) => boolean;
+  AUCTION_ACTION_DECIDED: (payload: UlsanMarbleAuctionActionDecidedPayload,) => NetworkGameEventApplyResult;
+  MINI_GAME_ACTION_DECIDED: (payload: UlsanMarbleMiniGameActionDecidedPayload,) => NetworkGameEventApplyResult;
   INSURANCE_ACTION_DECIDED: (payload: UlsanMarbleInsuranceActionDecidedPayload,) => boolean;
   ECONOMIC_NEWS_DRAW_DECIDED: (payload: UlsanMarbleEconomicNewsDrawDecidedPayload) => boolean;
   ECONOMIC_NEWS_APPLIED: (payload: UlsanMarbleEconomicNewsAppliedPayload) => boolean;
-  ECONOMIC_NEWS_CONFIRMED: (payload: UlsanMarbleEconomicNewsConfirmedPayload) => boolean;
-  CITY_HALL_ACTION_DECIDED: (payload: UlsanMarbleCityHallActionDecidedPayload,) => boolean;
+  ECONOMIC_NEWS_CONFIRMED: (payload: UlsanMarbleEconomicNewsConfirmedPayload) => NetworkGameEventApplyResult;
+  CITY_HALL_ACTION_DECIDED: (payload: UlsanMarbleCityHallActionDecidedPayload,) => NetworkGameEventApplyResult;
   DISASTER_RESOLVED: (payload: UlsanMarbleDisasterResolvedPayload,) => boolean;
   DISASTER_ACTION_DECIDED: (payload: UlsanMarbleDisasterActionDecidedPayload,) => boolean;
-
+  FESTIVAL_TRIGGER_RESOLVED: (payload: UlsanMarbleFestivalTriggerResolvedPayload,) => NetworkGameEventApplyResult;
+  FESTIVAL_ANNOUNCEMENT_CONFIRMED: (payload: UlsanMarbleFestivalAnnouncementConfirmedPayload,) => NetworkGameEventApplyResult;
+  TOURIST_TURN_RESOLVED: (payload: UlsanMarbleTouristTurnResolvedPayload,) => NetworkGameEventApplyResult;
+  TOURIST_TURN_CONFIRMED: (payload: UlsanMarbleTouristTurnConfirmedPayload,) => NetworkGameEventApplyResult;
+  FESTIVAL_DEV_ENDED: (payload: UlsanMarbleFestivalDevEndedPayload,) => NetworkGameEventApplyResult;
+  MAYOR_ELECTION_STARTED: (payload: UlsanMarbleMayorElectionStartedPayload,) => NetworkGameEventApplyResult;
+  MAYOR_ELECTION_VOTE_CAST: (payload: UlsanMarbleMayorElectionVoteCastPayload,) => NetworkGameEventApplyResult;
+  MAYOR_ELECTION_RESULT_RESOLVED: (payload: UlsanMarbleMayorElectionResultResolvedPayload,) => NetworkGameEventApplyResult;
+  MAYOR_ELECTION_RESULT_CONFIRMED: (payload: UlsanMarbleMayorElectionResultConfirmedPayload,) => NetworkGameEventApplyResult;
 }
 
 interface UseNetworkGameEventsOptions {
   events?: UlsanMarbleGameEvent[];
 
   turnSequence?: number;
+
+  onEventApplied?: (
+    eventId: number,
+    turnSequence: number,
+  ) => void;
 
   handlers:
     UlsanMarbleGameEventHandlers;
@@ -85,6 +115,7 @@ export function useNetworkGameEvents({
   events,
   turnSequence,
   handlers,
+  onEventApplied,
 }: UseNetworkGameEventsOptions): () => void {
   const processedEventIdRef =
   useRef(0);
@@ -116,6 +147,8 @@ export function useNetworkGameEvents({
   const applyPropertyMarketSettlementConfirmed = handlers.PROPERTY_MARKET_SETTLEMENT_CONFIRMED;
   const applyStockMarketResolved = handlers.STOCK_MARKET_RESOLVED;
   const applyStockMarketSettlementConfirmed = handlers.STOCK_MARKET_SETTLEMENT_CONFIRMED;
+  const applyMacroEconomyResolved = handlers.MACRO_ECONOMY_RESOLVED;
+  const applyCompanyDividendEventResolved = handlers.COMPANY_DIVIDEND_EVENT_RESOLVED;
   const applyAuctionActionDecided = handlers.AUCTION_ACTION_DECIDED;
   const applyMiniGameActionDecided = handlers.MINI_GAME_ACTION_DECIDED;
   const applyInsuranceActionDecided = handlers.INSURANCE_ACTION_DECIDED;
@@ -125,6 +158,15 @@ export function useNetworkGameEvents({
   const applyCityHallActionDecided = handlers.CITY_HALL_ACTION_DECIDED;
   const applyDisasterResolved =  handlers.DISASTER_RESOLVED;
   const applyDisasterActionDecided = handlers.DISASTER_ACTION_DECIDED;
+  const applyFestivalTriggerResolved = handlers.FESTIVAL_TRIGGER_RESOLVED;
+  const applyFestivalAnnouncementConfirmed = handlers.FESTIVAL_ANNOUNCEMENT_CONFIRMED;
+  const applyTouristTurnResolved = handlers.TOURIST_TURN_RESOLVED;
+  const applyTouristTurnConfirmed = handlers.TOURIST_TURN_CONFIRMED;
+  const applyFestivalDevEnded = handlers.FESTIVAL_DEV_ENDED;
+  const applyMayorElectionStarted = handlers.MAYOR_ELECTION_STARTED;
+  const applyMayorElectionVoteCast = handlers.MAYOR_ELECTION_VOTE_CAST;
+  const applyMayorElectionResultResolved = handlers.MAYOR_ELECTION_RESULT_RESOLVED;
+  const applyMayorElectionResultConfirmed = handlers.MAYOR_ELECTION_RESULT_CONFIRMED;
 
   useEffect(() => {
     if (
@@ -154,7 +196,10 @@ export function useNetworkGameEvents({
       return;
     }
 
-    let applied = false;
+    let result:
+      | boolean
+      | NetworkGameEventApplyResult =
+      false;
 
     console.log(
       "[GAME EVENT] 처리 시도",
@@ -167,67 +212,126 @@ export function useNetworkGameEvents({
     );
 
     switch (nextEvent.kind) {
-      case "TOLL_PAID":applied = applyTollPaid(nextEvent.payload);break;
-      case "GOLDEN_KEY_DRAWN": applied = applyGoldenKeyDrawn(nextEvent.payload);break;
-      case "GOLDEN_KEY_APPLIED":applied = applyGoldenKeyApplied(nextEvent.payload);break;
-      case "GOLDEN_KEY_CONFIRMED":applied = applyGoldenKeyConfirmed(nextEvent.payload); break;
-      case "PROPERTY_DEVELOPMENT_DECIDED": applied =applyPropertyDevelopmentDecided(nextEvent.payload,);break;  
-      case "AIRPORT_TRAVEL_DECIDED": applied = applyAirportTravelDecided(nextEvent.payload,);break;  
-      case "BANK_ACTION_DECIDED": applied = applyBankActionDecided(nextEvent.payload,);break;
-      case "LOTTERY_ACTION_DECIDED": applied = applyLotteryActionDecided(nextEvent.payload,);break;
-      case "LOTTO_DRAW_RESOLVED":applied = applyLottoDrawResolved(nextEvent.payload,);break;
-      case "LOTTO_DRAW_CONFIRMED":applied = applyLottoDrawConfirmed(nextEvent.payload,);break;
-      case "PORT_ACTION_DECIDED":applied = applyPortActionDecided(nextEvent.payload,);break;
-      case "PORT_SETTLEMENT_RESOLVED":applied = applyPortSettlementResolved(nextEvent.payload,);break;
-      case "PORT_SETTLEMENT_CONFIRMED":applied = applyPortSettlementConfirmed(nextEvent.payload,);break;
-      case "JAIL_ENTRY_CONFIRMED":applied = applyJailEntryConfirmed(nextEvent.payload,);break;
-      case "JAIL_TURN_ACTION_DECIDED":applied = applyJailTurnActionDecided(nextEvent.payload,);break;
-      case "JAIL_FINE_ACTION_DECIDED":applied = applyJailFineActionDecided( nextEvent.payload, );break;
-      case "STOCK_MARKET_RESOLVED":applied = applyStockMarketResolved(nextEvent.payload,);break;
-      case "STOCK_MARKET_SETTLEMENT_CONFIRMED":applied = applyStockMarketSettlementConfirmed(nextEvent.payload,);break;
-      case "TAX_SETTLEMENT_STARTED":applied = applyTaxSettlementStarted(nextEvent.payload,);break;
-      case "TAX_ACTION_DECIDED":applied = applyTaxActionDecided(nextEvent.payload,); break;
-      case "PROPERTY_MARKET_RESOLVED": applied = applyPropertyMarketResolved(nextEvent.payload,);break;
-      case "PROPERTY_MARKET_SETTLEMENT_CONFIRMED": applied = applyPropertyMarketSettlementConfirmed(nextEvent.payload,);break;
-      case "AUCTION_ACTION_DECIDED":applied = applyAuctionActionDecided(nextEvent.payload,);break;
-      case "MINI_GAME_ACTION_DECIDED": applied = applyMiniGameActionDecided(nextEvent.payload,);break;
-      case "INSURANCE_ACTION_DECIDED":applied = applyInsuranceActionDecided(nextEvent.payload,);break;
-      case "ECONOMIC_NEWS_DRAW_DECIDED":applied = applyEconomicNewsDrawDecided(nextEvent.payload);break;
-      case "ECONOMIC_NEWS_APPLIED":applied = applyEconomicNewsApplied(nextEvent.payload);break;
-      case "ECONOMIC_NEWS_CONFIRMED":applied = applyEconomicNewsConfirmed(nextEvent.payload);break;
-      case "CITY_HALL_ACTION_DECIDED":applied = applyCityHallActionDecided(nextEvent.payload);break;
-      case "DISASTER_RESOLVED":applied = applyDisasterResolved(nextEvent.payload,);break;
-      case "DISASTER_ACTION_DECIDED": applied = applyDisasterActionDecided(nextEvent.payload,);break;
+      case "TOLL_PAID":result = applyTollPaid(nextEvent.payload);break;
+      case "GOLDEN_KEY_DRAWN": result = applyGoldenKeyDrawn(nextEvent.payload);break;
+      case "GOLDEN_KEY_APPLIED":result = applyGoldenKeyApplied(nextEvent.payload);break;
+      case "GOLDEN_KEY_CONFIRMED":result = applyGoldenKeyConfirmed(nextEvent.payload); break;
+      case "PROPERTY_DEVELOPMENT_DECIDED": result = applyPropertyDevelopmentDecided(nextEvent.payload,);break;  
+      case "AIRPORT_TRAVEL_DECIDED": result = applyAirportTravelDecided(nextEvent.payload,);break;  
+      case "BANK_ACTION_DECIDED": result = applyBankActionDecided(nextEvent.payload,);break;
+      case "LOTTERY_ACTION_DECIDED": result = applyLotteryActionDecided(nextEvent.payload,);break;
+      case "LOTTO_DRAW_RESOLVED":result = applyLottoDrawResolved(nextEvent.payload,);break;
+      case "LOTTO_DRAW_CONFIRMED":result = applyLottoDrawConfirmed(nextEvent.payload,);break;
+      case "PORT_ACTION_DECIDED":result = applyPortActionDecided(nextEvent.payload,);break;
+      case "PORT_SETTLEMENT_RESOLVED":result = applyPortSettlementResolved(nextEvent.payload,);break;
+      case "PORT_SETTLEMENT_CONFIRMED":result = applyPortSettlementConfirmed(nextEvent.payload,);break;
+      case "JAIL_ENTRY_CONFIRMED":result = applyJailEntryConfirmed(nextEvent.payload,);break;
+      case "JAIL_TURN_ACTION_DECIDED":result = applyJailTurnActionDecided(nextEvent.payload,);break;
+      case "JAIL_FINE_ACTION_DECIDED":result = applyJailFineActionDecided( nextEvent.payload, );break;
+      case "STOCK_MARKET_RESOLVED":result = applyStockMarketResolved(nextEvent.payload,);break;
+      case "STOCK_MARKET_SETTLEMENT_CONFIRMED":result = applyStockMarketSettlementConfirmed(nextEvent.payload,);break;
+      case "MACRO_ECONOMY_RESOLVED":result = applyMacroEconomyResolved(nextEvent.payload,); break;
+      case "TAX_SETTLEMENT_STARTED":result = applyTaxSettlementStarted(nextEvent.payload,);break;
+      case "COMPANY_DIVIDEND_EVENT_RESOLVED":result = applyCompanyDividendEventResolved(nextEvent.payload,); break;
+      case "TAX_ACTION_DECIDED":result = applyTaxActionDecided(nextEvent.payload,); break;
+      case "PROPERTY_MARKET_RESOLVED": result = applyPropertyMarketResolved(nextEvent.payload,);break;
+      case "PROPERTY_MARKET_SETTLEMENT_CONFIRMED": result = applyPropertyMarketSettlementConfirmed(nextEvent.payload,);break;
+      case "AUCTION_ACTION_DECIDED":result = applyAuctionActionDecided(nextEvent.payload,);break;
+      case "MINI_GAME_ACTION_DECIDED": result = applyMiniGameActionDecided(nextEvent.payload,);break;
+      case "INSURANCE_ACTION_DECIDED":result = applyInsuranceActionDecided(nextEvent.payload,);break;
+      case "ECONOMIC_NEWS_DRAW_DECIDED":result = applyEconomicNewsDrawDecided(nextEvent.payload);break;
+      case "ECONOMIC_NEWS_APPLIED":result = applyEconomicNewsApplied(nextEvent.payload);break;
+      case "ECONOMIC_NEWS_CONFIRMED":result = applyEconomicNewsConfirmed(nextEvent.payload);break;
+      case "CITY_HALL_ACTION_DECIDED":result = applyCityHallActionDecided(nextEvent.payload);break;
+      case "DISASTER_RESOLVED":result = applyDisasterResolved(nextEvent.payload,);break;
+      case "DISASTER_ACTION_DECIDED": result = applyDisasterActionDecided(nextEvent.payload,);break;
+      case "FESTIVAL_TRIGGER_RESOLVED": result = applyFestivalTriggerResolved(nextEvent.payload,);break;
+      case "FESTIVAL_ANNOUNCEMENT_CONFIRMED": result = applyFestivalAnnouncementConfirmed(nextEvent.payload,);break;
+      case "TOURIST_TURN_RESOLVED": result = applyTouristTurnResolved(nextEvent.payload,);break;
+      case "TOURIST_TURN_CONFIRMED": result = applyTouristTurnConfirmed(nextEvent.payload,);break;
+      case "FESTIVAL_DEV_ENDED": result = applyFestivalDevEnded(nextEvent.payload,);break;
+      case "MAYOR_ELECTION_STARTED": result = applyMayorElectionStarted(nextEvent.payload,);break;
+      case "MAYOR_ELECTION_VOTE_CAST": result = applyMayorElectionVoteCast(nextEvent.payload,);break;
+      case "MAYOR_ELECTION_RESULT_RESOLVED": result = applyMayorElectionResultResolved(nextEvent.payload,);break;
+      case "MAYOR_ELECTION_RESULT_CONFIRMED": result = applyMayorElectionResultConfirmed(nextEvent.payload,);break;
 
       default:
         return;
     }
 
-    if (!applied) {
-      console.warn(
-        "[GAME EVENT] 적용 실패 - 큐 정지",
+    const applyResult:
+      NetworkGameEventApplyResult =
+        typeof result === "boolean"
+          ? result
+            ? "APPLIED"
+            : "INVALID"
+          : result;
+
+    if (applyResult === "WAIT") {
+      console.log(
+        "[GAME EVENT] 적용 대기",
         "kind =", nextEvent.kind,
         "eventId =", nextEvent.eventId,
         "eventSeq =", nextEvent.turnSequence,
         "currentSeq =", turnSequence,
         "processed =", processedEventIdRef.current,
-        "payload =", JSON.stringify(nextEvent.payload),
       );
+
       return;
     }
-      console.log(
-        "[GAME EVENT] 적용 완료",
+
+    if (applyResult === "INVALID") {
+      console.warn(
+        "[GAME EVENT] 잘못된 이벤트 - 큐 정지",
         "kind =", nextEvent.kind,
         "eventId =", nextEvent.eventId,
         "eventSeq =", nextEvent.turnSequence,
+        "currentSeq =", turnSequence,
+        "processed =", processedEventIdRef.current,
+        "payload =", JSON.stringify(
+          nextEvent.payload,
+        ),
       );
 
-    processedEventIdRef.current =
-      nextEvent.eventId;
+      return;
+    }
 
-    setProcessedVersion(
-      (current) => current + 1,
+  if (
+    applyResult ===
+    "ALREADY_APPLIED"
+  ) {
+    console.log(
+      "[GAME EVENT] 이미 적용됨",
+      "kind =", nextEvent.kind,
+      "eventId =", nextEvent.eventId,
+      "eventSeq =", nextEvent.turnSequence,
     );
+  } else {
+    console.log(
+      "[GAME EVENT] 적용 완료",
+      "kind =", nextEvent.kind,
+      "eventId =", nextEvent.eventId,
+      "eventSeq =", nextEvent.turnSequence,
+    );
+  } // ← 이게 빠져 있었음
+
+  processedEventIdRef.current =
+    nextEvent.eventId;
+
+  onEventApplied?.(
+    nextEvent.eventId,
+    nextEvent.turnSequence,
+  );
+
+  console.log(
+    "[GAME EVENT ACK SEND]",
+    "eventId =", nextEvent.eventId,
+    "eventSeq =", nextEvent.turnSequence,
+  );
+
+  setProcessedVersion(
+    (current) => current + 1,
+  );
 
   },[
   applyTollPaid,
@@ -252,6 +356,8 @@ export function useNetworkGameEvents({
   applyPropertyMarketSettlementConfirmed,
   applyStockMarketResolved,
   applyStockMarketSettlementConfirmed,
+  applyMacroEconomyResolved,
+  applyCompanyDividendEventResolved,
   applyAuctionActionDecided,
   applyMiniGameActionDecided,
   applyInsuranceActionDecided,
@@ -261,6 +367,16 @@ export function useNetworkGameEvents({
   applyEconomicNewsConfirmed,
   applyDisasterResolved,
   applyDisasterActionDecided,
+  applyFestivalTriggerResolved,
+  applyFestivalAnnouncementConfirmed,
+  applyTouristTurnResolved,
+  applyTouristTurnConfirmed,
+  applyFestivalDevEnded,
+  applyMayorElectionStarted,
+  applyMayorElectionVoteCast,
+  applyMayorElectionResultResolved,
+  applyMayorElectionResultConfirmed,
+  onEventApplied,
   events,
   processedVersion,
   turnSequence,

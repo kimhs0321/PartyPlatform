@@ -1,0 +1,487 @@
+.company-dividend-event-overlay {
+  position: fixed;
+  inset: 0;
+
+  z-index: 1170;
+
+  display: grid;
+  place-items: center;
+
+  padding: 24px;
+
+  background:
+    rgba(
+      1,
+      9,
+      15,
+      0.78
+    );
+
+  backdrop-filter:
+    blur(8px);
+
+  pointer-events: auto;
+}
+
+.company-dividend-event-modal {
+  position: relative;
+
+  width: min(
+    540px,
+    calc(100vw - 32px)
+  );
+
+  overflow: hidden;
+
+  padding: 26px;
+
+  color: #eaf7fb;
+
+  border:
+    1px solid
+    rgba(
+      137,
+      184,
+      203,
+      0.28
+    );
+
+  border-radius: 18px;
+
+  background:
+    linear-gradient(
+      155deg,
+      #102d39 0%,
+      #071923 70%,
+      #06151d 100%
+    );
+
+  box-shadow:
+    0 32px 90px
+    rgba(
+      0,
+      0,
+      0,
+      0.65
+    );
+}
+
+.company-dividend-event-modal::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+  right: 0;
+
+  height: 4px;
+
+  background:
+    #768993;
+}
+
+.company-dividend-event-modal.is-positive::before {
+  background:
+    linear-gradient(
+      90deg,
+      #40b982,
+      #d7ba5b
+    );
+}
+
+.company-dividend-event-modal.is-negative::before {
+  background:
+    linear-gradient(
+      90deg,
+      #c64f4f,
+      #8d3030
+    );
+}
+
+.company-dividend-event-modal__header {
+  display: flex;
+
+  align-items: center;
+  justify-content:
+    space-between;
+
+  gap: 20px;
+}
+
+.company-dividend-event-modal__header
+  > div {
+  display: flex;
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+.company-dividend-event-modal__header
+  span {
+  color: #789ba9;
+
+  font-size: 9px;
+  font-weight: 900;
+
+  letter-spacing:
+    0.15em;
+}
+
+.company-dividend-event-modal__header
+  strong {
+  font-size: 13px;
+  font-weight: 900;
+
+  letter-spacing:
+    0.08em;
+}
+
+.company-dividend-event-modal__header
+  small {
+  color: #7998a5;
+
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.company-dividend-event-modal__rule {
+  height: 1px;
+
+  margin:
+    15px 0 18px;
+
+  background:
+    rgba(
+      155,
+      197,
+      215,
+      0.16
+    );
+}
+
+.company-dividend-event-modal__company {
+  display: flex;
+
+  align-items: center;
+  justify-content:
+    space-between;
+
+  gap: 18px;
+
+  margin-bottom: 20px;
+}
+
+.company-dividend-event-modal__company
+  > div:first-child {
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+.company-dividend-event-modal__company
+  span {
+  color: #7d9da9;
+
+  font-size: 10px;
+  font-weight: 900;
+
+  letter-spacing:
+    0.08em;
+}
+
+.company-dividend-event-modal__company
+  strong {
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.company-dividend-event-modal__badge {
+  flex: 0 0 auto;
+
+  padding:
+    7px 11px;
+
+  font-size: 11px;
+  font-weight: 900;
+
+  border-radius:
+    999px;
+}
+
+.company-dividend-event-modal__badge.is-positive {
+  color: #a8edc9;
+
+  border:
+    1px solid
+    rgba(
+      70,
+      190,
+      132,
+      0.35
+    );
+
+  background:
+    rgba(
+      55,
+      155,
+      108,
+      0.14
+    );
+}
+
+.company-dividend-event-modal__badge.is-negative {
+  color: #ffb5b5;
+
+  border:
+    1px solid
+    rgba(
+      211,
+      79,
+      79,
+      0.36
+    );
+
+  background:
+    rgba(
+      176,
+      54,
+      54,
+      0.14
+    );
+}
+
+.company-dividend-event-modal__news {
+  padding:
+    20px 0 22px;
+}
+
+.company-dividend-event-modal__news
+  > span {
+  color: #d7ba5b;
+
+  font-size: 10px;
+  font-weight: 900;
+
+  letter-spacing:
+    0.12em;
+}
+
+.company-dividend-event-modal__news
+  h2 {
+  margin:
+    7px 0 9px;
+
+  font-size:
+    clamp(
+      21px,
+      4vw,
+      29px
+    );
+
+  line-height: 1.25;
+
+  letter-spacing:
+    -0.035em;
+
+  word-break:
+    keep-all;
+}
+
+.company-dividend-event-modal__news
+  p {
+  margin: 0;
+
+  color: #9db7c2;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  line-height: 1.65;
+
+  word-break:
+    keep-all;
+}
+
+.company-dividend-event-modal__effect {
+  display: grid;
+
+  gap: 4px;
+
+  padding:
+    17px 18px;
+
+  border:
+    1px solid
+    rgba(
+      141,
+      186,
+      205,
+      0.18
+    );
+
+  border-radius: 13px;
+
+  background:
+    rgba(
+      10,
+      34,
+      47,
+      0.72
+    );
+}
+
+.company-dividend-event-modal__effect
+  > span {
+  color: #718f9c;
+
+  font-size: 9px;
+  font-weight: 900;
+
+  letter-spacing:
+    0.11em;
+}
+
+.company-dividend-event-modal__effect
+  small {
+  color: #98b1bb;
+
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.company-dividend-event-modal__effect
+  strong {
+  margin-top: 3px;
+
+  color: #efd475;
+
+  font-size: 19px;
+  font-weight: 900;
+}
+
+.company-dividend-event-modal.is-negative
+  .company-dividend-event-modal__effect
+  strong {
+  color: #ff9d9d;
+}
+
+.company-dividend-event-modal__effect
+  p {
+  margin:
+    7px 0 0;
+
+  color: #718e9a;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  line-height: 1.55;
+}
+
+.company-dividend-event-modal__footer {
+  display: flex;
+
+  align-items: center;
+  justify-content:
+    space-between;
+
+  gap: 20px;
+
+  margin-top: 20px;
+}
+
+.company-dividend-event-modal__footer
+  > div {
+  display: flex;
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+.company-dividend-event-modal__footer
+  span {
+  color: #829da8;
+
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.company-dividend-event-modal__footer
+  small {
+  color: #58747f;
+
+  font-size: 8px;
+  font-weight: 900;
+
+  letter-spacing:
+    0.09em;
+}
+
+.company-dividend-event-modal__footer
+  button {
+  min-width: 120px;
+  min-height: 43px;
+
+  padding:
+    0 20px;
+
+  color: #f8fbfc;
+
+  font-weight: 900;
+
+  border:
+    1px solid
+    rgba(
+      215,
+      186,
+      91,
+      0.35
+    );
+
+  border-radius: 10px;
+
+  background: #725c20;
+
+  cursor: pointer;
+}
+
+.company-dividend-event-modal__footer
+  button:hover {
+  filter:
+    brightness(1.1);
+}
+
+@media (
+  max-width: 560px
+) {
+  .company-dividend-event-overlay {
+    padding: 16px;
+  }
+
+  .company-dividend-event-modal {
+    padding: 21px;
+  }
+
+  .company-dividend-event-modal__company {
+    align-items:
+      flex-start;
+
+    flex-direction:
+      column;
+  }
+
+  .company-dividend-event-modal__footer {
+    align-items:
+      stretch;
+
+    flex-direction:
+      column;
+  }
+
+  .company-dividend-event-modal__footer
+    button {
+    width: 100%;
+  }
+}

@@ -281,7 +281,9 @@ export type UlsanMarbleLotteryActionDecidedPayload =
       }
     );
 
-export type UlsanMarbleLottoDrawMode = "SCHEDULED";
+export type UlsanMarbleLottoDrawMode =
+  | "SCHEDULED"
+  | "DEV";
 
 export type UlsanMarbleLottoPrizeRank =
   | 1
@@ -682,7 +684,23 @@ export interface UlsanMarbleStockProtectionCreditPayload {
   amount: number;
 }
 
-export type UlsanMarbleStockMarketResolutionMode = "SCHEDULED";
+export interface UlsanMarbleStockDividendCreditPayload {
+  playerId: string;
+
+  companyId: string;
+  companyName: string;
+  ticker: string;
+
+  quantity: number;
+  pricePerShare: number;
+  dividendRate: number;
+
+  amount: number;
+}
+
+export type UlsanMarbleStockMarketResolutionMode =
+  | "SCHEDULED"
+  | "DEV";
 
 export interface UlsanMarbleStockMarketResolvedPayload {
   resolutionId: string;
@@ -704,6 +722,9 @@ export interface UlsanMarbleStockMarketResolvedPayload {
 
   protectionCredits:
     UlsanMarbleStockProtectionCreditPayload[];
+
+  dividendCredits:
+    UlsanMarbleStockDividendCreditPayload[];  
 
   nextStockLossIndustryByPlayer:
     Record<string, string>;
@@ -1428,6 +1449,362 @@ export type UlsanMarbleDisasterActionDecidedPayload =
         }
     );    
 
+export type UlsanMarbleFestivalId =
+  | "ULSAN_INDUSTRY"
+  | "NAM_WHALE"
+  | "JUNG_MADUHEE"
+  | "BUK_SOEBURI"
+  | "DONG_SHIPBUILDING"
+  | "ULJU_ONGGI";
+
+export type UlsanMarbleFestivalResolutionMode =
+  | "SCHEDULED"
+  | "DEV";
+
+export interface UlsanMarbleFestivalDeckPayload {
+  drawPile: UlsanMarbleFestivalId[];
+  cycle: number;
+}
+
+type UlsanMarbleFestivalBasePayload = {
+  controllerPlayerId: string;
+
+  turnNumber: number;
+  turnSequence: number;
+};
+
+export type UlsanMarbleFestivalTriggerResolvedPayload =
+  UlsanMarbleFestivalBasePayload &
+    (
+      | {
+          resolutionId: string;
+
+          mode: "SCHEDULED";
+          outcome: "SKIP";
+
+          additionallyDisabledPlayerIds:
+            string[];
+
+          nextDeck:
+            UlsanMarbleFestivalDeckPayload;
+        }
+      | {
+          resolutionId: string;
+
+          mode:
+            UlsanMarbleFestivalResolutionMode;
+
+          outcome: "START";
+
+          festivalId:
+            UlsanMarbleFestivalId;
+
+          additionallyDisabledPlayerIds:
+            string[];
+
+          nextDeck:
+            UlsanMarbleFestivalDeckPayload;
+        }
+    );
+
+export interface UlsanMarbleFestivalAnnouncementConfirmedPayload
+  extends UlsanMarbleFestivalBasePayload {
+  resolutionId: string;
+
+  festivalId:
+    UlsanMarbleFestivalId;
+}
+
+export type UlsanMarbleFestivalDiceFace =
+  | 1
+  | 2
+  | 3
+  | 4
+  | 5
+  | 6;
+
+export type UlsanMarbleTouristLandingKind =
+  | "OWNED_PROPERTY"
+  | "UNOWNED_PROPERTY"
+  | "SPECIAL_TILE"
+  | "FESTIVAL_END";
+
+export interface UlsanMarbleTouristNpcPayload {
+  position: number;
+  travelledSteps: number;
+
+  moving: boolean;
+
+  lastDice:
+    | [
+        UlsanMarbleFestivalDiceFace,
+        UlsanMarbleFestivalDiceFace,
+      ]
+    | null;
+}
+
+export interface UlsanMarbleTouristTurnResolvedPayload
+  extends UlsanMarbleFestivalBasePayload {
+  touristTurnId: string;
+
+  festivalId:
+    UlsanMarbleFestivalId;
+
+  diceValues: [
+    UlsanMarbleFestivalDiceFace,
+    UlsanMarbleFestivalDiceFace,
+  ];
+
+  fromPosition: number;
+  toPosition: number;
+
+  landedTileName: string;
+
+  landingKind:
+    UlsanMarbleTouristLandingKind;
+
+  propertyName: string | null;
+
+  ownerPlayerId: string | null;
+  ownerName: string | null;
+
+  bankPayout: number;
+  finalToll: number;
+
+  completedLap: boolean;
+
+  additionallyDisabledPlayerIds:
+    string[];
+
+  nextTouristNpc:
+    UlsanMarbleTouristNpcPayload | null;
+}
+
+export interface UlsanMarbleTouristTurnConfirmedPayload
+  extends UlsanMarbleFestivalBasePayload {
+  touristTurnId: string;
+
+  festivalId:
+    UlsanMarbleFestivalId;
+}
+
+export interface UlsanMarbleFestivalDevEndedPayload
+  extends UlsanMarbleFestivalBasePayload {
+  actionId: string;
+
+  festivalId:
+    UlsanMarbleFestivalId;
+}
+
+export type UlsanMarbleMayorCandidateId =
+  | "candidate-kang-minjun"
+  | "candidate-yoon-seoyeon"
+  | "candidate-park-jihun"
+  | "candidate-choi-hyejin"
+  | "candidate-lee-dohyun"
+  | "candidate-han-yuna"
+  | "candidate-kim-taeyang"
+  | "candidate-song-jiwoo"
+  | "candidate-oh-harin"
+  | "candidate-jung-woojin"
+  | "candidate-moon-seojun"
+  | "candidate-seo-haneul";
+
+export type UlsanMarbleMayorElectionMode =
+  | "SCHEDULED"
+  | "DEV";
+
+type UlsanMarbleMayorElectionBasePayload = {
+  electionId: string;
+
+  turnNumber: number;
+  turnSequence: number;
+};
+
+export interface UlsanMarbleMayorElectionStartedPayload
+  extends UlsanMarbleMayorElectionBasePayload {
+  controllerPlayerId: string;
+
+  mode:
+    UlsanMarbleMayorElectionMode;
+
+  candidateIds: [
+    UlsanMarbleMayorCandidateId,
+    UlsanMarbleMayorCandidateId,
+    UlsanMarbleMayorCandidateId,
+  ];
+
+  eligibleVoterIds:
+    string[];
+
+  additionallyDisabledPlayerIds:
+    string[];
+}
+
+export interface UlsanMarbleMayorElectionVoteCastPayload
+  extends UlsanMarbleMayorElectionBasePayload {
+  voterId: string;
+
+  candidateId:
+    UlsanMarbleMayorCandidateId;
+}
+
+export interface UlsanMarbleMayorElectionResultResolvedPayload
+  extends UlsanMarbleMayorElectionBasePayload {
+  controllerPlayerId: string;
+
+  winnerCandidateId:
+    UlsanMarbleMayorCandidateId;
+
+  voteCounts:
+    Record<string, number>;
+
+  tiedCandidateIds:
+    UlsanMarbleMayorCandidateId[];
+
+  wasTieBreak: boolean;
+}
+
+export interface UlsanMarbleMayorElectionResultConfirmedPayload
+  extends UlsanMarbleMayorElectionBasePayload {
+  controllerPlayerId: string;
+
+  winnerCandidateId:
+    UlsanMarbleMayorCandidateId;
+}
+
+export type UlsanMarbleMacroRegime =
+  | "BOOM"
+  | "NEUTRAL"
+  | "RECESSION";
+
+export type UlsanMarbleInterestRateLevel =
+  | "LOW"
+  | "BASE"
+  | "HIGH";
+
+export interface UlsanMarbleMacroEconomyReportPayload {
+  reportId: string;
+
+  regime:
+    UlsanMarbleMacroRegime;
+
+  observedFromTurn: number;
+  publishedTurn: number;
+
+  headline: string;
+  summary: string;
+}
+
+export interface UlsanMarbleMacroEconomyStatePayload {
+  regime:
+    UlsanMarbleMacroRegime;
+
+  regimeStartedTurn: number;
+  regimeEndsAfterTurn: number;
+
+  interestRateLevel:
+    UlsanMarbleInterestRateLevel;
+
+  lastInterestRateChangeTurn:
+    number | null;
+
+  pendingReports:
+    UlsanMarbleMacroEconomyReportPayload[];
+
+  reportHistory:
+    UlsanMarbleMacroEconomyReportPayload[];
+
+  lastResolvedTurn: number;
+}
+
+export interface UlsanMarbleMacroEconomyResolvedPayload {
+  resolutionId: string;
+
+  controllerPlayerId: string;
+
+  /*
+   * 완료된 실제 글로벌 턴 N.
+   * 서버 game.turnNumber는 이 시점에 N+1일 수 있다.
+   */
+  turnNumber: number;
+
+  turnSequence: number;
+
+  nextState:
+    UlsanMarbleMacroEconomyStatePayload;
+
+  regimeChanged: boolean;
+
+  previousRegime:
+    UlsanMarbleMacroRegime;
+
+  currentRegime:
+    UlsanMarbleMacroRegime;
+
+  interestRateChanged: boolean;
+
+  previousInterestRateLevel:
+    UlsanMarbleInterestRateLevel;
+
+  currentInterestRateLevel:
+    UlsanMarbleInterestRateLevel;
+
+  publishedReports:
+    UlsanMarbleMacroEconomyReportPayload[];
+
+  stockMarketBias: number;
+
+  additionallyDisabledPlayerIds:
+    string[];
+}
+
+export type UlsanMarbleCompanyDividendEventType =
+  | "DIVIDEND_UP"
+  | "DIVIDEND_DOWN"
+  | "SPECIAL_DIVIDEND"
+  | "DIVIDEND_SUSPENDED";
+
+export interface UlsanMarbleCompanyDividendEventPayload {
+  eventId: string;
+
+  companyId: string;
+  companyName: string;
+  ticker: string;
+
+  turnNumber: number;
+
+  type:
+    UlsanMarbleCompanyDividendEventType;
+
+  headline: string;
+  summary: string;
+
+  persistentRateDelta: number;
+  specialDividendRate: number;
+}
+
+export interface UlsanMarbleCompanyDividendEventResolvedPayload {
+  resolutionId: string;
+
+  controllerPlayerId: string;
+
+  turnNumber: number;
+  turnSequence: number;
+
+  event:
+    UlsanMarbleCompanyDividendEventPayload;
+
+  /*
+   * 경기 국면 → 회사 이벤트 → 주식시장
+   * 사이에서 그대로 전달한다.
+   */
+  macroStockMarketBias: number;
+
+  additionallyDisabledPlayerIds:
+    string[];
+}
+
 export type UlsanMarbleGameEventRequest =
   | {kind: "TOLL_PAID"; payload:UlsanMarbleTollPaidPayload;}
   | {kind: "GOLDEN_KEY_DRAWN"; payload: UlsanMarbleGoldenKeyDrawnPayload;}
@@ -1448,6 +1825,8 @@ export type UlsanMarbleGameEventRequest =
   | {kind: "PROPERTY_MARKET_SETTLEMENT_CONFIRMED"; payload: UlsanMarblePropertyMarketSettlementConfirmedPayload;}  
   | {kind: "STOCK_MARKET_RESOLVED"; payload: UlsanMarbleStockMarketResolvedPayload;}
   | {kind: "STOCK_MARKET_SETTLEMENT_CONFIRMED"; payload: UlsanMarbleStockMarketSettlementConfirmedPayload;}  
+  | {kind: "COMPANY_DIVIDEND_EVENT_RESOLVED"; payload: UlsanMarbleCompanyDividendEventResolvedPayload;}
+  | {kind: "MACRO_ECONOMY_RESOLVED"; payload: UlsanMarbleMacroEconomyResolvedPayload;}
   | {kind: "JAIL_ENTRY_CONFIRMED"; payload: UlsanMarbleJailEntryConfirmedPayload;}
   | {kind: "JAIL_TURN_ACTION_DECIDED"; payload: UlsanMarbleJailTurnActionDecidedPayload;}
   | {kind: "JAIL_FINE_ACTION_DECIDED"; payload: UlsanMarbleJailFineActionDecidedPayload;}  
@@ -1460,6 +1839,15 @@ export type UlsanMarbleGameEventRequest =
   | {kind: "ECONOMIC_NEWS_CONFIRMED"; payload: UlsanMarbleEconomicNewsConfirmedPayload; }  
   | {kind: "DISASTER_RESOLVED"; payload: UlsanMarbleDisasterResolvedPayload;}  
   | {kind: "DISASTER_ACTION_DECIDED"; payload: UlsanMarbleDisasterActionDecidedPayload;}  
+  | {kind: "FESTIVAL_TRIGGER_RESOLVED"; payload: UlsanMarbleFestivalTriggerResolvedPayload;}
+  | {kind: "FESTIVAL_ANNOUNCEMENT_CONFIRMED"; payload: UlsanMarbleFestivalAnnouncementConfirmedPayload;}
+  | {kind: "TOURIST_TURN_RESOLVED"; payload: UlsanMarbleTouristTurnResolvedPayload;}
+  | {kind: "TOURIST_TURN_CONFIRMED"; payload: UlsanMarbleTouristTurnConfirmedPayload;}
+  | {kind: "FESTIVAL_DEV_ENDED"; payload: UlsanMarbleFestivalDevEndedPayload;}
+  | {kind: "MAYOR_ELECTION_STARTED"; payload: UlsanMarbleMayorElectionStartedPayload;}
+  | {kind: "MAYOR_ELECTION_VOTE_CAST"; payload: UlsanMarbleMayorElectionVoteCastPayload;}
+  | {kind: "MAYOR_ELECTION_RESULT_RESOLVED"; payload: UlsanMarbleMayorElectionResultResolvedPayload;}
+  | {kind: "MAYOR_ELECTION_RESULT_CONFIRMED"; payload: UlsanMarbleMayorElectionResultConfirmedPayload;};
 
 export type UlsanMarbleGameEvent =
   UlsanMarbleGameEventRequest & {
@@ -1559,6 +1947,15 @@ export type UlsanMarbleCommand =
       expectedTurnSequence: number;
       event:
         UlsanMarbleGameEventRequest;
+    }
+  | {
+      type: "ACK_GAME_EVENT";
+      eventId: number;
+      turnSequence: number;
+    }
+  | {
+      type: "TURN_READY";
+      turnSequence: number;
     }
   | {
       type: "DEV_END_TURN";

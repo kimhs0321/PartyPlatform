@@ -17,6 +17,8 @@ import "./MayorElectionModal.css";
 interface MayorElectionModalProps {
   election: PendingMayorElection | null;
   players: PlayerTokenData[];
+  canVote: boolean;
+  canConfirmResult: boolean;
   onVote: (candidateId: string) => void;
   onConfirmResult: () => void;
 }
@@ -53,6 +55,8 @@ function CandidatePortrait({
 export function MayorElectionModal({
   election,
   players,
+  canVote,
+  canConfirmResult,
   onVote,
   onConfirmResult,
 }: MayorElectionModalProps) {
@@ -93,7 +97,9 @@ export function MayorElectionModal({
   const isStamping = stampedCandidateId !== null;
 
   const castVote = (candidateId: string) => {
-    if (!currentVoter || isStamping || election.result) return;
+    if (!canVote || !currentVoter || isStamping || election.result) {
+      return;
+    }
 
     setStampedCandidateId(candidateId);
 
@@ -194,7 +200,11 @@ export function MayorElectionModal({
             )}
 
             <footer>
-              <button type="button" onClick={onConfirmResult}>
+              <button
+                type="button"
+                disabled={!canConfirmResult}
+                onClick={onConfirmResult}
+              >
                 당선 결과 확인
               </button>
             </footer>
@@ -271,7 +281,7 @@ export function MayorElectionModal({
                     <button
                       type="button"
                       className="mayor-ballot-paper__vote"
-                      disabled={!currentVoter || isStamping}
+                      disabled={!canVote || !currentVoter || isStamping}
                       onClick={() => castVote(candidate.id)}
                     >
                       <span>투표란</span>

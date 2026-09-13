@@ -4,16 +4,22 @@ import "./FestivalAnnouncementModal.css";
 import { getFestivalDefinition } from "../../game/festival/festivalData";
 import type { PendingFestivalAnnouncement } from "../../game/festival/festivalTypes";
 
-interface FestivalAnnouncementModalProps {
-  announcement: PendingFestivalAnnouncement | null;
-  onConfirm: () => void;
-}
-
 const CONFETTI_COUNT = 18;
 const INTRO_DURATION_MS = 2200;
 
+
+interface FestivalAnnouncementModalProps {
+  announcement:
+    PendingFestivalAnnouncement | null;
+
+  canConfirm: boolean;
+
+  onConfirm: () => void;
+}
+
 export function FestivalAnnouncementModal({
   announcement,
+  canConfirm,
   onConfirm,
 }: FestivalAnnouncementModalProps) {
   const [ready, setReady] = useState(false);
@@ -114,10 +120,17 @@ export function FestivalAnnouncementModal({
 
         <button
           type="button"
-          disabled={!ready}
+          disabled={
+            !ready ||
+            !canConfirm
+          }
           onClick={onConfirm}
         >
-          {ready ? "축제 시작" : "축제 준비 중…"}
+          {!ready
+            ? "축제 준비 중…"
+            : canConfirm
+              ? "축제 시작"
+              : "현재 플레이어 확인 대기…"}
         </button>
       </article>
     </section>

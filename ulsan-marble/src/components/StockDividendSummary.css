@@ -1,0 +1,313 @@
+.stock-dividend-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 205;
+
+  display: grid;
+  place-items: center;
+
+  padding: 24px;
+
+  background:
+    rgba(1, 9, 15, 0.68);
+
+  backdrop-filter:
+    blur(7px);
+
+  pointer-events: auto;
+}
+
+.stock-dividend-modal {
+  width: min(
+    680px,
+    92vw
+  );
+
+  max-height: 86vh;
+  overflow-y: auto;
+
+  padding: 24px;
+
+  color: #eaf7fb;
+
+  border:
+    1px solid
+    rgba(
+      215,
+      186,
+      91,
+      0.38
+    );
+
+  border-radius: 20px;
+
+  background:
+    linear-gradient(
+      160deg,
+      #102d39,
+      #071b27
+    );
+
+  box-shadow:
+    0 28px 80px
+    rgba(
+      0,
+      0,
+      0,
+      0.6
+    );
+}
+
+.stock-dividend-modal__header
+  > span {
+  color: #e5c96d;
+
+  font-size: 11px;
+  font-weight: 900;
+
+  letter-spacing:
+    0.13em;
+}
+
+.stock-dividend-modal__header h2 {
+  margin:
+    5px 0;
+
+  font-size: 25px;
+}
+
+.stock-dividend-modal__header p {
+  margin: 0;
+
+  color: #94b3c1;
+
+  font-size: 12px;
+}
+
+.stock-dividend-modal__total {
+  display: flex;
+
+  align-items: center;
+  justify-content:
+    space-between;
+
+  gap: 20px;
+
+  margin:
+    22px 0 16px;
+
+  padding:
+    18px 20px;
+
+  border:
+    1px solid
+    rgba(
+      229,
+      201,
+      109,
+      0.25
+    );
+
+  border-radius: 14px;
+
+  background:
+    rgba(
+      229,
+      201,
+      109,
+      0.07
+    );
+}
+
+.stock-dividend-modal__total
+  span {
+  color: #aac1cb;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.stock-dividend-modal__total
+  strong {
+  color: #f1d87d;
+
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.stock-dividend-modal__list {
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+.stock-dividend-modal__item {
+  display: grid;
+
+  grid-template-columns:
+    minmax(120px, 1fr)
+    minmax(220px, 2fr)
+    auto;
+
+  align-items: center;
+
+  gap: 14px;
+
+  padding:
+    12px 14px;
+
+  border:
+    1px solid
+    rgba(
+      132,
+      193,
+      219,
+      0.15
+    );
+
+  border-radius: 11px;
+
+  background:
+    rgba(
+      10,
+      35,
+      50,
+      0.65
+    );
+}
+
+.stock-dividend-modal__company {
+  display: flex;
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+.stock-dividend-modal__company
+  strong {
+  font-size: 13px;
+}
+
+.stock-dividend-modal__company
+  span {
+  color: #789cab;
+
+  font-size: 9px;
+}
+
+.stock-dividend-modal__detail {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 5px 12px;
+
+  color: #91adba;
+
+  font-size: 10px;
+}
+
+.stock-dividend-modal__amount {
+  color: #f1d87d;
+
+  font-size: 14px;
+  font-weight: 900;
+
+  white-space: nowrap;
+}
+
+.stock-dividend-modal__empty {
+  padding:
+    34px 20px;
+
+  text-align: center;
+
+  border:
+    1px dashed
+    rgba(
+      132,
+      193,
+      219,
+      0.2
+    );
+
+  border-radius: 12px;
+
+  background:
+    rgba(
+      10,
+      35,
+      50,
+      0.45
+    );
+}
+
+.stock-dividend-modal__empty
+  strong {
+  display: block;
+
+  font-size: 18px;
+}
+
+.stock-dividend-modal__empty p {
+  margin:
+    7px 0 0;
+
+  color: #829fab;
+
+  font-size: 11px;
+}
+
+.stock-dividend-modal__footer {
+  margin-top: 18px;
+}
+
+.stock-dividend-modal__footer p {
+  margin:
+    0 0 10px;
+
+  color: #7896a3;
+
+  font-size: 10px;
+
+  text-align: center;
+}
+
+.stock-dividend-modal__footer
+  button {
+  width: 100%;
+  min-height: 44px;
+
+  color: #fff;
+
+  font-weight: 900;
+
+  border:
+    1px solid
+    rgba(
+      229,
+      201,
+      109,
+      0.45
+    );
+
+  border-radius: 11px;
+
+  background: #77601f;
+
+  cursor: pointer;
+}
+
+@media (
+  max-width: 700px
+) {
+  .stock-dividend-modal__item {
+    grid-template-columns:
+      1fr auto;
+  }
+
+  .stock-dividend-modal__detail {
+    grid-column:
+      1 / -1;
+  }
+}

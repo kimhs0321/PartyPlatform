@@ -10,12 +10,22 @@ function validatePublisher(
   playerId: string,
   turnSequence: number,
 ): void {
-  if (game.activePlayerId !== playerId) {
-    throw new Error("현재 플레이어만 로또 추첨을 진행할 수 있습니다.");
+  if (
+    game.controllerPlayerId !==
+    playerId
+  ) {
+    throw new Error(
+      "게임 진행 담당자만 로또 추첨을 진행할 수 있습니다.",
+    );
   }
 
-  if (game.turnSequence !== turnSequence) {
-    throw new Error("로또 추첨의 턴 순서가 일치하지 않습니다.");
+  if (
+    game.turnSequence !==
+    turnSequence
+  ) {
+    throw new Error(
+      "로또 추첨의 턴 순서가 일치하지 않습니다.",
+    );
   }
 }
 

@@ -237,12 +237,12 @@ export function validateTaxSettlementStartedEvent(
   payload:
     UlsanMarbleTaxSettlementStartedPayload,
 ): void {
-  if (
+    if (
     playerId !==
-    game.activePlayerId
+    game.controllerPlayerId
   ) {
     throw new Error(
-      "현재 플레이어만 세금 정산을 시작할 수 있습니다.",
+      "게임 진행 담당자만 세금 정산을 시작할 수 있습니다.",
     );
   }
 

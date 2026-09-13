@@ -9,7 +9,7 @@ import type {
   MayorPolicyId,
 } from "./electionTypes";
 
-export const MAYOR_ELECTION_INTERVAL_TURNS = 100;
+export const MAYOR_ELECTION_INTERVAL_TURNS = 10;
 export const MAYOR_CANDIDATE_COUNT = 3;
 
 export function isScheduledMayorElectionTurn(turnNumber: number): boolean {

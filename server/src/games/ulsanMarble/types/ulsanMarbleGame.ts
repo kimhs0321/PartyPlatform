@@ -80,6 +80,12 @@ export type ClientUlsanMarbleGameState = {
   activePlayerIndex: number;
   activePlayerId: string;
 
+  /*
+   * 게임 전체 authoritative 진행 담당자.
+   * 플레이 순서와 무관하게 게임 종료까지 고정한다.
+   */
+  controllerPlayerId: string;
+
   turnNumber: number;
   turnSequence: number;
 

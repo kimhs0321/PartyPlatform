@@ -1,30 +1,21 @@
 import { useCallback, useRef } from "react";
 import type { Dispatch, MutableRefObject, SetStateAction } from "react";
-
 import type {
   UlsanMarbleEconomicNewsAppliedPayload,
   UlsanMarbleEconomicNewsConfirmedPayload,
   UlsanMarbleEconomicNewsDrawDecidedPayload,
   UlsanMarbleGameEventRequest,
 } from "../../../../shared/ulsanMarbleProtocol";
-
 import type { PropertyData } from "../../types";
 import type { PropertyOwnershipMap } from "../property/propertyTypes";
 import type { DevelopmentRestrictionMap } from "../property/developmentRestrictionTypes";
-
 import {
   applyDevelopmentRestriction,
   createDevelopmentRestriction,
 } from "../property/developmentRestrictionRules";
-
+import type {NetworkGameEventApplyResult,} from "../network/useNetworkGameEvents";
 import { isMaxDevelopmentStage } from "../property/propertyDevelopment";
-
-import type {
-  EconomicNewsDefinition,
-  EconomicNewsState,
-  PendingEconomicNewsResolution,
-} from "./economicNewsTypes";
-
+import type {EconomicNewsDefinition,EconomicNewsState,PendingEconomicNewsResolution,} from "./economicNewsTypes";
 import {
   applyResolvedEconomicNewsActivation,
   drawEconomicNews,
@@ -42,6 +33,7 @@ interface Options {
   properties: PropertyData[];
   localPlayerId: string;
   activePlayerId: string;
+  controllerPlayerId?: string;
   turnNumber: number;
   turnSequence: number;
 
@@ -49,6 +41,7 @@ interface Options {
   commitDevelopmentRestrictions: (state: DevelopmentRestrictionMap) => void;
 
   completeTileResolution: () => void;
+  isTileResolutionReady: boolean;
   startEconomicNewsPhase: () => void;
   cancelCurrentAction: () => void;
   startDisasterResolution: (mode: "SCHEDULED" | "DEV", disabledIds?: string[]) => void;
@@ -71,13 +64,18 @@ export function useEconomicNewsResolution({
   propertyOwnershipsRef,
   developmentRestrictionsRef,
   properties,
+
   localPlayerId,
   activePlayerId,
+  controllerPlayerId,
+
   turnNumber,
   turnSequence,
+
   commitEconomicNewsState,
   commitDevelopmentRestrictions,
   completeTileResolution,
+  isTileResolutionReady,
   startEconomicNewsPhase,
   cancelCurrentAction,
   startDisasterResolution,
@@ -86,6 +84,7 @@ export function useEconomicNewsResolution({
   const publishedDrawIdRef = useRef<string | null>(null);
   const publishedApplyIdRef = useRef<string | null>(null);
   const publishedConfirmIdRef = useRef<string | null>(null);
+  const confirmedResolutionIdsRef = useRef<Set<string>>(new Set(),);
 
   const articleMap = new Map(economicNewsPool.map((article) => [article.id, article]));
 
@@ -196,6 +195,8 @@ export function useEconomicNewsResolution({
       });
     },
     [
+      activePlayerId,
+      controllerPlayerId,
       economicNewsPool,
       economicNewsStateRef,
       localPlayerId,
@@ -213,13 +214,23 @@ export function useEconomicNewsResolution({
         additionallyDisabledPlayerIds:
           string[] = [],
       ) => {
-        if (
-          onNetworkGameEventRequest &&
-          activePlayerId !== localPlayerId
-        ) {
+        const resolutionControllerPlayerId =
+          mode === "SCHEDULED" &&
+          onNetworkGameEventRequest
+            ? controllerPlayerId
+            : activePlayerId;
+
+        if (!resolutionControllerPlayerId) {
           return;
         }
 
+        if (
+          onNetworkGameEventRequest &&
+          resolutionControllerPlayerId !==
+            localPlayerId
+        ) {
+          return;
+        }
         const source =
           mode === "DEV"
             ? "DEV"
@@ -229,7 +240,7 @@ export function useEconomicNewsResolution({
           createResolutionId(
             turnSequence,
             source,
-            activePlayerId,
+            resolutionControllerPlayerId,
           );
 
         const disabledIds = [
@@ -249,7 +260,7 @@ export function useEconomicNewsResolution({
           publishDraw({
             resolutionId,
             controllerPlayerId:
-              activePlayerId,
+              resolutionControllerPlayerId,
             outcome: "SKIP",
             source: "RANDOM",
             turnNumber,
@@ -278,7 +289,7 @@ export function useEconomicNewsResolution({
         publishDraw({
           resolutionId,
           controllerPlayerId:
-            activePlayerId,
+            resolutionControllerPlayerId,
           outcome: "DRAWN",
           source,
 
@@ -463,40 +474,173 @@ export function useEconomicNewsResolution({
     propertyOwnershipsRef,
   ]);
 
-  const applyEconomicNewsConfirmed = useCallback(
-    (payload: UlsanMarbleEconomicNewsConfirmedPayload): boolean => {
-      const pending = pendingEconomicNews;
+  const applyEconomicNewsConfirmed =
+    useCallback(
+      (
+        payload:
+          UlsanMarbleEconomicNewsConfirmedPayload,
+      ): NetworkGameEventApplyResult => {
+        /*
+        * 로컬 턴 lifecycle이 아직
+        * 해당 서버 턴에 도달하지 않았다.
+        */
+        if (
+          payload.turnSequence !==
+          turnSequence
+        ) {
+          console.log(
+            "[ECONOMIC NEWS CONFIRM WAIT TURN]",
+            "payloadSeq =",
+            payload.turnSequence,
+            "localSeq =",
+            turnSequence,
+          );
 
-      if (
-        !pending ||
-        pending.stage !== "APPLIED" ||
-        pending.resolutionId !== payload.resolutionId ||
-        pending.turnSequence !== payload.turnSequence
-      ) {
-        return false;
-      }
+          return "WAIT";
+        }
 
-      setPendingEconomicNews(null);
-      publishedConfirmIdRef.current = null;
+        /*
+        * 동일 CONFIRMED 이벤트가 다시 들어온 경우.
+        */
+        if (
+          confirmedResolutionIdsRef.current.has(
+            payload.resolutionId,
+          )
+        ) {
+          if (
+            publishedConfirmIdRef.current ===
+            payload.resolutionId
+          ) {
+            publishedConfirmIdRef.current =
+              null;
+          }
 
-      if (pending.source === "NEWSPAPER") {
-        completeTileResolution();
-      } else if (pending.source === "DEV") {
-        cancelCurrentAction();
-      } else {
-        startDisasterResolution("SCHEDULED", pending.additionallyDisabledPlayerIds);
-      }
+          return "ALREADY_APPLIED";
+        }
 
-      return true;
-    },
-    [
-      cancelCurrentAction,
-      completeTileResolution,
-      pendingEconomicNews,
-      setPendingEconomicNews,
-      startDisasterResolution,
-    ],
-  );
+        const pending =
+          pendingEconomicNews;
+
+        /*
+        * DRAW/APPLIED 상태가 아직
+        * 로컬에 만들어지지 않았다.
+        */
+        if (!pending) {
+          console.log(
+            "[ECONOMIC NEWS CONFIRM WAIT PENDING]",
+            "resolutionId =",
+            payload.resolutionId,
+          );
+
+          return "WAIT";
+        }
+
+        /*
+        * 동일 resolution의 APPLIED 단계까지
+        * 아직 진행되지 않았다.
+        */
+        if (
+          pending.resolutionId !==
+            payload.resolutionId ||
+          pending.turnSequence !==
+            payload.turnSequence ||
+          pending.turnNumber !==
+            payload.turnNumber ||
+          pending.source !==
+            payload.source ||
+          pending.controllerPlayerId !==
+            payload.controllerPlayerId
+        ) {
+          console.warn(
+            "[ECONOMIC NEWS CONFIRM INVALID]",
+            {
+              pendingResolutionId:
+                pending.resolutionId,
+              payloadResolutionId:
+                payload.resolutionId,
+              pendingTurnSequence:
+                pending.turnSequence,
+              payloadTurnSequence:
+                payload.turnSequence,
+              pendingSource:
+                pending.source,
+              payloadSource:
+                payload.source,
+            },
+          );
+
+          return "INVALID";
+        }
+
+        if (
+          pending.stage !== "APPLIED"
+        ) {
+          console.log(
+            "[ECONOMIC NEWS CONFIRM WAIT STAGE]",
+            "stage =",
+            pending.stage,
+            "resolutionId =",
+            payload.resolutionId,
+          );
+
+          return "WAIT";
+        }
+
+        /*
+        * 신문 칸 뉴스는 tile resolution의 일부다.
+        * 이동 애니메이션이 아직 끝나지 않았다면
+        * completeTileResolution을 호출하면 안 된다.
+        */
+        if (
+          pending.source === "NEWSPAPER" &&
+          !isTileResolutionReady
+        ) {
+          console.log(
+            "[ECONOMIC NEWS CONFIRM WAIT TILE]",
+            "resolutionId =",
+            payload.resolutionId,
+          );
+
+          return "WAIT";
+        }
+
+        if (
+          pending.source === "NEWSPAPER"
+        ) {
+          completeTileResolution();
+        } else if (
+          pending.source === "DEV"
+        ) {
+          cancelCurrentAction();
+        } else {
+          startDisasterResolution(
+            "SCHEDULED",
+            pending
+              .additionallyDisabledPlayerIds,
+          );
+        }
+
+        confirmedResolutionIdsRef.current.add(
+          payload.resolutionId,
+        );
+
+        setPendingEconomicNews(null);
+
+        publishedConfirmIdRef.current =
+          null;
+
+        return "APPLIED";
+      },
+      [
+        cancelCurrentAction,
+        completeTileResolution,
+        isTileResolutionReady,
+        pendingEconomicNews,
+        setPendingEconomicNews,
+        startDisasterResolution,
+        turnSequence,
+      ],
+    );
 
   const closePendingEconomicNews = useCallback(() => {
     const pending = pendingEconomicNews;
@@ -521,7 +665,18 @@ export function useEconomicNewsResolution({
       return;
     }
 
-    if (!applyEconomicNewsConfirmed(payload)) publishedConfirmIdRef.current = null;
+    const result =
+      applyEconomicNewsConfirmed(
+        payload,
+      );
+
+    if (
+      result !== "APPLIED" &&
+      result !== "ALREADY_APPLIED"
+    ) {
+      publishedConfirmIdRef.current =
+        null;
+    }
   }, [
     applyEconomicNewsConfirmed,
     localPlayerId,
@@ -538,13 +693,13 @@ export function useEconomicNewsResolution({
     publishedDrawIdRef.current = null;
     publishedApplyIdRef.current = null;
     publishedConfirmIdRef.current = null;
+    confirmedResolutionIdsRef.current.clear();
     setPendingEconomicNews(null);
   }, [setPendingEconomicNews]);
 
   return {
     startNewspaperEconomicNews,
     startRandomEconomicNewsResolution,
-
     applyPendingEconomicNews,
     closePendingEconomicNews,
 

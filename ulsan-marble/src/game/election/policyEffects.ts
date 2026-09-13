@@ -12,8 +12,33 @@ export function getActiveMayorPolicy(
   return mayorTerm.policy;
 }
 
-export function getPolicySalary(baseSalary: number, policy: MayorPolicy | null): number {
-  return Math.max(0, Math.round(baseSalary + (policy?.effects.salaryBonus ?? 0)));
+export const SALARY_INCREASE_RATE_PER_COMPLETED_LAP =
+  0.1;
+
+export function getPolicySalary(
+  baseSalary: number,
+  policy: MayorPolicy | null,
+  completedLaps = 0,
+): number {
+  const safeCompletedLaps = Math.max(
+    0,
+    Math.trunc(completedLaps),
+  );
+
+  const lapAdjustedSalary =
+    baseSalary *
+    Math.pow(
+      1 + SALARY_INCREASE_RATE_PER_COMPLETED_LAP,
+      safeCompletedLaps,
+    );
+
+  return Math.max(
+    0,
+    Math.round(
+      lapAdjustedSalary +
+        (policy?.effects.salaryBonus ?? 0),
+    ),
+  );
 }
 
 export function getPolicyConstructionCost(

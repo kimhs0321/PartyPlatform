@@ -199,3 +199,9 @@
     grid-template-columns: 1fr;
   }
 }
+/* 전역 텍스트 색상에 의해 검게 보이는 요소 보정 */
+.market-change-modal h2,
+.market-change-modal strong,
+.market-change-modal b {
+  color: #edf9ff;
+}

@@ -30,18 +30,67 @@ export function startGame(io: Server, socket: Socket) {
       return;
     }
 
+  if (
+    startedRoom.game ===
+    "울산마블"
+  ) {
+    const shuffledPlayerIds = [
+      ...startedRoom.playerIds,
+    ];
+
+    for (
+      let index =
+        shuffledPlayerIds.length - 1;
+      index > 0;
+      index -= 1
+    ) {
+      const randomIndex =
+        Math.floor(
+          Math.random() *
+            (index + 1),
+        );
+
+      [
+        shuffledPlayerIds[index],
+        shuffledPlayerIds[randomIndex],
+      ] = [
+        shuffledPlayerIds[randomIndex],
+        shuffledPlayerIds[index],
+      ];
+    }
+
+    startedRoom.playerIds =
+      shuffledPlayerIds;
+
+    console.log(
+      "[ULSAN MARBLE TURN ORDER]",
+      {
+        hostId: startedRoom.hostId,
+        playerIds:
+          startedRoom.playerIds,
+      },
+    );
+  }
+
   gameManager.startGame(startedRoom);
 
   await gameModule.startGame(io, startedRoom);
 
   if (startedRoom.game === "울산마블") {
     ulsanMarbleGameManager.createGame(
-      startedRoom.id,
-      startedRoom.playerIds,
-      startedRoom.gameSettings
-        .ulsanMarble
-        .roundLimit,
-    );
+    startedRoom.id,
+    startedRoom.playerIds,
+
+    /*
+    * 방장을 게임 전체 진행 controller로 고정한다.
+    * 플레이 순서가 어떻게 배정되든 이 값은 변하지 않는다.
+    */
+    startedRoom.hostId,
+
+    startedRoom.gameSettings
+      .ulsanMarble
+      .roundLimit,
+  );
 
     emitUlsanMarbleState(
       io,

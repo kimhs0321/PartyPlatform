@@ -182,7 +182,7 @@ export function PortSettlementModal({
           >
             {canConfirm
               ? "정산 확인"
-              : "현재 플레이어의 확인을 기다리는 중"}
+              : "정산 확인 대기 중"}
           </button>
       </section>
     </div>

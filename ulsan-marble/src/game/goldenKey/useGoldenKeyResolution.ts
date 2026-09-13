@@ -749,8 +749,9 @@ export function useGoldenKeyResolution({
             getPolicySalary(
               baseSalary,
               activeMayorPolicy,
+              player.completedLaps ?? 0,
             );
-
+            
           if (salaryAmount > 0) {
             moneyOperations.push({
               kind: "DEPOSIT",

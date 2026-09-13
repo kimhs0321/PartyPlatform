@@ -16,7 +16,6 @@ import {
   getMiniGameDefinition,
   MINI_GAME_BET_OPTIONS,
   MINI_GAME_PRIZE_AMOUNT,
-  MINI_GAME_RESPONSE_TIME_MS,
 } from "../../game/minigame/minigameRules";
 import type {
   HighLowChoice,
@@ -162,9 +161,6 @@ export function MiniGameModal({
   onPassBet,
   onClose,
 }: MiniGameModalProps) {
-  const [remainingMs, setRemainingMs] = useState(
-    MINI_GAME_RESPONSE_TIME_MS,
-  );
   const [betAmount, setBetAmount] = useState<number>(
     MINI_GAME_BET_OPTIONS[0],
   );
@@ -193,7 +189,6 @@ export function MiniGameModal({
 
   const actionStartedAtRef = useRef(Date.now());
   const timingStartedAtRef = useRef(performance.now());
-  const timeoutHandledRef = useRef<string | null>(null);
   const actionHandledRef = useRef(false);
   const targetRollTimeoutRef = useRef<number | null>(
     null,
@@ -348,9 +343,7 @@ export function MiniGameModal({
 
     actionStartedAtRef.current = Date.now();
     timingStartedAtRef.current = performance.now();
-    timeoutHandledRef.current = null;
     actionHandledRef.current = false;
-    setRemainingMs(MINI_GAME_RESPONSE_TIME_MS);
     setBetAmount(MINI_GAME_BET_OPTIONS[0]);
     setOddEvenChoice("ODD");
     setHighLowChoice("HIGH");
@@ -450,76 +443,6 @@ export function MiniGameModal({
       }
     };
   }, [actionKey, game]);
-
-  useEffect(() => {
-    if (!game || game.stage !== "PLAYING") return;
-
-    const update = () => {
-      const deadlineAt =
-        game.deadlineAt ??
-        (
-          actionStartedAtRef.current +
-          MINI_GAME_RESPONSE_TIME_MS
-        );
-
-      const remaining =
-        Math.max(
-          0,
-          deadlineAt -
-            Date.now(),
-        );
-      setRemainingMs(remaining);
-
-      if (
-        remaining > 0 ||
-        timeoutHandledRef.current === actionKey ||
-        actionHandledRef.current
-      ) {
-        return;
-      }
-
-      if (
-        !canControlCurrentPlayer
-      ) {
-        return;
-      }
-
-      timeoutHandledRef.current = actionKey;
-
-      if (game.gameId === "TIMING_STOP") {
-        const timingElapsed =
-          performance.now() -
-          timingStartedAtRef.current;
-        const position =
-          getTimingPosition(timingElapsed);
-        holdTimingStop(
-          position,
-          MINI_GAME_RESPONSE_TIME_MS,
-        );
-        return;
-      }
-
-      if (game.gameId === "TARGET_DICE") {
-        startTargetDiceRoll();
-        return;
-      }
-
-      actionHandledRef.current = true;
-      onPassBet();
-    };
-
-    update();
-    const intervalId = window.setInterval(update, 100);
-
-    return () => window.clearInterval(intervalId);
-  }, [
-    actionKey,
-    game,
-    holdTimingStop,
-    onPassBet,
-    startTargetDiceRoll,
-    canControlCurrentPlayer,
-  ]);
 
   useEffect(() => {
     if (resultRevealTimeoutRef.current !== null) {
@@ -633,10 +556,6 @@ export function MiniGameModal({
 
   const definition =
     getMiniGameDefinition(game.gameId);
-  const countdownSeconds = Math.max(
-    0,
-    Math.ceil(remainingMs / 1_000),
-  );
   const errorMessage = getErrorMessage(error);
   const winner = game.winnerPlayerId
     ? playerMap.get(game.winnerPlayerId) ?? null
@@ -824,18 +743,12 @@ export function MiniGameModal({
                   </small>
                 </span>
 
-                <b
-                  className={
-                    countdownSeconds <= 3
-                      ? "is-urgent"
-                      : ""
-                  }
-                >
+                <b>
                   {targetDiceRolling
                     ? "ROLL"
                     : targetDiceSettling
                       ? "RESULT"
-                      : `${countdownSeconds}초`}
+                      : "진행 중"}
                 </b>
               </div>
             )}
@@ -1455,8 +1368,8 @@ export function MiniGameModal({
               <div className="minigame-arena__rule-card">
                 <span>진행 규칙</span>
                 <p>
-                  각 참가자는 제한시간 안에
-                  한 번만 선택할 수 있습니다.
+                  진행 중
+                  각 참가자는 자신의 차례에 한 번만 선택할 수 있습니다.
                 </p>
                 <strong>
                   {completedCount}/

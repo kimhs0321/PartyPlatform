@@ -60,7 +60,7 @@ interface UseLottoDrawResolutionOptions {
   };
 
   localPlayerId: string;
-  activePlayerId: string;
+  controllerPlayerId?: string;
 
   turnNumber: number;
   turnSequence: number;
@@ -106,7 +106,7 @@ export function useLottoDrawResolution({
   playersRef,
 
   localPlayerId,
-  activePlayerId,
+  controllerPlayerId,
 
   turnNumber,
   turnSequence,
@@ -335,7 +335,7 @@ export function useLottoDrawResolution({
          */
         if (
           onNetworkGameEventRequest &&
-          activePlayerId !==
+          controllerPlayerId !==
             localPlayerId
         ) {
           return;
@@ -383,7 +383,7 @@ export function useLottoDrawResolution({
         );
       },
       [
-        activePlayerId,
+        controllerPlayerId,
         localPlayerId,
         lottoStateRef,
         onNetworkGameEventRequest,
@@ -450,7 +450,7 @@ export function useLottoDrawResolution({
 
       if (
         onNetworkGameEventRequest &&
-        activePlayerId !==
+        controllerPlayerId !==
           localPlayerId
       ) {
         return;
@@ -499,7 +499,7 @@ export function useLottoDrawResolution({
           null;
       }
     }, [
-      activePlayerId,
+      controllerPlayerId,
       applyLottoDrawConfirmed,
       localPlayerId,
       onNetworkGameEventRequest,
@@ -510,7 +510,7 @@ export function useLottoDrawResolution({
 
   const canConfirmLottoDraw =
     Boolean(pendingLottoDrawResolution) &&
-    (!onNetworkGameEventRequest || activePlayerId === localPlayerId);
+    (!onNetworkGameEventRequest || controllerPlayerId === localPlayerId);
 
   const resetLottoDrawResolution =
     useCallback((): void => {

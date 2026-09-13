@@ -12,20 +12,75 @@ function validateBase(
   payload: {
     resolutionId: string;
     controllerPlayerId: string;
+
+    source:
+      | "NEWSPAPER"
+      | "RANDOM"
+      | "DEV";
+
     turnNumber: number;
     turnSequence: number;
   },
 ): void {
-  if (game.activePlayerId !== playerId || payload.controllerPlayerId !== playerId) {
-    throw new Error("현재 플레이어만 경제뉴스를 진행할 수 있습니다.");
+  /*
+   * payload에 기록된 진행자와
+   * 실제 이벤트 발행자는 항상 같아야 한다.
+   */
+  if (
+    payload.controllerPlayerId !==
+    playerId
+  ) {
+    throw new Error(
+      "경제뉴스 진행 플레이어와 발행자가 일치하지 않습니다.",
+    );
   }
 
-  if (game.turnSequence !== payload.turnSequence) {
-    throw new Error("경제뉴스의 턴 순서가 일치하지 않습니다.");
+  /*
+   * 정기 RANDOM 경제뉴스만
+   * 고정 controller가 진행한다.
+   *
+   * NEWSPAPER / DEV는 기존대로
+   * 현재 행동 플레이어가 진행한다.
+   */
+  if (
+    payload.source === "RANDOM"
+  ) {
+    if (
+      game.controllerPlayerId !==
+      playerId
+    ) {
+      throw new Error(
+        "게임 진행 담당자만 정기 경제뉴스를 진행할 수 있습니다.",
+      );
+    }
+  } else {
+    if (
+      game.activePlayerId !==
+      playerId
+    ) {
+      throw new Error(
+        "현재 플레이어만 해당 경제뉴스를 진행할 수 있습니다.",
+      );
+    }
   }
 
-  if (!payload.resolutionId.trim() || payload.resolutionId.length > 160) {
-    throw new Error("경제뉴스 식별자가 올바르지 않습니다.");
+  if (
+    game.turnSequence !==
+    payload.turnSequence
+  ) {
+    throw new Error(
+      "경제뉴스의 턴 순서가 일치하지 않습니다.",
+    );
+  }
+
+  if (
+    !payload.resolutionId.trim() ||
+    payload.resolutionId.length >
+      160
+  ) {
+    throw new Error(
+      "경제뉴스 식별자가 올바르지 않습니다.",
+    );
   }
 }
 
@@ -70,13 +125,28 @@ export function validateEconomicNewsAppliedEvent(
   validateBase(game, playerId, payload);
   validateTurnNumber(game, payload.source, payload.turnNumber);
 
-  const draw = [...game.gameEvents].reverse().find(
-    (event) =>
-      event.kind === "ECONOMIC_NEWS_DRAW_DECIDED" &&
-      event.payload.outcome === "DRAWN" &&
-      event.payload.resolutionId === payload.resolutionId &&
-      event.payload.articleId === payload.articleId,
-  );
+  const draw =
+    [...game.gameEvents]
+      .reverse()
+      .find(
+        (event) =>
+          event.kind ===
+            "ECONOMIC_NEWS_DRAW_DECIDED" &&
+          event.payload.outcome ===
+            "DRAWN" &&
+          event.payload.resolutionId ===
+            payload.resolutionId &&
+          event.payload.articleId ===
+            payload.articleId &&
+          event.payload.source ===
+            payload.source &&
+          event.payload.controllerPlayerId ===
+            payload.controllerPlayerId &&
+          event.payload.turnNumber ===
+            payload.turnNumber &&
+          event.payload.turnSequence ===
+            payload.turnSequence,
+      );
 
   if (!draw) throw new Error("적용할 경제뉴스 추첨 결과가 없습니다.");
 }
@@ -89,11 +159,22 @@ export function validateEconomicNewsConfirmedEvent(
   validateBase(game, playerId, payload);
   validateTurnNumber(game, payload.source, payload.turnNumber);
 
-  const applied = game.gameEvents.some(
-    (event) =>
-      event.kind === "ECONOMIC_NEWS_APPLIED" &&
-      event.payload.resolutionId === payload.resolutionId,
-  );
+  const applied =
+    game.gameEvents.some(
+      (event) =>
+        event.kind ===
+          "ECONOMIC_NEWS_APPLIED" &&
+        event.payload.resolutionId ===
+          payload.resolutionId &&
+        event.payload.source ===
+          payload.source &&
+        event.payload.controllerPlayerId ===
+          payload.controllerPlayerId &&
+        event.payload.turnNumber ===
+          payload.turnNumber &&
+        event.payload.turnSequence ===
+          payload.turnSequence,
+    );
 
   if (!applied) throw new Error("확인할 경제뉴스 결과가 없습니다.");
 

@@ -67,13 +67,43 @@ export function TollPaymentModal({
 }: TollPaymentModalProps) {
   const [settlementPhase, setSettlementPhase] =
     useState<SettlementPhase>("IDLE");
-  const timerIdsRef = useRef<number[]>([]);
+
+  const timerIdsRef =
+    useRef<number[]>([]);
+
+  const clearSettlementTimers = () => {
+    timerIdsRef.current.forEach(
+      (timerId) => {
+        window.clearTimeout(
+          timerId,
+        );
+      },
+    );
+
+    timerIdsRef.current = [];
+  };
+
+  /*
+  * 통행료 대상이 변경되거나 사라지면
+  * 이전 결제 애니메이션 상태를 초기화한다.
+  *
+  * TollPaymentModal 컴포넌트 자체는 유지되므로
+  * 명시적으로 IDLE로 되돌려야 한다.
+  */
+  useEffect(() => {
+    clearSettlementTimers();
+
+    setSettlementPhase("IDLE");
+  }, [
+    property?.id,
+    payer?.id,
+    owner?.id,
+    amount,
+  ]);
 
   useEffect(() => {
     return () => {
-      timerIdsRef.current.forEach((timerId) => {
-        window.clearTimeout(timerId);
-      });
+      clearSettlementTimers();
     };
   }, []);
 
@@ -90,10 +120,7 @@ export function TollPaymentModal({
     return;
   }
 
-    timerIdsRef.current.forEach((timerId) => {
-      window.clearTimeout(timerId);
-    });
-    timerIdsRef.current = [];
+    clearSettlementTimers();
 
     setSettlementPhase("TRANSFERRING");
 

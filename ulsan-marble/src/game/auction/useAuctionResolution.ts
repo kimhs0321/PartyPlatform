@@ -15,23 +15,18 @@ import type {
   UlsanMarbleAuctionSnapshotPayload,
   UlsanMarbleGameEventRequest,
 } from "../../../../shared/ulsanMarbleProtocol";
-
-import type {
-  PlayerTokenData,
-} from "../../components/PlayerToken";
-
+import type {NetworkGameEventApplyResult,} from "../network/useNetworkGameEvents";
+import type {PlayerTokenData,} from "../../components/PlayerToken";
 import type {
   MoneyOperationResult,
   TransactionReason,
 } from "../economy/economyTypes";
-
 import {
   AUCTION_MINIMUM_INCREMENT,
   AUCTION_RESPONSE_TIME_MS,
   AUCTION_START_PRICE,
   MAX_AUCTION_ITEMS_PER_PLAYER,
 } from "./auctionItems";
-
 import {
   awardAuctionItem,
   createAuctionBidderOrder,
@@ -40,7 +35,6 @@ import {
   getPlayerAuctionItems,
   hasAuctionItem,
 } from "./auctionRules";
-
 import type {
   AuctionError,
   AuctionState,
@@ -85,19 +79,11 @@ interface UseAuctionResolutionOptions {
   turnNumber: number;
   turnSequence: number;
 
-  commitAuctionState: (
-    nextState: AuctionState,
-  ) => void;
-
+  commitAuctionState: (nextState: AuctionState,) => void;
+  isTileResolutionReady: boolean;
   withdraw: WithdrawMoney;
-
-  completeTileResolution:
-    () => void;
-
-  onNetworkGameEventRequest?: (
-    event:
-      UlsanMarbleGameEventRequest,
-  ) => void;
+  completeTileResolution: () => void;
+  onNetworkGameEventRequest?: (event:UlsanMarbleGameEventRequest,) => void;
 }
 
 function createAuctionId(
@@ -226,7 +212,7 @@ export function useAuctionResolution({
 
   turnNumber,
   turnSequence,
-
+  isTileResolutionReady,
   commitAuctionState,
   withdraw,
   completeTileResolution,
@@ -278,15 +264,29 @@ export function useAuctionResolution({
     useCallback(
       (
         payload:
-          UlsanMarbleAuctionActionDecidedPayload,
-      ): boolean => {
+          UlsanMarbleAuctionActionDecidedPayload,): NetworkGameEventApplyResult => {
         if (
-          payload.turnNumber !==
-            turnNumber ||
-          payload.turnSequence !==
-            turnSequence
+          payload.turnSequence !== turnSequence
         ) {
-          return false;
+          if (
+            turnSequence < payload.turnSequence
+          ) {
+            return "WAIT";
+          }
+
+          return "INVALID";
+        }
+
+        if (
+          payload.turnNumber !== turnNumber
+        ) {
+          if (
+          turnNumber < payload.turnNumber
+          ) {
+            return "WAIT";
+          }
+
+          return "INVALID";
         }
 
         if (
@@ -294,12 +294,12 @@ export function useAuctionResolution({
             payload.actionId,
           )
         ) {
-          return true;
+          return "ALREADY_APPLIED";
         }
 
         const currentAuction =
           pendingAuctionRef.current;
-
+          
         /*
          * START
          */
@@ -312,7 +312,7 @@ export function useAuctionResolution({
             currentAuction.auctionId !==
               payload.auctionId
           ) {
-            return false;
+            return "INVALID";
           }
 
           commitAuctionState({
@@ -356,7 +356,7 @@ export function useAuctionResolution({
             currentAuction.stage !==
               "BIDDING"
           ) {
-            return false;
+            return "INVALID";
           }
 
           const nextAuction =
@@ -380,9 +380,9 @@ export function useAuctionResolution({
                 .winnerPlayerId;
 
             if (!winnerPlayerId) {
-              return false;
+              return "INVALID";
             }
-
+            
             /*
              * 즉시 RESULT라면
              * 아이템 지급 가능 여부를
@@ -410,7 +410,7 @@ export function useAuctionResolution({
                 "DUPLICATE_ITEM",
               );
 
-              return false;
+              return "INVALID";
             }
 
             const payment =
@@ -430,7 +430,7 @@ export function useAuctionResolution({
                 "PAYMENT_FAILED",
               );
 
-              return false;
+              return "INVALID";
             }
 
             if (awardedState) {
@@ -462,7 +462,7 @@ export function useAuctionResolution({
               .winnerPlayerId !==
               payload.playerId
           ) {
-            return false;
+            return "INVALID";
           }
 
           const nextState =
@@ -482,7 +482,7 @@ export function useAuctionResolution({
               "INVALID_DISCARD",
             );
 
-            return false;
+            return "INVALID";
           }
 
           commitAuctionState(
@@ -497,9 +497,22 @@ export function useAuctionResolution({
         }
 
         /*
-         * CLOSE
-         */
-        else {
+        * CLOSE
+        */
+        else if (
+          payload.action ===
+          "CLOSE"
+        ) {
+          if (!isTileResolutionReady) {
+            console.log(
+              "[AUCTION CLOSE WAIT TILE]",
+              "auctionId =",
+              payload.auctionId,
+            );
+
+            return "WAIT";
+          }
+
           if (
             !currentAuction ||
             currentAuction.auctionId !==
@@ -510,7 +523,7 @@ export function useAuctionResolution({
               .arrivalPlayerId !==
               payload.playerId
           ) {
-            return false;
+            return "INVALID";
           }
 
           appliedActionIdsRef.current.add(
@@ -530,7 +543,7 @@ export function useAuctionResolution({
 
           completeTileResolution();
 
-          return true;
+          return "APPLIED";
         }
 
         setAuctionError(null);
@@ -547,13 +560,14 @@ export function useAuctionResolution({
             null;
         }
 
-        return true;
+        return "APPLIED";
       },
       [
         auctionStateRef,
         commitAuctionState,
         commitPendingAuction,
         completeTileResolution,
+        isTileResolutionReady,
         setAuctionError,
         turnNumber,
         turnSequence,
@@ -605,17 +619,22 @@ export function useAuctionResolution({
          * 단독 실행 모드:
          * 즉시 로컬 적용.
          */
-        const applied =
+        const result =
           applyAuctionActionDecided(
             payload,
           );
 
-        if (!applied) {
+        if (
+          result === "WAIT" ||
+          result === "INVALID"
+        ) {
           publishedActionIdRef.current =
             null;
+
+          return false;
         }
 
-        return applied;
+        return true;
       },
       [
         applyAuctionActionDecided,
@@ -629,8 +648,7 @@ export function useAuctionResolution({
         arrivalPlayerId: string,
 
         arrival?:
-          UlsanMarbleArrivalContext,
-      ): boolean => {
+          UlsanMarbleArrivalContext,): boolean => {
         if (
           pendingAuctionRef.current ||
           publishedActionIdRef.current

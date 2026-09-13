@@ -14,9 +14,9 @@ const PORT_INVESTMENTS: Record<
   UlsanMarblePortContractType,
   number
 > = {
-  COASTAL: 100,
-  EAST_ASIA: 200,
-  OCEAN: 300,
+  COASTAL: 500,
+  EAST_ASIA: 900,
+  OCEAN: 1500,
 };
 
 function validateIdentifier(

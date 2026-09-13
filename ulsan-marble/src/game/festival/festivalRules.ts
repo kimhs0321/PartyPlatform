@@ -8,7 +8,7 @@ import type {
 } from "./festivalTypes";
 
 export const FESTIVAL_TRIGGER_INTERVAL = 5;
-export const FESTIVAL_TRIGGER_CHANCE = 0.01;
+export const FESTIVAL_TRIGGER_CHANCE = 0.4;
 export const TOURIST_OWNER_PAYOUT_RATE = 0.6;
 export const TOURIST_MOVE_STEP_DELAY_MS = 170;
 

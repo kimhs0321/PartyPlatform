@@ -123,23 +123,9 @@ function validateSnapshot(
     );
   }
 
-  if (
-    game.stage ===
-      "PLAYING" &&
-    game.deadlineAt === null
-  ) {
+  if (game.deadlineAt !== null) {
     fail(
-      "미니게임 제한시간 정보가 없습니다.",
-    );
-  }
-
-  if (
-    game.stage ===
-      "RESULT" &&
-    game.deadlineAt !== null
-  ) {
-    fail(
-      "종료된 미니게임에 제한시간이 남아 있습니다.",
+      "제한시간이 없는 미니게임에 제한시간 정보가 포함되어 있습니다.",
     );
   }
 

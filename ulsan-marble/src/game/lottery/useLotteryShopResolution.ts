@@ -20,6 +20,10 @@ import type {
   TransactionReason,
 } from "../economy/economyTypes";
 
+import type {
+  NetworkGameEventApplyResult,
+} from "../network/useNetworkGameEvents";
+
 import {
   getPolicyLottoJackpotContribution,
   getPolicyScratchWinProbabilityBonus,
@@ -120,6 +124,8 @@ function createRequestKey(
         ),
       ].join(":");
 
+
+      
     case "CLOSE":
       return [
         payload.visitId,
@@ -163,28 +169,69 @@ export function useLotteryShopResolution({
       (
         payload:
           UlsanMarbleLotteryActionDecidedPayload,
-      ): boolean => {
+      ): NetworkGameEventApplyResult => {
         const shop =
           pendingLotteryShop;
 
         /*
-         * 상대 화면이 아직 복권판매소
-         * 도착 처리를 끝내지 못한 경우다.
-         * 이벤트를 소비하지 않고 재시도한다.
-         */
+        * 서버 이벤트가 로컬 복권판매소 도착 상태보다
+        * 먼저 도착할 수 있다.
+        */
         if (!shop) {
-          return false;
+          console.log(
+            "[LOTTERY ACTION WAIT]",
+            "action =", payload.action,
+            "player =", payload.playerId,
+            "visitId =", payload.visitId,
+          );
+
+          return "WAIT";
         }
 
+        /*
+        * 로컬 턴 lifecycle이 아직 서버 이벤트 턴에
+        * 도달하지 못한 경우에는 기다린다.
+        */
+        if (
+          payload.turnSequence !==
+          turnSequence
+        ) {
+          console.log(
+            "[LOTTERY ACTION WAIT TURN]",
+            "payloadSeq =",
+            payload.turnSequence,
+            "localSeq =",
+            turnSequence,
+          );
+
+          return "WAIT";
+        }
+
+        /*
+        * 같은 턴인데 방문 자체가 다르면
+        * 실제 동기화 불일치다.
+        */
         if (
           shop.playerId !==
             payload.playerId ||
           shop.visitId !==
-            payload.visitId ||
-          payload.turnSequence !==
-            turnSequence
+            payload.visitId
         ) {
-          return false;
+          console.warn(
+            "[LOTTERY ACTION INVALID VISIT]",
+            {
+              shopPlayerId:
+                shop.playerId,
+              payloadPlayerId:
+                payload.playerId,
+              shopVisitId:
+                shop.visitId,
+              payloadVisitId:
+                payload.visitId,
+            },
+          );
+
+          return "INVALID";
         }
 
         if (payload.action === "CLOSE") {
@@ -193,9 +240,10 @@ export function useLotteryShopResolution({
 
           setPendingLotteryShop(null);
           setLotteryShopError(null);
+
           completeTileResolution();
 
-          return true;
+          return "APPLIED";
         }
 
         if (
@@ -216,16 +264,52 @@ export function useLotteryShopResolution({
             lotteryActionPublishRef.current =
               null;
 
-            return true;
+            return "ALREADY_APPLIED";
+          }
+
+          /*
+          * 로컬 구매 횟수가 서버 이벤트가 기대하는 값보다
+          * 아직 작다면 이전 상태 반영을 기다린다.
+          */
+          if (
+            shop.scratchPurchaseCount <
+            payload.expectedPurchaseCount
+          ) {
+            console.log(
+              "[LOTTERY SCRATCH WAIT COUNT]",
+              "local =",
+              shop.scratchPurchaseCount,
+              "expected =",
+              payload.expectedPurchaseCount,
+            );
+
+            return "WAIT";
+          }
+
+          /*
+          * 이미 더 진행됐는데 동일 결과도 아니라면
+          * 순서 또는 상태가 실제로 어긋난 것이다.
+          */
+          if (
+            shop.scratchPurchaseCount >
+            payload.expectedPurchaseCount
+          ) {
+            console.warn(
+              "[LOTTERY SCRATCH INVALID COUNT]",
+              "local =",
+              shop.scratchPurchaseCount,
+              "expected =",
+              payload.expectedPurchaseCount,
+            );
+
+            return "INVALID";
           }
 
           if (
-            shop.scratchPurchaseCount !==
-              payload.expectedPurchaseCount ||
             shop.scratchPurchaseCount >=
-              MAX_SCRATCH_PURCHASES_PER_VISIT
+            MAX_SCRATCH_PURCHASES_PER_VISIT
           ) {
-            return false;
+            return "INVALID";
           }
 
           const purchaseResult =
@@ -246,7 +330,7 @@ export function useLotteryShopResolution({
               },
             );
 
-            return false;
+            return "INVALID";
           }
 
           if (
@@ -270,7 +354,7 @@ export function useLotteryShopResolution({
                 },
               );
 
-              return false;
+              return "INVALID";
             }
           }
 
@@ -307,24 +391,121 @@ export function useLotteryShopResolution({
 
           setLotteryShopError(null);
 
-          return true;
+          return "APPLIED";
         }
 
         /*
          * BUY_LOTTO
          */
         if (
-          payload.tickets.length <= 0 ||
-          shop.lottoPurchaseCount !==
-            payload.expectedPurchaseCount ||
+          payload.tickets.length <= 0
+        ) {
+          return "INVALID";
+        }
+
+        const expectedNextLottoCount =
+          payload.expectedPurchaseCount +
+          payload.tickets.length;
+
+        const existingTicketIds =
+          new Set(
+            lottoStateRef.current.tickets.map(
+              (ticket) => ticket.id,
+            ),
+          );
+
+        const existingPayloadTicketCount =
+          payload.tickets.filter(
+            (ticket) =>
+              existingTicketIds.has(
+                ticket.id,
+              ),
+          ).length;
+
+        /*
+        * 동일 구매가 이미 완전히 반영된 경우.
+        */
+        if (
+          payload.tickets.length > 0 &&
+          shop.lottoPurchaseCount ===
+            expectedNextLottoCount &&
+          existingPayloadTicketCount ===
+            payload.tickets.length
+        ) {
+          lotteryActionPublishRef.current =
+            null;
+
+          return "ALREADY_APPLIED";
+        }
+
+        /*
+        * 일부 티켓만 이미 존재한다면
+        * 부분 적용 상태이므로 정상적인 재시도가 아니다.
+        */
+        if (
+          existingPayloadTicketCount > 0
+        ) {
+          console.warn(
+            "[LOTTERY LOTTO INVALID PARTIAL]",
+            "existing =",
+            existingPayloadTicketCount,
+            "total =",
+            payload.tickets.length,
+          );
+
+          return "INVALID";
+        }
+
+        if (
+          shop.lottoPurchaseCount <
+          payload.expectedPurchaseCount
+        ) {
+          console.log(
+            "[LOTTERY LOTTO WAIT COUNT]",
+            "local =",
+            shop.lottoPurchaseCount,
+            "expected =",
+            payload.expectedPurchaseCount,
+          );
+
+          return "WAIT";
+        }
+
+        if (
+          shop.lottoPurchaseCount >
+          payload.expectedPurchaseCount
+        ) {
+          return "INVALID";
+        }
+
+        if (
           shop.lottoPurchaseCount +
             payload.tickets.length >
-            MAX_LOTTO_PURCHASES_PER_VISIT ||
-          lottoStateRef.current
-            .drawNumber !==
-            payload.drawNumber
+          MAX_LOTTO_PURCHASES_PER_VISIT
         ) {
-          return false;
+          return "INVALID";
+        }
+
+        if (
+          lottoStateRef.current.drawNumber <
+          payload.drawNumber
+        ) {
+          console.log(
+            "[LOTTERY LOTTO WAIT DRAW]",
+            "localDraw =",
+            lottoStateRef.current.drawNumber,
+            "payloadDraw =",
+            payload.drawNumber,
+          );
+
+          return "WAIT";
+        }
+
+        if (
+          lottoStateRef.current.drawNumber >
+          payload.drawNumber
+        ) {
+          return "INVALID";
         }
 
         const purchaseCost =
@@ -349,7 +530,7 @@ export function useLotteryShopResolution({
             },
           );
 
-          return false;
+          return "INVALID";
         }
 
         commitLottoState({
@@ -392,7 +573,7 @@ export function useLotteryShopResolution({
 
         setLotteryShopError(null);
 
-        return true;
+        return "APPLIED";
       },
       [
         commitLottoState,
@@ -445,12 +626,15 @@ export function useLotteryShopResolution({
           return;
         }
 
-        const applied =
+        const result =
           applyLotteryActionDecided(
             payload,
           );
 
-        if (!applied) {
+        if (
+          result !== "APPLIED" &&
+          result !== "ALREADY_APPLIED"
+        ) {
           lotteryActionPublishRef.current =
             null;
         }

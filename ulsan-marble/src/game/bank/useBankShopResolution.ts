@@ -11,6 +11,8 @@ import type {
   UlsanMarbleGameEventRequest,
 } from "../../../../shared/ulsanMarbleProtocol";
 
+import type {NetworkGameEventApplyResult,} from "../network/useNetworkGameEvents";
+
 import {
   addGeneralDeposit,
   getGeneralDepositBalance,
@@ -180,28 +182,71 @@ export function useBankShopResolution({
       (
         payload:
           UlsanMarbleBankActionDecidedPayload,
-      ): boolean => {
-        const pending =
-          pendingBankShop;
+      ): NetworkGameEventApplyResult => {
 
-        /*
-         * 은행 도착 상태가 아직 생성되지 않았다면
-         * useNetworkGameEvents에서 다음 렌더에 재시도한다.
-         */
-        if (!pending) {
-          return false;
-        }
+       const pending =
+        pendingBankShop;
 
-        if (
-          pending.playerId !==
-            payload.playerId ||
-          pending.visitId !==
-            payload.visitId ||
-          payload.turnSequence !==
-            turnSequence
-        ) {
-          return false;
-        }
+      /*
+      * 서버 이벤트가 로컬 은행 도착 상태보다
+      * 먼저 도착할 수 있다.
+      */
+      if (!pending) {
+        console.log(
+          "[BANK ACTION WAIT]",
+          "action =", payload.action,
+          "player =", payload.playerId,
+          "visitId =", payload.visitId,
+        );
+
+        return "WAIT";
+      }
+
+      /*
+      * 로컬 턴 lifecycle이 아직 서버 이벤트의
+      * 턴까지 도달하지 않았다.
+      */
+      if (
+        payload.turnSequence !==
+        turnSequence
+      ) {
+        console.log(
+          "[BANK ACTION WAIT TURN]",
+          "payloadSeq =",
+          payload.turnSequence,
+          "localSeq =",
+          turnSequence,
+        );
+
+        return "WAIT";
+      }
+
+      /*
+      * 같은 턴인데 은행 방문 자체가 다르면
+      * 실제 상태 불일치다.
+      */
+      if (
+        pending.playerId !==
+          payload.playerId ||
+        pending.visitId !==
+          payload.visitId
+      ) {
+        console.warn(
+          "[BANK ACTION INVALID VISIT]",
+          {
+            pendingPlayerId:
+              pending.playerId,
+            payloadPlayerId:
+              payload.playerId,
+            pendingVisitId:
+              pending.visitId,
+            payloadVisitId:
+              payload.visitId,
+          },
+        );
+
+        return "INVALID";
+      }
 
         const finishAction = () => {
           bankActionPublishRef.current =
@@ -212,17 +257,19 @@ export function useBankShopResolution({
 
         const failAction = (
           error: BankShopError,
-        ): true => {
+        ): NetworkGameEventApplyResult => {
           bankActionPublishRef.current =
             null;
 
           setBankShopError(error);
 
-          /*
-           * 요청 자체는 처리했으므로
-           * 이벤트 큐에서는 소비한다.
-           */
-          return true;
+          console.warn(
+            "[BANK ACTION INVALID]",
+            "action =", payload.action,
+            "error =", error,
+          );
+
+          return "INVALID";
         };
 
         switch (payload.action) {
@@ -262,7 +309,7 @@ export function useBankShopResolution({
             );
 
             finishAction();
-            return true;
+            return "APPLIED";
           }
 
           case "WITHDRAW": {
@@ -307,7 +354,7 @@ export function useBankShopResolution({
             );
 
             finishAction();
-            return true;
+            return "APPLIED";
           }
 
           case "START_SAVINGS": {
@@ -315,7 +362,15 @@ export function useBankShopResolution({
               payload.openedTurn !==
               turnNumber
             ) {
-              return false;
+              console.log(
+                "[BANK SAVINGS WAIT TURN]",
+                "openedTurn =",
+                payload.openedTurn,
+                "localTurn =",
+                turnNumber,
+              );
+
+              return "WAIT";
             }
 
             const playerId =
@@ -403,7 +458,7 @@ export function useBankShopResolution({
             );
 
             finishAction();
-            return true;
+            return "APPLIED";
           }
 
           case "CLOSE": {
@@ -415,7 +470,7 @@ export function useBankShopResolution({
 
             completeTileResolution();
 
-            return true;
+            return "APPLIED";
           }
         }
       },
@@ -475,12 +530,15 @@ export function useBankShopResolution({
           return;
         }
 
-        const applied =
+        const result =
           applyBankActionDecided(
             payload,
           );
 
-        if (!applied) {
+        if (
+          result !== "APPLIED" &&
+          result !== "ALREADY_APPLIED"
+        ) {
           bankActionPublishRef.current =
             null;
         }

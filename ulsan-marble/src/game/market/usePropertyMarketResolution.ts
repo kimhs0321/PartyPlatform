@@ -95,7 +95,7 @@ interface UsePropertyMarketResolutionOptions {
     PropertyData[];
 
   localPlayerId: string;
-  activePlayerId: string;
+  controllerPlayerId?: string
 
   turnNumber: number;
   turnSequence: number;
@@ -182,7 +182,7 @@ export function usePropertyMarketResolution({
   properties,
 
   localPlayerId,
-  activePlayerId,
+  controllerPlayerId,
 
   turnNumber,
   turnSequence,
@@ -613,7 +613,7 @@ export function usePropertyMarketResolution({
          */
         if (
           isNetworkGame &&
-          activePlayerId !==
+          controllerPlayerId !==
             localPlayerId
         ) {
           return true;
@@ -704,7 +704,7 @@ export function usePropertyMarketResolution({
         return applied;
       },
       [
-        activePlayerId,
+        controllerPlayerId,
         applyPropertyMarketResolved,
         applyResolvedSnapshot,
         calculatePropertyMarket,
@@ -753,14 +753,13 @@ export function usePropertyMarketResolution({
          * 정기 시세변동 확인은
          * 현재 플레이어만 가능.
          */
-        if (
-          isNetworkGame &&
-          activePlayerId !==
-            localPlayerId
-        ) {
-          return false;
-        }
-
+          if (
+            isNetworkGame &&
+            controllerPlayerId !==
+              localPlayerId
+          ) {
+            return false;
+          }
         if (
           publishedConfirmationIdRef
             .current ===
@@ -817,7 +816,7 @@ export function usePropertyMarketResolution({
         return applied;
       },
       [
-        activePlayerId,
+        controllerPlayerId,
         applyPropertyMarketSettlementConfirmed,
         cancelCurrentAction,
         localPlayerId,
@@ -834,7 +833,7 @@ export function usePropertyMarketResolution({
       pendingMarketResolution?.mode ===
         "DEV" ||
       !onNetworkGameEventRequest ||
-      activePlayerId ===
+      controllerPlayerId ===
         localPlayerId
     );
 

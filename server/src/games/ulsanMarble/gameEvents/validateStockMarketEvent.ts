@@ -7,17 +7,35 @@ import type {
   ClientUlsanMarbleGameState,
 } from "../types/ulsanMarbleGame";
 
+const STOCK_DIVIDEND_INTERVAL_TURNS =
+  5;
+
+const MAX_STOCK_DIVIDEND_RATE =
+  0.075;
+
+
+function isScheduledStockDividendTurn(
+  turnNumber: number,
+): boolean {
+  return (
+    turnNumber > 0 &&
+    turnNumber %
+      STOCK_DIVIDEND_INTERVAL_TURNS ===
+      0
+  );
+}
+
 function validateStockMarketPublisher(
   game: ClientUlsanMarbleGameState,
   playerId: string,
   turnSequence: number,
 ): void {
   if (
-    game.activePlayerId !==
+    game.controllerPlayerId !==
     playerId
   ) {
     throw new Error(
-      "현재 플레이어만 주식 시세 정산을 진행할 수 있습니다.",
+      "게임 진행 담당자만 주식 시세 정산을 진행할 수 있습니다.",
     );
   }
 
@@ -41,6 +59,185 @@ function validateResolutionId(
   ) {
     throw new Error(
       "주식 시세 정산 식별자가 올바르지 않습니다.",
+    );
+  }
+}
+
+
+function validateDividendCredits(
+  game: ClientUlsanMarbleGameState,
+  payload:
+    UlsanMarbleStockMarketResolvedPayload,
+): void {
+  if (
+    !Array.isArray(
+      payload.dividendCredits,
+    )
+  ) {
+    throw new Error(
+      "주식 배당금 정산 결과가 올바르지 않습니다.",
+    );
+  }
+
+  if (
+    payload.mode === "DEV"
+  ) {
+    if (
+      payload.dividendCredits.length > 0
+    ) {
+      throw new Error(
+        "DEV 주식 정산에는 배당금이 포함될 수 없습니다.",
+      );
+    }
+
+    return;
+  }
+
+  if (
+    !isScheduledStockDividendTurn(
+      payload.turnNumber,
+    )
+  ) {
+    if (
+      payload.dividendCredits.length > 0
+    ) {
+      throw new Error(
+        "배당 정산 턴이 아닌데 배당금이 포함되어 있습니다.",
+      );
+    }
+
+    return;
+  }
+
+  const creditKeys =
+    new Set<string>();
+
+  for (
+    const credit of
+    payload.dividendCredits
+  ) {
+    if (
+      typeof credit.playerId !==
+        "string" ||
+      !game.playerIds.includes(
+        credit.playerId,
+      )
+    ) {
+      throw new Error(
+        "주식 배당금 수령 플레이어가 올바르지 않습니다.",
+      );
+    }
+
+    if (
+      typeof credit.companyId !==
+        "string" ||
+      credit.companyId.trim().length ===
+        0 ||
+      typeof credit.companyName !==
+        "string" ||
+      credit.companyName.trim().length ===
+        0 ||
+      credit.companyName.length > 100 ||
+      typeof credit.ticker !==
+        "string" ||
+      credit.ticker.trim().length === 0
+    ) {
+      throw new Error(
+        "주식 배당금 종목 정보가 올바르지 않습니다.",
+      );
+    }
+
+    if (
+      !Number.isInteger(
+        credit.quantity,
+      ) ||
+      credit.quantity <= 0
+    ) {
+      throw new Error(
+        "주식 배당금 보유 수량이 올바르지 않습니다.",
+      );
+    }
+
+    if (
+      !Number.isInteger(
+        credit.pricePerShare,
+      ) ||
+      credit.pricePerShare <= 0
+    ) {
+      throw new Error(
+        "주식 배당금 기준 주가가 올바르지 않습니다.",
+      );
+    }
+
+    if (
+      !Number.isFinite(
+        credit.dividendRate,
+      ) ||
+      credit.dividendRate <= 0 ||
+      credit.dividendRate >
+        MAX_STOCK_DIVIDEND_RATE
+    ) {
+      throw new Error(
+        "주식 배당률이 올바르지 않습니다.",
+      );
+    }
+
+    const quote =
+      payload.nextMarket[
+        credit.companyId
+      ];
+
+    if (
+      !quote ||
+      quote.companyId !==
+        credit.companyId ||
+      !Number.isInteger(
+        quote.currentPrice,
+      ) ||
+      quote.currentPrice <= 0 ||
+      quote.currentPrice !==
+        credit.pricePerShare
+    ) {
+      throw new Error(
+        "주식 배당금 기준 주가가 정산 주가와 일치하지 않습니다.",
+      );
+    }
+
+    const expectedAmount =
+      Math.round(
+        credit.quantity *
+          credit.pricePerShare *
+          credit.dividendRate,
+      );
+
+    if (
+      !Number.isInteger(
+        credit.amount,
+      ) ||
+      credit.amount <= 0 ||
+      credit.amount !==
+        expectedAmount
+    ) {
+      throw new Error(
+        "주식 배당금 계산 결과가 일치하지 않습니다.",
+      );
+    }
+
+    const creditKey =
+      `${credit.playerId}:${credit.companyId}`;
+
+    if (
+      creditKeys.has(
+        creditKey,
+      )
+    ) {
+      throw new Error(
+        "동일한 플레이어와 회사의 배당금이 중복되어 있습니다.",
+      );
+    }
+
+    creditKeys.add(
+      creditKey,
     );
   }
 }
@@ -132,6 +329,16 @@ export function validateStockMarketResolvedEvent(
   }
 
   if (
+    !Array.isArray(
+      payload.dividendCredits,
+    )
+  ) {
+    throw new Error(
+      "주식 배당금 결과가 올바르지 않습니다.",
+    );
+  }
+
+  if (
     !payload.nextStockLossIndustryByPlayer ||
     typeof payload
       .nextStockLossIndustryByPlayer !==
@@ -144,6 +351,11 @@ export function validateStockMarketResolvedEvent(
       "주식 손실보전 상태가 올바르지 않습니다.",
     );
   }
+
+  validateDividendCredits(
+    game,
+    payload,
+  );
 
   const alreadyPublished =
     game.gameEvents.some((event) => {

@@ -117,6 +117,8 @@ import {
 } from "./AssetOverviewModal";
 import { AirportTravelModal } from "./AirportTravelModal";
 import { AirportFlight } from "./airport/AirportFlight";
+import {StockDividendSummary,} from "./StockDividendSummary";
+import {CompanyDividendEventModal,} from "./CompanyDividendEventModal";
 
 const board = boardJson as BoardData;
 const propertyData = propertiesJson as PropertiesData;
@@ -151,6 +153,7 @@ type UlsanBoardProps = {
   network?: {
     state: {
       activePlayerId: string;
+      controllerPlayerId: string;
 
       turnNumber: number;
       turnSequence: number;
@@ -211,6 +214,7 @@ export function UlsanBoard({
         : 50
     : standaloneRoundLimit;
   const [dismissedStockMarketResolutionId,setDismissedStockMarketResolutionId,] = useState<string | null>(null);    
+  const [stockDividendViewResolutionId,setStockDividendViewResolutionId,] = useState<string | null>(null,);
   const [gameResult, setGameResult] = useState<GameResult | null>(null);
   const [assetOverviewOpen, setAssetOverviewOpen] = useState(false);
   const [completedDisasterEffectId, setCompletedDisasterEffectId] =
@@ -305,8 +309,7 @@ export function UlsanBoard({
       network
         ? (event) => {
             const expectedTurnSequence =
-              network.state
-                ?.turnSequence;
+              network.state?.turnSequence;
 
             if (
               expectedTurnSequence ===
@@ -316,11 +319,33 @@ export function UlsanBoard({
             }
 
             network.sendCommand({
-              type:
-                "PUBLISH_GAME_EVENT",
-
+              type: "PUBLISH_GAME_EVENT",
               expectedTurnSequence,
               event,
+            });
+          }
+        : undefined,
+
+    onNetworkGameEventAck:
+      network
+        ? (
+            eventId,
+            turnSequence,
+          ) => {
+            network.sendCommand({
+              type: "ACK_GAME_EVENT",
+              eventId,
+              turnSequence,
+            });
+          }
+        : undefined,
+
+    onNetworkTurnReady:
+      network
+        ? (turnSequence) => {
+            network.sendCommand({
+              type: "TURN_READY",
+              turnSequence,
             });
           }
         : undefined,
@@ -332,7 +357,10 @@ export function UlsanBoard({
       network?.state?.turnSequence,
 
     networkActivePlayerId:
-      network?.state?.activePlayerId,  
+      network?.state?.activePlayerId,
+
+    networkControllerPlayerId:
+      network?.state?.controllerPlayerId,  
 
     onNetworkEndTurnRequest:
       network
@@ -1132,6 +1160,28 @@ export function UlsanBoard({
       ? game.pendingStockMarketResolution
       : null;
 
+  const isVisibleStockDividendTurn =
+    Boolean(
+      visibleStockMarketResolution &&
+        visibleStockMarketResolution.mode ===
+          "SCHEDULED" &&
+        visibleStockMarketResolution
+          .turnNumber > 0 &&
+        visibleStockMarketResolution
+          .turnNumber %
+          5 ===
+          0,
+    );
+
+  const isShowingStockDividend =
+    Boolean(
+      visibleStockMarketResolution &&
+        isVisibleStockDividendTurn &&
+        stockDividendViewResolutionId ===
+          visibleStockMarketResolution
+            .resolutionId,
+    );      
+
   const handleStockMarketResolutionConfirm = () => {
     const resolution =
       game.pendingStockMarketResolution;
@@ -1149,6 +1199,28 @@ export function UlsanBoard({
       resolution.resolutionId,
     );
   };      
+
+  const handleStockMarketChangeNext =
+    () => {
+      const resolution =
+        visibleStockMarketResolution;
+
+      if (!resolution) {
+        return;
+      }
+
+      if (
+        isVisibleStockDividendTurn
+      ) {
+        setStockDividendViewResolutionId(
+          resolution.resolutionId,
+        );
+
+        return;
+      }
+
+      handleStockMarketResolutionConfirm();
+    };
 
     return (
     <main className="map-prototype">
@@ -1342,8 +1414,57 @@ export function UlsanBoard({
                 ],
               });
             }}
-              canEndTurn={ game.dev.canEndTurn && !gameLocked && (!isNetworkGame || game.activePlayerId === localPlayerId)}
-              onEndTurn={game.dev.endTurn}
+              canEndTurn={
+                !gameLocked &&
+                (
+                  network
+                    ? (
+                        network.state?.phase ===
+                          "WAITING_FOR_ROLL" &&
+                        network.state.activePlayerId ===
+                          localPlayerId
+                      )
+                    : game.dev.canEndTurn
+                )
+              }
+
+              onEndTurn={
+                network
+                  ? () => {
+                      const state =
+                        network.state;
+
+                      if (
+                        !state ||
+                        state.phase !==
+                          "WAITING_FOR_ROLL" ||
+                        state.activePlayerId !==
+                          localPlayerId
+                      ) {
+                        return;
+                      }
+
+                      console.log(
+                        "[DEV END TURN CLICK]",
+                        {
+                          serverPhase:
+                            state.phase,
+                          serverActivePlayerId:
+                            state.activePlayerId,
+                          localPlayerId,
+                          localPhase:
+                            game.turnPhase,
+                          localActivePlayerId:
+                            game.activePlayerId,
+                        },
+                      );
+
+                      network.sendCommand({
+                        type: "DEV_END_TURN",
+                      });
+                    }
+                  : game.dev.endTurn
+              }
               onResetGame={game.dev.resetGame}
               
         
@@ -1357,14 +1478,28 @@ export function UlsanBoard({
           />
 
           <FestivalAnnouncementModal
-            announcement={game.pendingFestivalAnnouncement}
-            onConfirm={game.completeFestivalAnnouncement}
+            announcement={
+              game.pendingFestivalAnnouncement
+            }
+            canConfirm={
+              game.canConfirmFestivalAnnouncement
+            }
+            onConfirm={
+              game.completeFestivalAnnouncement
+            }
           />
 
           <TouristTurnModal
-            result={game.pendingTouristTurnResult}
-            onConfirm={game.completePendingTouristTurn}
-          />
+            result={
+              game.pendingTouristTurnResult
+            }
+            canConfirm={
+              game.canConfirmTouristTurn
+            }
+            onConfirm={
+              game.completePendingTouristTurn
+            }
+/>
 
           <SalaryNotice notice={game.salaryNotice} />
           <DoubleDiceNotice notice={game.doubleDiceNotice} />
@@ -1373,22 +1508,52 @@ export function UlsanBoard({
           <div className="local-finance-dock">
             <MoneyPanel
               player={game.localPlayer}
-              latestTransaction={game.latestLocalTransaction}
-              generalDepositBalance={game.localGeneralDepositBalance}
-              savingsContract={game.localSavingsContract}
+              latestTransaction={
+                game.latestLocalTransaction
+              }
+              generalDepositBalance={
+                game.localGeneralDepositBalance
+              }
+              savingsContract={
+                game.localSavingsContract
+              }
             />
 
             {gameStarted && !gameResult && (
               <button
                 type="button"
                 className="local-finance-dock__asset-button"
-                onClick={() => setAssetOverviewOpen(true)}
+                onClick={() =>
+                  setAssetOverviewOpen(true)
+                }
                 aria-haspopup="dialog"
               >
                 <span>보유 현황</span>
                 <strong>내 자산</strong>
                 <small>전체 보기 →</small>
               </button>
+            )}
+
+            {(
+              !isNetworkGame ||
+              game.activePlayerId ===
+                game.localPlayer.id
+            ) && (
+              <AuctionItemActionPanel
+                items={game.activePlayerAuctionItems}
+                targetEffects={
+                  game.auctionState.targetEffects
+                }
+                playerId={game.localPlayer.id}
+                enabled={
+                  game.canRoll &&
+                  !game.activePlayerIsJailed &&
+                  !gameLocked
+                }
+                onUseTargetedItem={
+                  game.beginAuctionTargetItem
+                }
+              />
             )}
           </div>
 
@@ -1429,15 +1594,9 @@ export function UlsanBoard({
             cityHallTerm={game.activeCityHallTerm}
             disasterPenalties={game.activeDisasterPenalties}
             industries={stockData.industries}
+            interestRateLevel={game.macroEconomyState.interestRateLevel}
+            macroReports={game.macroEconomyState.reportHistory}
             turnNumber={game.turnNumber}
-          />
-
-          <AuctionItemActionPanel
-            items={game.activePlayerAuctionItems}
-            targetEffects={game.auctionState.targetEffects}
-            playerId={game.activePlayerId}
-            enabled={game.canRoll && !game.activePlayerIsJailed && !gameLocked}
-            onUseTargetedItem={game.beginAuctionTargetItem}
           />
 
           {!game.activePlayerIsJailed && (
@@ -1567,7 +1726,7 @@ export function UlsanBoard({
           <PortSettlementModal
             settlement={game.pendingPortSettlement}
             players={game.players}
-            canConfirm={!isNetworkGame || game.activePlayerId === localPlayerId}
+            canConfirm={!isNetworkGame || network?.state?.controllerPlayerId === game.localPlayer.id }
             onConfirm={game.completePendingPortSettlement}
           />
 
@@ -1748,7 +1907,7 @@ export function UlsanBoard({
               ownerIncomeAmount={game.pendingTollOwnerIncome}
               stage={game.pendingTollPayment?.stage ?? null}
               showPayerBalance={ game.pendingTollPayer?.id === game.localPlayer.id }
-              canPay={game.canPayPendingToll}
+              canPay={game.canPayPendingToll && game.pendingTollPayer?.id === game.localPlayer.id}
               canInteract={!isNetworkGame || game.pendingTollPayer?.id === game.localPlayer.id}
               error={game.tollPaymentError}
               canUseExemptionItem={game.canUsePendingTollExemption}
@@ -1796,6 +1955,7 @@ export function UlsanBoard({
             companies={stockData.companies}
             market={game.stockMarket}
             portfolios={game.stockPortfolios}
+            dividendModifiers={game.companyDividendModifiers}
             error={game.stockTradeError}
             onBuy={game.buyStock}
             onSell={game.sellStock}
@@ -1810,11 +1970,26 @@ export function UlsanBoard({
             onConfirm={game.completePendingMarketResolution}
           />
 
+          <CompanyDividendEventModal
+            event={game.pendingCompanyDividendEvent}
+            onConfirm={game.dismissCompanyDividendEvent}
+          />
+
           <StockMarketChangeModal
-            cycle={ visibleStockMarketResolution?.cycle ??null}
+            cycle={!isShowingStockDividend ? visibleStockMarketResolution ?.cycle ?? null : null}
             industries={stockData.industries}
-            devMode={visibleStockMarketResolution?.mode ==="DEV"}
-            canConfirm={Boolean(visibleStockMarketResolution,)}
+            devMode={visibleStockMarketResolution ?.mode === "DEV"}
+            canConfirm={ Boolean(visibleStockMarketResolution,)}
+            actionLabel={isVisibleStockDividendTurn ? "다음" : "확인"}
+            onConfirm={handleStockMarketChangeNext}
+          />
+
+          <StockDividendSummary
+            open={isShowingStockDividend}
+            turnNumber={visibleStockMarketResolution ?.turnNumber ?? 0}
+            credits={visibleStockMarketResolution ?.dividendCredits ?? []}
+            playerId={game.localPlayer.id}
+            playerName={game.localPlayer.name}
             onConfirm={handleStockMarketResolutionConfirm}
           />
 
@@ -1829,16 +2004,14 @@ export function UlsanBoard({
           <MayorElectionModal
             election={game.pendingMayorElection}
             players={game.players}
+            canVote={game.canVoteInMayorElection}
+            canConfirmResult={game.canConfirmMayorElectionResult}
             onVote={game.castMayorElectionVote}
             onConfirmResult={game.completePendingMayorElection}
           />
 
           <DisasterEventModal
-            event={
-              disasterEffectEvent
-                ? null
-                : pendingDisasterEvent
-            }
+            event={ disasterEffectEvent ? null : pendingDisasterEvent}
             players={game.players}
             districts={propertyData.districts}
             canConfirm={game.canConfirmPendingDisasterEvent}

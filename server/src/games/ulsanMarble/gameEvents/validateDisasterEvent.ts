@@ -12,13 +12,13 @@ export function validateDisasterResolvedEvent(
   playerId: string,
   payload: UlsanMarbleDisasterResolvedPayload,
 ): void {
-  if (
+    if (
     payload.mode === "SCHEDULED" &&
-    game.activePlayerId !==
+    game.controllerPlayerId !==
       playerId
   ) {
     throw new Error(
-      "현재 플레이어만 재난 결과를 결정할 수 있습니다.",
+      "게임 진행 담당자만 정기 재난 결과를 결정할 수 있습니다.",
     );
   }
 
@@ -70,12 +70,12 @@ export function validateDisasterResolvedEvent(
   }
 }
 
-export function validateDisasterActionDecidedEvent(
+  export function validateDisasterActionDecidedEvent(
   game: ClientUlsanMarbleGameState,
   playerId: string,
   payload:
     UlsanMarbleDisasterActionDecidedPayload,
-): void {
+  ): void {
   if (
     payload.playerId !==
     playerId
@@ -94,22 +94,30 @@ export function validateDisasterActionDecidedEvent(
     );
   }
 
-  const matchesResolvedDisaster =
-    game.gameEvents.some(
-      (event) =>
-        event.kind ===
-          "DISASTER_RESOLVED" &&
-        event.turnSequence ===
-          payload.turnSequence &&
-        event.payload.outcome ===
-          "EVENT" &&
-        event.payload.event.id ===
-          payload.disasterId &&
-        event.payload.event.turnNumber ===
-          payload.turnNumber,
-    );
+  const resolvedDisaster =
+    [...game.gameEvents]
+      .reverse()
+      .find(
+        (event) =>
+          event.kind ===
+            "DISASTER_RESOLVED" &&
+          event.turnSequence ===
+            payload.turnSequence &&
+          event.payload.outcome ===
+            "EVENT" &&
+          event.payload.event.id ===
+            payload.disasterId &&
+          event.payload.event.turnNumber ===
+            payload.turnNumber,
+      );
 
-  if (!matchesResolvedDisaster) {
+  if (
+    !resolvedDisaster ||
+    resolvedDisaster.kind !==
+      "DISASTER_RESOLVED" ||
+    resolvedDisaster.payload.outcome !==
+      "EVENT"
+  ) {
     throw new Error(
       "재난 처리 대상 정보가 일치하지 않습니다.",
     );
@@ -125,21 +133,20 @@ export function validateDisasterActionDecidedEvent(
   }
 
   /*
-   * 재난 결과 화면 확인은
-   * 현재 턴 플레이어만 가능.
-   *
-   * 실제 피해 정산은 다른 플레이어의
-   * 차례일 수도 있으므로 activePlayer 검사를
-   * PAY/매각/파산에는 적용하지 않는다.
-   */
+  * 전역 재난 결과 화면 확인은
+  * 고정 controller만 가능하다.
+  *
+  * PAY / 매각 / 파산은
+  * 실제 피해 당사자가 진행한다.
+  */
   if (
     payload.action ===
       "ACKNOWLEDGE" &&
-    game.activePlayerId !==
+    game.controllerPlayerId !==
       playerId
   ) {
     throw new Error(
-      "현재 플레이어만 재난 결과를 확인할 수 있습니다.",
+      "게임 진행 담당자만 재난 결과를 확인할 수 있습니다.",
     );
   }
 
@@ -196,5 +203,94 @@ export function validateDisasterActionDecidedEvent(
     throw new Error(
       "재난 주식 매각 정보가 올바르지 않습니다.",
     );
+  }
+
+  const duplicateAction =
+    game.gameEvents.some(
+      (event) =>
+        event.kind ===
+          "DISASTER_ACTION_DECIDED" &&
+        event.payload.actionId ===
+          payload.actionId,
+    );
+
+  if (duplicateAction) {
+    throw new Error(
+      "이미 처리된 재난 행동입니다.",
+    );
+  }  
+
+  if (
+  payload.action !==
+  "ACKNOWLEDGE"
+  ) {
+  const acknowledged =
+    game.gameEvents.some(
+      (event) =>
+        event.kind ===
+          "DISASTER_ACTION_DECIDED" &&
+        event.payload.disasterId ===
+          payload.disasterId &&
+        event.payload.turnSequence ===
+          payload.turnSequence &&
+        event.payload.action ===
+          "ACKNOWLEDGE",
+    );
+
+  if (!acknowledged) {
+    throw new Error(
+      "재난 결과 확인이 완료되지 않았습니다.",
+    );
+  }
+
+  const completedAssessmentCount =
+    game.gameEvents.filter(
+      (event) =>
+        event.kind ===
+          "DISASTER_ACTION_DECIDED" &&
+        event.payload.disasterId ===
+          payload.disasterId &&
+        event.payload.turnSequence ===
+          payload.turnSequence &&
+        (
+          event.payload.action ===
+            "PAY" ||
+          event.payload.action ===
+            "DECLARE_BANKRUPTCY"
+        ),
+    ).length;
+
+  const currentAssessment =
+    resolvedDisaster.payload.event
+      .playerAssessments[
+        completedAssessmentCount
+      ];
+
+  if (!currentAssessment) {
+    throw new Error(
+      "이미 완료된 재난 정산입니다.",
+    );
+  }
+
+  if (
+    currentAssessment.playerId !==
+      playerId ||
+    payload.playerId !==
+      currentAssessment.playerId
+  ) {
+    throw new Error(
+      "현재 재난 피해 플레이어만 정산을 진행할 수 있습니다.",
+    );
+  }
+
+  if (
+    payload.action === "PAY" &&
+    payload.totalAmount !==
+      currentAssessment.totalAmount
+  ) {
+    throw new Error(
+      "재난 복구비가 현재 피해 금액과 일치하지 않습니다.",
+    );
+  }
   }
 }

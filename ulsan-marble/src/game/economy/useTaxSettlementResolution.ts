@@ -203,7 +203,7 @@ interface UseTaxSettlementResolutionOptions {
     >[0];
 
   localPlayerId: string;
-  activePlayerId: string;
+  controllerPlayerId?: string;
 
   turnNumber: number;
   turnSequence: number;
@@ -310,7 +310,7 @@ export function useTaxSettlementResolution({
   activeMayorPolicy,
 
   localPlayerId,
-  activePlayerId,
+  controllerPlayerId,
 
   turnNumber,
   turnSequence,
@@ -702,7 +702,7 @@ export function useTaxSettlementResolution({
          */
         if (
           isNetworkGame &&
-          activePlayerId !==
+          controllerPlayerId !==
             localPlayerId
         ) {
           return true;
@@ -848,7 +848,7 @@ export function useTaxSettlementResolution({
       },
       [
         activeMayorPolicy,
-        activePlayerId,
+        controllerPlayerId,
         applyTaxSettlementStarted,
         auctionStateRef,
         cityHallStateRef,

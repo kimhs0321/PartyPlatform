@@ -2,6 +2,10 @@ import type {
   StockMarketCycle,
 } from "./stockTypes";
 
+import type {
+  StockDividendCredit,
+} from "./stockDividend";
+
 export type StockMarketResolutionMode =
   | "SCHEDULED"
   | "DEV";
@@ -14,6 +18,7 @@ export interface PendingStockMarketResolution {
 
   cycle: StockMarketCycle;
   mode: StockMarketResolutionMode;
+  dividendCredits: StockDividendCredit[];
 
   additionallyDisabledPlayerIds:
     string[];

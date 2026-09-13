@@ -5,7 +5,13 @@ import {
   getStockPrice,
   getStockQuote,
 } from "../game/stock/stockMarket";
-import { getStockHolding } from "../game/stock/stockTrading";
+import {
+  getMaxAffordableStockQuantity,
+  getStockBuyTotalCost,
+  getStockHolding,
+  getStockSellNetProceeds,
+  getStockTradeFee,
+} from "../game/stock/stockTrading";
 import type {
   StockCompanyData,
   StockIndustryData,
@@ -14,6 +20,8 @@ import type {
   StockTradeError,
 } from "../game/stock/stockTypes";
 import "./StockMarketModal.css";
+import {getEffectiveCompanyDividendRate,} from "../game/stock/companyDividendRules";
+import type {CompanyDividendModifierMap,} from "../game/stock/companyDividendTypes";
 
 interface StockMarketModalProps {
   open: boolean;
@@ -22,6 +30,7 @@ interface StockMarketModalProps {
   companies: StockCompanyData[];
   market: StockMarketMap;
   portfolios: StockPortfolioMap;
+  dividendModifiers: CompanyDividendModifierMap;
   error: StockTradeError | null;
   onBuy: (companyId: string, quantity: number) => void;
   onSell: (companyId: string, quantity: number) => void;
@@ -44,6 +53,14 @@ function getChangeClass(value: number): string {
   if (value > 0) return "is-up";
   if (value < 0) return "is-down";
   return "is-flat";
+}
+
+function formatDividendRate(
+  rate: number,
+): string {
+  return `${(
+    rate * 100
+  ).toFixed(1)}%`;
 }
 
 function getErrorLabel(error: StockTradeError | null): string | null {
@@ -74,6 +91,7 @@ export function StockMarketModal({
   companies,
   market,
   portfolios,
+  dividendModifiers,
   error,
   onBuy,
   onSell,
@@ -148,8 +166,14 @@ export function StockMarketModal({
     : 0;
 
   const safeQuantity = Math.max(1, Math.trunc(quantity || 1));
+
   const totalPrice = currentPrice * safeQuantity;
 
+  const transactionFee = getStockTradeFee( currentPrice,safeQuantity,);
+
+  const buyTotalCost = getStockBuyTotalCost( currentPrice, safeQuantity,);
+
+  const sellNetProceeds = getStockSellNetProceeds( currentPrice, safeQuantity,);
   const selectedHoldingQuantity = selectedHolding?.quantity ?? 0;
   const selectedAveragePrice = selectedHolding?.averagePurchasePrice ?? 0;
   const selectedMarketValue = selectedHoldingQuantity * currentPrice;
@@ -157,17 +181,27 @@ export function StockMarketModal({
   const selectedProfitLoss = selectedMarketValue - selectedInvestment;
   const selectedProfitLossRate =
     selectedInvestment > 0 ? selectedProfitLoss / selectedInvestment : 0;
+    const selectedBaseDividendRate =
+    selectedCompany
+      ?.dividendRatePerSettlement ??
+    0;
+
+  const selectedEffectiveDividendRate =
+    selectedCompany
+      ? getEffectiveCompanyDividendRate(
+          selectedCompany,
+          dividendModifiers[
+            selectedCompany.id
+          ],
+        )
+      : 0;  
 
   const maxBuyQuantity =
-    currentPrice > 0
-      ? Math.max(
-          0,
-          Math.min(
-            availableShares,
-            Math.floor(player.money / currentPrice),
-          ),
-        )
-      : 0;
+    getMaxAffordableStockQuantity(
+      player.money,
+      currentPrice,
+      availableShares,
+    );
 
   const portfolioSummary = useMemo(() => {
     let investedAmount = 0;
@@ -431,26 +465,72 @@ export function StockMarketModal({
                 <section className="stock-order-panel__holding">
                   <div>
                     <span>내 보유</span>
-                    <strong>{selectedHoldingQuantity}주</strong>
-                  </div>
-                  <div>
-                    <span>평균 매입가</span>
-                    <strong>{formatMoney(selectedAveragePrice)}</strong>
-                  </div>
-                  <div>
-                    <span>평가손익</span>
-                    <strong className={getChangeClass(selectedProfitLoss)}>
-                      {formatMoney(selectedProfitLoss)}
+
+                    <strong>
+                      {selectedHoldingQuantity}주
                     </strong>
                   </div>
+
+                  <div>
+                    <span>평균 매입가</span>
+
+                    <strong>
+                      {formatMoney(
+                        selectedAveragePrice,
+                      )}
+                    </strong>
+                  </div>
+
+                  <div>
+                    <span>평가손익</span>
+
+                    <strong
+                      className={getChangeClass(
+                        selectedProfitLoss,
+                      )}
+                    >
+                      {formatMoney(
+                        selectedProfitLoss,
+                      )}
+                    </strong>
+                  </div>
+
                   <div>
                     <span>수익률</span>
+
                     <strong
                       className={getChangeClass(
                         selectedProfitLossRate,
                       )}
                     >
-                      {formatRate(selectedProfitLossRate)}
+                      {formatRate(
+                        selectedProfitLossRate,
+                      )}
+                    </strong>
+                  </div>
+
+                  <div>
+                    <span>기본 배당률</span>
+
+                    <strong>
+                      {formatDividendRate(
+                        selectedBaseDividendRate,
+                      )}
+                    </strong>
+                  </div>
+
+                  <div>
+                    <span>적용 배당률</span>
+
+                    <strong
+                      className={getChangeClass(
+                        selectedEffectiveDividendRate -
+                          selectedBaseDividendRate,
+                      )}
+                    >
+                      {formatDividendRate(
+                        selectedEffectiveDividendRate,
+                      )}
                     </strong>
                   </div>
                 </section>
@@ -532,17 +612,32 @@ export function StockMarketModal({
                       </button>
                     </div>
                   </label>
+                    <dl className="stock-order-panel__summary">
+                      <div>
+                        <dt>시장 잔량</dt>
+                        <dd>{availableShares}주</dd>
+                      </div>
 
-                  <dl className="stock-order-panel__summary">
-                    <div>
-                      <dt>시장 잔량</dt>
-                      <dd>{availableShares}주</dd>
-                    </div>
-                    <div>
-                      <dt>주문 총액</dt>
-                      <dd>{formatMoney(totalPrice)}</dd>
-                    </div>
-                  </dl>
+                      <div>
+                        <dt>주문 금액</dt>
+                        <dd>{formatMoney(totalPrice)}</dd>
+                      </div>
+
+                      <div>
+                        <dt>거래 수수료 1%</dt>
+                        <dd>{formatMoney(transactionFee)}</dd>
+                      </div>
+
+                      <div>
+                        <dt>매수 시 결제</dt>
+                        <dd>{formatMoney(buyTotalCost)}</dd>
+                      </div>
+
+                      <div>
+                        <dt>매도 시 수령</dt>
+                        <dd>{formatMoney(sellNetProceeds)}</dd>
+                      </div>
+                    </dl>
 
                   {errorLabel && (
                     <p className="stock-order-panel__error" role="alert">
@@ -557,7 +652,7 @@ export function StockMarketModal({
                       disabled={
                         selectedQuote.status !== "NORMAL" ||
                         availableShares < safeQuantity ||
-                        player.money < totalPrice
+                        player.money < buyTotalCost
                       }
                       onClick={() =>
                         onBuy(selectedCompany.id, safeQuantity)

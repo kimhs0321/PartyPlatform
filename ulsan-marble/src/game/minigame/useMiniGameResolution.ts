@@ -1,34 +1,19 @@
-import {
-  useCallback,
-  useRef,
-} from "react";
-
+import {useCallback,useRef,} from "react";
+import type {NetworkGameEventApplyResult,} from "../network/useNetworkGameEvents";
 import type {
   Dispatch,
   MutableRefObject,
   SetStateAction,
 } from "react";
-
 import type {
   UlsanMarbleArrivalContext,
   UlsanMarbleGameEventRequest,
   UlsanMarbleMiniGameActionDecidedPayload,
   UlsanMarbleMiniGameSnapshotPayload,
 } from "../../../../shared/ulsanMarbleProtocol";
-
-import type {
-  PlayerTokenData,
-} from "../../components/PlayerToken";
-
-import type {
-  DiceValue,
-} from "../dice";
-
-import type {
-  MoneyOperationResult,
-  TransactionReason,
-} from "../economy/economyTypes";
-
+import type {PlayerTokenData,} from "../../components/PlayerToken";
+import type {DiceValue,} from "../dice";
+import type {MoneyOperationResult,TransactionReason,} from "../economy/economyTypes";
 import {
   createMiniGameParticipantOrder,
   createPendingMiniGame,
@@ -43,7 +28,6 @@ import {
   resolveOddEvenMiniGame,
   rollTargetDiceAttempt,
 } from "./minigameRules";
-
 import type {
   HighLowChoice,
   MiniGameError,
@@ -322,19 +306,45 @@ export function useMiniGameResolution({
       ],
     );
 
-  const applyMiniGameActionDecided =
-    useCallback(
+  const applyMiniGameActionDecided = useCallback(
       (
         payload:
-          UlsanMarbleMiniGameActionDecidedPayload,
-      ): boolean => {
+          UlsanMarbleMiniGameActionDecidedPayload,): NetworkGameEventApplyResult => {
+        if (
+          payload.turnSequence !==
+          turnSequence
+        ) {
+          console.log(
+            "[MINIGAME ACTION WAIT TURN SEQUENCE]",
+            "payloadSeq =",
+            payload.turnSequence,
+            "localSeq =",
+            turnSequence,
+          );
+
+          return "WAIT";
+        }
+
         if (
           payload.turnNumber !==
-            turnNumber ||
-          payload.turnSequence !==
-            turnSequence
+          turnNumber
         ) {
-          return false;
+          if (
+            turnNumber <
+            payload.turnNumber
+          ) {
+            console.log(
+              "[MINIGAME ACTION WAIT TURN NUMBER]",
+              "payloadTurn =",
+              payload.turnNumber,
+              "localTurn =",
+              turnNumber,
+            );
+
+            return "WAIT";
+          }
+
+          return "INVALID";
         }
 
         if (
@@ -342,7 +352,15 @@ export function useMiniGameResolution({
             payload.actionId,
           )
         ) {
-          return true;
+          if (
+            publishedActionIdRef.current ===
+            payload.actionId
+          ) {
+            publishedActionIdRef.current =
+              null;
+          }
+
+          return "ALREADY_APPLIED";
         }
 
         if (
@@ -354,9 +372,16 @@ export function useMiniGameResolution({
             miniGameIdRef.current !==
               payload.miniGameId
           ) {
-            return false;
-          }
+            console.warn(
+              "[MINIGAME START INVALID GAME]",
+              "currentId =",
+              miniGameIdRef.current,
+              "payloadId =",
+              payload.miniGameId,
+            );
 
+            return "INVALID";
+          }
           commitMiniGameState({
             deck: {
               cycle:
@@ -387,16 +412,56 @@ export function useMiniGameResolution({
           const current =
             pendingMiniGameRef.current;
 
+          /*
+          * START/게임 결과 상태가 로컬에 아직
+          * 준비되지 않았으면 기다린다.
+          */
+          if (!current) {
+            console.log(
+              "[MINIGAME CLOSE WAIT PENDING]",
+              "miniGameId =",
+              payload.miniGameId,
+            );
+
+            return "WAIT";
+          }
+
           if (
-            !current ||
             miniGameIdRef.current !==
-              payload.miniGameId ||
-            current.stage !==
-              "RESULT" ||
-            current.arrivalPlayerId !==
-              payload.playerId
+            payload.miniGameId
           ) {
-            return false;
+            console.warn(
+              "[MINIGAME CLOSE INVALID GAME]",
+              "currentId =",
+              miniGameIdRef.current,
+              "payloadId =",
+              payload.miniGameId,
+            );
+
+            return "INVALID";
+          }
+
+          if (
+            current.arrivalPlayerId !==
+            payload.playerId
+          ) {
+            return "INVALID";
+          }
+
+          /*
+          * 이전 게임 액션의 결과 반영이 아직 끝나지 않았다.
+          */
+          if (
+            current.stage !==
+            "RESULT"
+          ) {
+            console.log(
+              "[MINIGAME CLOSE WAIT RESULT]",
+              "stage =",
+              current.stage,
+            );
+
+            return "WAIT";
           }
 
           processedActionIdsRef.current.add(
@@ -422,19 +487,35 @@ export function useMiniGameResolution({
 
           completeTileResolution();
 
-          return true;
+          return "APPLIED";
+
         } else {
           const current =
             pendingMiniGameRef.current;
 
+          if (!current) {
+            console.log(
+              "[MINIGAME ACTION WAIT PENDING]",
+              "action =", payload.action,
+              "miniGameId =",
+              payload.miniGameId,
+            );
+
+            return "WAIT";
+          }
+
           if (
-            !current ||
             miniGameIdRef.current !==
-              payload.miniGameId ||
-            current.stage !==
-              "PLAYING"
+            payload.miniGameId
           ) {
-            return false;
+            return "INVALID";
+          }
+
+          if (
+            current.stage !==
+            "PLAYING"
+          ) {
+            return "INVALID";
           }
 
           const currentPlayerId =
@@ -447,7 +528,15 @@ export function useMiniGameResolution({
             currentPlayerId !==
               payload.playerId
           ) {
-            return false;
+            console.warn(
+              "[MINIGAME ACTION INVALID PLAYER]",
+              "currentPlayer =",
+              currentPlayerId,
+              "payloadPlayer =",
+              payload.playerId,
+            );
+
+            return "INVALID";
           }
 
           /*
@@ -482,7 +571,7 @@ export function useMiniGameResolution({
                   : "PAYMENT_FAILED",
               );
 
-              return false;
+              return "INVALID";
             }
           }
 
@@ -497,9 +586,9 @@ export function useMiniGameResolution({
               nextGame,
             )
           ) {
-            return false;
+            return "INVALID";
           }
-
+          
           commitPendingMiniGame(
             nextGame,
           );
@@ -519,13 +608,14 @@ export function useMiniGameResolution({
             null;
         }
 
-        return true;
+        return "APPLIED";
       },
       [
         applyResultPayments,
         commitMiniGameState,
         commitPendingMiniGame,
         completeTileResolution,
+        pendingMiniGame,
         setMiniGameError,
         turnNumber,
         turnSequence,
@@ -568,10 +658,14 @@ export function useMiniGameResolution({
           }
         }
 
-        const applied =
+        const result =
           applyMiniGameActionDecided(
             payload,
           );
+
+        const applied =
+          result === "APPLIED" ||
+          result === "ALREADY_APPLIED";
 
         if (!applied) {
           publishedActionIdRef.current =

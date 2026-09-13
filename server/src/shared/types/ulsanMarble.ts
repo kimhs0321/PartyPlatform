@@ -11,7 +11,7 @@ export type UlsanMarbleSettings = {
 };
 
 export const DEFAULT_ULSAN_MARBLE_SETTINGS: UlsanMarbleSettings = {
-  startingMoney: 20_000_000,
+  startingMoney: 35_000_000,
   salary: 2_000_000,
   roundLimit: 50,
 };

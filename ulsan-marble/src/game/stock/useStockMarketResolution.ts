@@ -55,6 +55,20 @@ import {
   createStockMarketCycle,
 } from "./stockMarket";
 
+import {
+  calculateStockDividends,
+  isScheduledStockDividendTurn,
+} from "./stockDividend";
+
+import {
+  consumeOneTimeDividendEffects,
+} from "./companyDividendRules";
+
+
+import type {
+  CompanyDividendModifierMap,
+} from "./companyDividendTypes";
+
 import type {
   StockCompanyData,
   StockIndustryData,
@@ -84,6 +98,9 @@ interface UseStockMarketResolutionOptions {
   stockPortfoliosRef:
     MutableRefObject<StockPortfolioMap>;
 
+  companyDividendModifiersRef:
+    MutableRefObject<CompanyDividendModifierMap>;  
+
   auctionStateRef:
     MutableRefObject<AuctionState>;
 
@@ -103,7 +120,7 @@ interface UseStockMarketResolutionOptions {
     StockCompanyData[];
 
   localPlayerId: string;
-  activePlayerId: string;
+  controllerPlayerId?: string;
 
   turnNumber: number;
   turnSequence: number;
@@ -123,7 +140,9 @@ interface UseStockMarketResolutionOptions {
   deposit: (
     playerId: string,
     amount: number,
-    reason: "ITEM_COMPENSATION",
+    reason:
+      | "ITEM_COMPENSATION"
+      | "STOCK_DIVIDEND",
     memo?: string,
   ) => unknown;
 
@@ -184,6 +203,7 @@ export function useStockMarketResolution({
 
   stockMarketRef,
   stockPortfoliosRef,
+  companyDividendModifiersRef,
   auctionStateRef,
   cityHallStateRef,
   economicNewsStateRef,
@@ -193,8 +213,8 @@ export function useStockMarketResolution({
   stockCompanies,
 
   localPlayerId,
-  activePlayerId,
-
+  controllerPlayerId,
+  
   turnNumber,
   turnSequence,
 
@@ -332,6 +352,31 @@ export function useStockMarketResolution({
           );
         }
 
+        for (
+          const credit
+          of payload.dividendCredits
+        ) {
+          deposit(
+            credit.playerId,
+            credit.amount,
+            "STOCK_DIVIDEND",
+            `${credit.companyName} 배당금 · ${credit.quantity}주 · ${(credit.dividendRate * 100).toFixed(1)}%`,
+          );
+        }
+
+        if (
+          payload.mode ===
+            "SCHEDULED" &&
+          isScheduledStockDividendTurn(
+            payload.turnNumber,
+          )
+        ) {
+          companyDividendModifiersRef.current =
+            consumeOneTimeDividendEffects(
+              companyDividendModifiersRef.current,
+            );
+        }
+
         const nextPending:
           PendingStockMarketResolution = {
             resolutionId:
@@ -348,6 +393,10 @@ export function useStockMarketResolution({
 
             mode:
               payload.mode,
+
+            dividendCredits: [
+              ...payload.dividendCredits,
+            ],
 
             additionallyDisabledPlayerIds: [
               ...new Set(
@@ -383,6 +432,7 @@ export function useStockMarketResolution({
       [
         auctionStateRef,
         cityHallStateRef,
+        companyDividendModifiersRef,
         commitAuctionState,
         commitCityHallState,
         commitStockMarket,
@@ -474,6 +524,9 @@ export function useStockMarketResolution({
 
         additionallyDisabledPlayerIds:
           string[] = [],
+
+        macroStockMarketBias:
+          number = 0,
       ): boolean => {
         if (
           pendingResolutionRef.current
@@ -488,7 +541,7 @@ export function useStockMarketResolution({
 
         if (
           isNetworkGame &&
-          activePlayerId !==
+          controllerPlayerId !==
             localPlayerId
         ) {
           return true;
@@ -517,6 +570,21 @@ export function useStockMarketResolution({
             activeCityHallTerm,
           );
 
+        const scheduledMacroBias =
+          mode === "SCHEDULED"
+            ? macroStockMarketBias
+            : 0;
+
+        const macroIndustryChangeBiases =
+          Object.fromEntries(
+            stockIndustries.map(
+              (industry) => [
+                industry.id,
+                scheduledMacroBias,
+              ],
+            ),
+          );
+
         const result =
           createStockMarketCycle(
             stockIndustries,
@@ -540,6 +608,8 @@ export function useStockMarketResolution({
 
                   cityHallOptions
                     .industryChangeBiases,
+
+                  macroIndustryChangeBiases,
                 ),
 
               minimumFinalChangeRate:
@@ -555,6 +625,17 @@ export function useStockMarketResolution({
             stockPortfoliosRef.current,
             stockCompanies,
           );
+
+        const dividendCredits =
+          mode === "SCHEDULED"
+            ? calculateStockDividends(
+                turnNumber,
+                stockCompanies,
+                result.market,
+                stockPortfoliosRef.current,
+                companyDividendModifiersRef.current,
+              )
+            : [];
 
         const resolutionId =
           createResolutionId(
@@ -585,6 +666,8 @@ export function useStockMarketResolution({
 
             protectionCredits:
               protectionResult.credits,
+
+            dividendCredits,
 
             nextStockLossIndustryByPlayer: {
               ...protectionResult
@@ -634,7 +717,7 @@ export function useStockMarketResolution({
         return applied;
       },
       [
-        activePlayerId,
+        controllerPlayerId,
         applyStockMarketResolved,
         auctionStateRef,
         cityHallStateRef,
@@ -646,6 +729,7 @@ export function useStockMarketResolution({
         stockIndustries,
         stockMarketRef,
         stockPortfoliosRef,
+        companyDividendModifiersRef,
         turnNumber,
         turnSequence,
       ],
@@ -668,7 +752,7 @@ export function useStockMarketResolution({
 
         if (
           isNetworkGame &&
-          activePlayerId !==
+          controllerPlayerId !==
             localPlayerId
         ) {
           return false;
@@ -690,7 +774,7 @@ export function useStockMarketResolution({
 
         console.log("[STOCK CONFIRM] publish", {
           localPlayerId,
-          activePlayerId,
+          controllerPlayerId,
           currentPending,
           payload,
         });
@@ -724,7 +808,7 @@ export function useStockMarketResolution({
         return applied;
       },
       [
-        activePlayerId,
+        controllerPlayerId,
         applyStockMarketSettlementConfirmed,
         localPlayerId,
         onNetworkGameEventRequest,

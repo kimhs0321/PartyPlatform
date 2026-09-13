@@ -32,7 +32,7 @@ function validateResolutionId(
   }
 }
 
-function validateCurrentPlayerAndTurn(
+function validateControllerAndTurn(
   game:
     ClientUlsanMarbleGameState,
 
@@ -43,11 +43,11 @@ function validateCurrentPlayerAndTurn(
   turnSequence: number,
 ): void {
   if (
-    game.activePlayerId !==
+    game.controllerPlayerId !==
       playerId
   ) {
     throw new Error(
-      "현재 플레이어만 부동산 시세변동을 진행할 수 있습니다.",
+      "게임 진행 담당자만 부동산 시세변동을 진행할 수 있습니다.",
     );
   }
 
@@ -60,17 +60,6 @@ function validateCurrentPlayerAndTurn(
     );
   }
 
-  /*
-   * 정기 부동산 시세변동은
-   * 이전 라운드 종료 후 처리된다.
-   *
-   * 서버는 END_TURN을 받으면서 이미
-   * 다음 라운드로 turnNumber를 증가시킨 상태다.
-   *
-   * 예:
-   * 5라운드 정산 payload.turnNumber = 5
-   * 서버 game.turnNumber = 6
-   */
   const expectedSettlementTurn =
     game.turnNumber - 1;
 
@@ -83,7 +72,6 @@ function validateCurrentPlayerAndTurn(
     );
   }
 }
-
 function validateFiniteNumber(
   value: number,
   label: string,
@@ -104,7 +92,7 @@ export function validatePropertyMarketResolvedEvent(
   payload:
     UlsanMarblePropertyMarketResolvedPayload,
 ): void {
-  validateCurrentPlayerAndTurn(
+  validateControllerAndTurn(
     game,
     playerId,
     payload.turnNumber,
@@ -460,7 +448,7 @@ export function validatePropertyMarketSettlementConfirmedEvent(
   payload:
     UlsanMarblePropertyMarketSettlementConfirmedPayload,
 ): void {
-  validateCurrentPlayerAndTurn(
+  validateControllerAndTurn(
     game,
     playerId,
     payload.turnNumber,

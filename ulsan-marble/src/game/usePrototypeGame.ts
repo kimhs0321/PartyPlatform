@@ -83,29 +83,9 @@ import {
   getCombinedLiquidationValue,
   getDebtShortfall,
 } from "./economy/insolvency";
-import {
-  applyDisasterEventToState,
-  createDisasterEvent,
-  createInitialDisasterState,
-  getActiveDisasterPenalties,
-  getDisasterTollMultiplier,
-  getPolicyDisasterChanceMultiplier,
-  getPolicyDisasterRepairCostMultiplier,
-  selectRandomDisasterType,
-  shouldTriggerDisaster,
-} from "./disaster/disasterRules";
-import type {
-  DisasterLiquidationError,
-  DisasterPaymentError,
-  DisasterState,
-  DisasterType,
-  PendingDisasterResolution,
-} from "./disaster/disasterTypes";
-import {
-  didPassStart,
-  getNextBoardPosition,
-  START_SALARY,
-} from "./economy/salary";
+import {getDisasterTollMultiplier,} from "./disaster/disasterRules";
+import {useDisasterResolution,} from "./disaster/useDisasterResolution";
+import {didPassStart,getNextBoardPosition,START_SALARY,} from "./economy/salary";
 import { isScheduledTaxTurn,} from "./economy/tax";
 import { createEconomicNewsPool } from "./economicNews/economicNewsPool";
 import {
@@ -129,12 +109,7 @@ import type {
   TaxLiquidationError,
   TaxPaymentError,
 } from "./economy/taxTypes";
-import { getCandidatePolicy,} from "./election/candidatePool";
-import {
-  createMayorElectionCandidates,
-  isScheduledMayorElectionTurn,
-  resolveMayorElection,
-} from "./election/electionRules";
+import {isScheduledMayorElectionTurn,} from "./election/electionRules";
 import {
   getActiveMayorPolicy,
   getPolicyConstructionCost,
@@ -188,20 +163,16 @@ import type {
 import {createInitialMiniGameState,} from "./minigame/minigameRules";
 import type {MiniGameError,MiniGameState,PendingMiniGame,} from "./minigame/minigameTypes";
 import {useMiniGameResolution,} from "./minigame/useMiniGameResolution";
-import {getFestivalDefinition,} from "./festival/festivalData";
 import {
-  advanceTouristNpcOneStep,
   createInitialFestivalDeckState,
-  createTouristNpcState,
   getFestivalTollMultiplier,
-  getTouristOwnerPayout,
-  TOURIST_MOVE_STEP_DELAY_MS,
-  tryTriggerFestival,
 } from "./festival/festivalRules";
+import {
+  useFestivalResolution,
+} from "./festival/useFestivalResolution";
 import type {
   ActiveFestival,
   FestivalDeckState,
-  FestivalId,
   PendingFestivalAnnouncement,
   PendingTouristTurnResult,
   TouristNpcState,
@@ -252,7 +223,14 @@ import {
   getPortfolioMarketValue,
   getStockPrice,
 } from "./stock/stockMarket";
-import {buyStockHolding,getStockHolding,sellStockHolding,} from "./stock/stockTrading";
+import {
+  buyStockHolding,
+  getStockBuyTotalCost,
+  getStockHolding,
+  getStockSellNetProceeds,
+  getStockTradeFee,
+  sellStockHolding,
+} from "./stock/stockTrading";
 import {getSellableStockAssets,} from "./stock/stockLiquidation";
 import type {
   StockCompanyData,
@@ -261,16 +239,17 @@ import type {
   StockPortfolioMap,
   StockTradeError,
 } from "./stock/stockTypes";
-import type { UlsanMarbleArrivalContext,UlsanMarbleTollPaidPayload, UlsanMarbleDisasterResolvedPayload,UlsanMarbleDisasterActionDecidedPayload,} 
-from "../../../shared/ulsanMarbleProtocol";
+import { createInitialCompanyDividendModifiers,} from "./stock/companyDividendRules";
+import type {CompanyDividendModifierMap,} from "./stock/companyDividendTypes";
+import type { UlsanMarbleArrivalContext,UlsanMarbleTollPaidPayload,} from "../../../shared/ulsanMarbleProtocol";
 import type {UsePrototypeGameNetworkOptions,UlsanMarbleNetworkDiceRoll,} from "./network/networkTypes";
 import {useNetworkDiceRoll,} from "./network/useNetworkDiceRoll";
 import {useNetworkPropertyDecision,} from "./network/useNetworkPropertyDecision";
 import {useNetworkTurnSync,} from "./network/useNetworkTurnSync";
 import {useNetworkStockTrades,} from "./network/useNetworkStockTrades";
-import {useNetworkGameEvents,} from "./network/useNetworkGameEvents";
-import { useNetworkGoldenKey,} from "./network/useNetworkGoldenKey";
-import { useGoldenKeyResolution } from "./goldenKey/useGoldenKeyResolution";
+import {useNetworkGameEvents,type NetworkGameEventApplyResult,} from "./network/useNetworkGameEvents";
+import {useNetworkGoldenKey,} from "./network/useNetworkGoldenKey";
+import {useGoldenKeyResolution } from "./goldenKey/useGoldenKeyResolution";
 import {useAirportResolution,} from "./airport/useAirportResolution";
 import {usePropertyDevelopmentResolution,} from "./property/usePropertyDevelopmentResolution";
 import {useBankShopResolution,} from "./bank/useBankShopResolution";
@@ -281,11 +260,16 @@ import {usePortSettlementResolution,} from "./port/usePortSettlementResolution";
 import {useJailEntryResolution,} from "./jail/useJailEntryResolution";
 import {useJailTurnResolution,} from "./jail/useJailTurnResolution";
 import {useStockMarketResolution,} from "./stock/useStockMarketResolution";
+import {useCompanyDividendEventResolution,} from "./stock/useCompanyDividendEventResolution";
 import type {PendingStockMarketResolution} from "./stock/stockResolutionTypes";
 import {useAuctionResolution,} from "./auction/useAuctionResolution";
 import {useInsuranceShopResolution,} from "./insurance/useInsuranceShopResolution";
-import { useTaxSettlementResolution,} from "./economy/useTaxSettlementResolution";
+import {useTaxSettlementResolution,} from "./economy/useTaxSettlementResolution";
 import {useJailFineResolution,} from "./jail/useJailFineResolution";
+import {useMayorElectionResolution } from "./election/useMayorElectionResolution";
+import {createInitialMacroEconomyState,getMacroBankInterestMultiplier,} from "./economy/macroEconomyRules";
+import type {MacroEconomyState,} from "./economy/macroEconomyTypes";
+import {useMacroEconomyResolution,} from "./economy/useMacroEconomyResolution";
 
 export type {
   UlsanMarbleNetworkDiceRoll,
@@ -340,11 +324,14 @@ export function usePrototypeGame({
 
   networkGameEvents,
   onNetworkGameEventRequest,
+  onNetworkGameEventAck,
+  onNetworkTurnReady,
 
   networkTurnNumber,
   networkTurnSequence,
   networkActivePlayerId,
   onNetworkEndTurnRequest,
+  networkControllerPlayerId,
   onNetworkDevEndTurnRequest,
   
     
@@ -411,6 +398,7 @@ export function usePrototypeGame({
   const [stockPortfolios, setStockPortfolios] = useState<StockPortfolioMap>(() => createInitialStockPortfolios(playerIds),);
   const stockPortfoliosRef = useRef<StockPortfolioMap>(createInitialStockPortfolios(playerIds),);
   const [pendingStockMarketResolution, setPendingStockMarketResolution] = useState<PendingStockMarketResolution | null>(null);
+  const companyDividendModifiersRef = useRef<CompanyDividendModifierMap>(createInitialCompanyDividendModifiers(stockCompanies,),);
   const [isStockMarketOpen, setIsStockMarketOpen] = useState(false);
   const [lottoState, setLottoState] = useState<LottoState>(() => createInitialLottoState(),);
   const lottoStateRef = useRef<LottoState>(createInitialLottoState());
@@ -423,13 +411,6 @@ export function usePrototypeGame({
   const [cityHallState, setCityHallState] = useState<CityHallState>(() => createInitialCityHallState(),);
   const cityHallStateRef = useRef<CityHallState>(createInitialCityHallState());
   const [pendingCityHallSelection, setPendingCityHallSelection] = useState<PendingCityHallSelection | null>(null);
-  const [disasterState, setDisasterState] = useState<DisasterState>(() => createInitialDisasterState(),);
-  const disasterStateRef = useRef<DisasterState>(createInitialDisasterState());
-  const processedDisasterActionIdsRef = useRef<Set<string>>(new Set(),);
-  const publishedDisasterActionIdsRef = useRef<Set<string>>(new Set(),);
-  const [pendingDisasterResolution, setPendingDisasterResolution] = useState<PendingDisasterResolution | null>(null);
-  const [disasterPaymentError, setDisasterPaymentError] = useState<DisasterPaymentError | null>(null);
-  const [disasterLiquidationError, setDisasterLiquidationError] = useState<DisasterLiquidationError | null>(null);
   const [insuranceContracts, setInsuranceContracts] = useState<InsuranceContractMap>(() => createInitialInsuranceContracts());
   const insuranceContractsRef = useRef<InsuranceContractMap>(createInitialInsuranceContracts(),);
   const [pendingInsuranceShop, setPendingInsuranceShop] = useState<PendingInsuranceShop | null>(null);
@@ -439,6 +420,8 @@ export function usePrototypeGame({
   const [pendingGoldenKey, setPendingGoldenKey] = useState<PendingGoldenKeyResolution | null>(null);
   const [economicNewsState, setEconomicNewsState] = useState<EconomicNewsState>(() => createInitialEconomicNewsState(economicNewsPool),);
   const economicNewsStateRef = useRef<EconomicNewsState>(economicNewsState);
+  const [macroEconomyState,setMacroEconomyState,] = useState<MacroEconomyState>(() =>createInitialMacroEconomyState(),);
+  const macroEconomyStateRef = useRef<MacroEconomyState>(macroEconomyState,);
   const [pendingEconomicNews, setPendingEconomicNews] = useState<PendingEconomicNewsResolution | null>(null);
   const [pendingJailEntry, setPendingJailEntry] = useState<PendingJailEntry | null>(null);
   const [pendingJailFine, setPendingJailFine] = useState<PendingJailFine | null>(null);
@@ -489,6 +472,7 @@ export function usePrototypeGame({
   const [pendingTaxSettlement, setPendingTaxSettlement] = useState<PendingTaxSettlement | null>(null);
   const [taxPaymentError, setTaxPaymentError] = useState<TaxPaymentError | null>(null);
   const [taxLiquidationError, setTaxLiquidationError] = useState<TaxLiquidationError | null>(null);
+  const sentTurnReadySequenceRef =useRef<number | null>(null);
 
 
   const bankruptPlayerIds = useMemo(
@@ -516,12 +500,6 @@ export function usePrototypeGame({
     () => getCityHallConstructionCostMultiplier(activeCityHallTerm),
     [activeCityHallTerm],
   );
-
-  const activeDisasterPenalties = useMemo(
-    () => getActiveDisasterPenalties(disasterState, turn.turnNumber),
-    [disasterState, turn.turnNumber],
-  );
-
   const visibleEconomicNews = useMemo(
     () => getVisibleEconomicNews(economicNewsState, turn.turnNumber),
     [economicNewsState, turn.turnNumber],
@@ -618,12 +596,6 @@ export function usePrototypeGame({
     cityHallStateRef.current = nextState;
     setCityHallState(nextState);
   }, []);
-
-  const commitDisasterState = useCallback((nextState: DisasterState) => {
-    disasterStateRef.current = nextState;
-    setDisasterState(nextState);
-  }, []);
-
   const commitInsuranceContracts = useCallback(
     (nextContracts: InsuranceContractMap) => {
       insuranceContractsRef.current = nextContracts;
@@ -659,6 +631,10 @@ export function usePrototypeGame({
     commitDevelopmentRestrictions,
     turn.turnNumber,
   ]);
+
+  const commitMacroEconomyState =
+  useCallback(
+    (nextState:MacroEconomyState,) => {macroEconomyStateRef.current =nextState; setMacroEconomyState(nextState,);},[],);
   const commitPortState = useCallback((nextState: PortState) => {
     portStateRef.current = nextState;
     setPortState(nextState);
@@ -1670,145 +1646,6 @@ export function usePrototypeGame({
     pendingTaxLiquidationAssets.length === 0 &&
     pendingTaxStockLiquidationAssets.length === 0;
 
-  const pendingDisasterAssessment = useMemo(() => {
-    if (
-      !pendingDisasterResolution ||
-      pendingDisasterResolution.stage !== "SETTLEMENT"
-    ) {
-      return null;
-    }
-
-    return (
-      pendingDisasterResolution.event.playerAssessments[
-        pendingDisasterResolution.currentAssessmentIndex
-      ] ?? null
-    );
-  }, [pendingDisasterResolution]);
-
-  const canConfirmPendingDisasterEvent =
-    Boolean(
-      pendingDisasterResolution &&
-      pendingDisasterResolution.stage ===
-        "EVENT",
-    ) &&
-    (
-      !onNetworkGameEventRequest ||
-      (
-        networkActivePlayerId ??
-        turn.activePlayerId
-      ) === resolvedLocalPlayerId
-    );
-
-  const canInteractWithPendingDisaster =
-    Boolean(
-      pendingDisasterAssessment,
-    ) &&
-    (
-      !onNetworkGameEventRequest ||
-      pendingDisasterAssessment?.playerId ===
-        resolvedLocalPlayerId
-    );
-
-  const pendingDisasterPlayer = useMemo(() => {
-    if (!pendingDisasterAssessment) return null;
-
-    return (
-      players.find(
-        (player) => player.id === pendingDisasterAssessment.playerId,
-      ) ?? null
-    );
-  }, [pendingDisasterAssessment, players]);
-
-  const canPayPendingDisaster = useMemo(() => {
-    if (!pendingDisasterAssessment || !pendingDisasterPlayer) return false;
-
-    return (
-      pendingDisasterPlayer.money +
-        getGeneralDepositBalance(bankState, pendingDisasterPlayer.id) >=
-      pendingDisasterAssessment.totalAmount
-    );
-  }, [bankState, pendingDisasterAssessment, pendingDisasterPlayer]);
-
-  const pendingDisasterLiquidationAssets = useMemo(() => {
-    if (!pendingDisasterAssessment) return [];
-
-    return getSellablePropertyAssets(
-      propertyOwnerships,
-      properties,
-      pendingDisasterAssessment.playerId,
-      propertyMarket,
-      getPolicyPropertySaleRate(activeMayorPolicy),
-    );
-  }, [
-    activeMayorPolicy,
-    pendingDisasterAssessment,
-    properties,
-    propertyMarket,
-    propertyOwnerships,
-  ]);
-
-  const pendingDisasterStockLiquidationAssets = useMemo(() => {
-    if (!pendingDisasterAssessment) return [];
-
-    return getSellableStockAssets(
-      stockPortfolios,
-      stockCompanies,
-      stockMarket,
-      pendingDisasterAssessment.playerId,
-    );
-  }, [
-    pendingDisasterAssessment,
-    stockCompanies,
-    stockMarket,
-    stockPortfolios,
-  ]);
-
-  const pendingDisasterLiquidationValue = useMemo(
-    () =>
-      getCombinedLiquidationValue(
-        pendingDisasterLiquidationAssets,
-        pendingDisasterStockLiquidationAssets,
-      ),
-    [
-      pendingDisasterLiquidationAssets,
-      pendingDisasterStockLiquidationAssets,
-    ],
-  );
-
-  const pendingDisasterShortfall = useMemo(() => {
-    if (!pendingDisasterAssessment || !pendingDisasterPlayer) return 0;
-
-    return getDebtShortfall(
-      pendingDisasterPlayer.money +
-        getGeneralDepositBalance(bankState, pendingDisasterPlayer.id),
-      pendingDisasterAssessment.totalAmount,
-    );
-  }, [bankState, pendingDisasterAssessment, pendingDisasterPlayer]);
-
-  const canCoverPendingDisasterAfterLiquidation = useMemo(() => {
-    if (!pendingDisasterAssessment || !pendingDisasterPlayer) return false;
-
-    return canCoverDebtAfterLiquidation(
-      pendingDisasterPlayer.money +
-        getGeneralDepositBalance(bankState, pendingDisasterPlayer.id),
-      pendingDisasterAssessment.totalAmount,
-      pendingDisasterLiquidationAssets,
-      pendingDisasterStockLiquidationAssets,
-    );
-  }, [
-    bankState,
-    pendingDisasterAssessment,
-    pendingDisasterLiquidationAssets,
-    pendingDisasterPlayer,
-    pendingDisasterStockLiquidationAssets,
-  ]);
-
-  const canDeclarePendingDisasterBankruptcy =
-    Boolean(pendingDisasterAssessment) &&
-    !canPayPendingDisaster &&
-    pendingDisasterLiquidationAssets.length === 0 &&
-    pendingDisasterStockLiquidationAssets.length === 0;
-
   const isRollingDice = turn.phase === "ROLLING_DICE";
   const isMoving = turn.phase === "MOVING" || turn.phase === "ARRIVED";
   const isTokenMoving = turn.phase === "MOVING";
@@ -1861,13 +1698,11 @@ export function usePrototypeGame({
       bankStateRef.current,
       eligiblePlayerIds,
       settlementTurn,
-      getEconomicNewsBankInterestMultiplier(settlementEconomicNews) *
-        getCityHallBankInterestMultiplier(
-          getActiveCityHallTerm(cityHallStateRef.current, settlementTurn),
-        ),
-      depositBonusMultipliers,
-    );
-    commitBankState(result.state);
+      getEconomicNewsBankInterestMultiplier(settlementEconomicNews,) *
+        getCityHallBankInterestMultiplier(getActiveCityHallTerm(cityHallStateRef.current,settlementTurn,),) *
+        getMacroBankInterestMultiplier(macroEconomyStateRef.current.interestRateLevel,),
+        depositBonusMultipliers, );
+      commitBankState(result.state);
 
     let nextAuctionState = auctionStateRef.current;
     let usedDepositBonus = false;
@@ -2034,369 +1869,130 @@ export function usePrototypeGame({
     withdraw,
   ]);
  
-  const startMayorElectionResolution = useCallback(
-    (
-      mode: "SCHEDULED" | "DEV",
-      additionallyDisabledPlayerIds: string[] = [],
-    ) => {
-      const disabledPlayerIdSet = new Set(additionallyDisabledPlayerIds);
-      const eligibleVoterIds = playersRef.current
-        .filter(
-          (player) =>
-            !player.isBankrupt && !disabledPlayerIdSet.has(player.id),
-        )
-        .map((player) => player.id);
+const {
+  disasterState,
+  disasterStateRef,
+  activeDisasterPenalties,
 
-      if (eligibleVoterIds.length === 0) {
-        if (mode === "DEV") {
-          turn.cancelCurrentAction();
-        } else {
-          turn.completeMayorElection(additionallyDisabledPlayerIds);
-        }
-        return;
-      }
+  pendingDisasterResolution,
+  pendingDisasterAssessment,
+  pendingDisasterPlayer,
 
-      const candidates = createMayorElectionCandidates(
-        currentMayorTermRef.current?.policy.id ?? null,
-      );
+  canConfirmPendingDisasterEvent,
+  canInteractWithPendingDisaster,
+  canPayPendingDisaster,
 
-      setPendingMayorElection({
-        electionTurn: turn.turnNumber,
-        mode,
-        candidates,
-        eligibleVoterIds,
-        currentVoterIndex: 0,
-        votes: {},
-        result: null,
-        additionallyDisabledPlayerIds: [
-          ...new Set(additionallyDisabledPlayerIds),
-        ],
-      });
-      turn.startMayorElection();
-    },
-    [turn],
-  );
+  pendingDisasterLiquidationAssets,
+  pendingDisasterStockLiquidationAssets,
+  pendingDisasterLiquidationValue,
+  pendingDisasterShortfall,
+  canCoverPendingDisasterAfterLiquidation,
+  canDeclarePendingDisasterBankruptcy,
 
-  const applyDisasterResolved = useCallback(
-    (
-      payload:
-        UlsanMarbleDisasterResolvedPayload,
-    ): boolean => {
-      const currentTurnSequence =
-        networkTurnSequence ??
-        turn.turnSequence;
+  disasterPaymentError,
+  disasterLiquidationError,
 
-      if (
-        payload.turnSequence !==
-          currentTurnSequence
-      ) {
-        return false;
-      }
+  startDisasterResolution,
 
-      if (
-        payload.outcome === "SKIP"
-      ) {
-        turn.completeTurn(
-          payload
-            .additionallyDisabledPlayerIds,
-        );
+  acknowledgePendingDisasterEvent,
+  completePendingDisasterResolution,
 
-        return true;
-      }
+  payPendingDisasterRepair,
+  sellPropertyForPendingDisaster,
+  sellStockForPendingDisaster,
+  declarePendingDisasterBankruptcy,
 
-      commitPropertyMarket(
-        payload.nextMarket,
-      );
+  applyDisasterResolved,
+  applyDisasterActionDecided,
 
-      commitAuctionState({
-        ...auctionStateRef.current,
+  devRunDisaster,
+  devResetDisasterCooldown,
 
-        inventories:
-          payload.nextAuctionInventories,
-      });
+  clearPendingDisasterResolution,
+  resetDisasterResolution,
+} = useDisasterResolution({
+  players,
+  playersRef,
 
-      commitDisasterState(
-        applyDisasterEventToState(
-          disasterStateRef.current,
-          payload.event,
-          payload.penalties,
-        ),
-      );
+  propertyOwnerships,
+  propertyOwnershipsRef,
 
-      setPendingDisasterResolution({
-        event: payload.event,
+  propertyMarket,
+  propertyMarketRef,
 
-        mode: payload.mode,
+  stockPortfolios,
+  stockPortfoliosRef,
 
-        stage: "EVENT",
+  stockMarket,
+  stockMarketRef,
 
-        currentAssessmentIndex: 0,
+  insuranceContractsRef,
+  lottoStateRef,
 
-        additionallyDisabledPlayerIds: [
-          ...payload
-            .additionallyDisabledPlayerIds,
-        ],
+  cityHallStateRef,
+  auctionStateRef,
 
-        newlyBankruptPlayerIds: [],
-      });
+  properties,
+  stockCompanies,
 
-      setDisasterPaymentError(null);
-      setDisasterLiquidationError(null);
+  activeMayorPolicy,
 
-      turn.startDisaster();
+  localPlayerId:
+    resolvedLocalPlayerId,
 
-      return true;
-    },
-    [
-      commitAuctionState,
-      commitDisasterState,
-      commitPropertyMarket,
-      networkTurnSequence,
-      turn,
-    ],
-  );
+  /*
+   * 로컬/DEV에서만 사용.
+   * 온라인 authoritative 진행자는
+   * controllerPlayerId를 사용한다.
+   */
+  activePlayerId:
+    turn.activePlayerId,
 
-  const startDisasterResolution = useCallback(
-    (
-      mode: "SCHEDULED" | "DEV",
-      additionallyDisabledPlayerIds: string[] = [],
-      forcedType?: DisasterType,
-    ) => {
+  controllerPlayerId:
+    networkControllerPlayerId,
 
-      const isNetworkResolution =
-        Boolean(
-          onNetworkGameEventRequest,
-        );
+  turnNumber:
+    turn.turnNumber,
 
-      const requiresActivePublisher =
-        mode === "SCHEDULED" &&
-        isNetworkResolution;
+  turnSequence:
+    turn.turnSequence,
 
-      const serverTurnNumber =
-        networkTurnNumber ??
-        turn.turnNumber;
+  networkTurnNumber,
+  networkTurnSequence,
 
-      if (
-        requiresActivePublisher &&
-        (
-          networkActivePlayerId ??
-          turn.activePlayerId
-        ) !== resolvedLocalPlayerId
-      ) {
-        return;
-      }
+  canRunDev:
+    turn.canRoll,
 
-      const shouldStart =
-        mode === "DEV" ||
-        shouldTriggerDisaster(
-          turn.turnNumber,
-          disasterStateRef.current.lastOccurredTurn,
-          getPolicyDisasterChanceMultiplier(activeMayorPolicy),
-        );
+  commitPlayers,
+  commitPropertyOwnerships,
+  commitPropertyMarket,
+  commitStockPortfolios,
+  commitLottoState,
+  commitInsuranceContracts,
+  commitAuctionState,
 
-      if (!shouldStart) {
-        if (
-          isNetworkResolution &&
-          onNetworkGameEventRequest
-        ) {
-          onNetworkGameEventRequest({
-            kind: "DISASTER_RESOLVED",
+  getPlayerLiquidBalance,
+  deposit,
+  withdraw,
 
-            payload: {
-              mode: "SCHEDULED",
-              outcome: "SKIP",
+  prepareMandatoryPayment,
+  settleBankAssetsForBankruptcy,
 
-              turnNumber: serverTurnNumber,
-                  
-              turnSequence:
-                networkTurnSequence ??
-                turn.turnSequence,
+  startDisasterPhase:
+    turn.startDisaster,
 
-              additionallyDisabledPlayerIds: [
-                ...new Set(
-                  additionallyDisabledPlayerIds,
-                ),
-              ],
-            },
-          });
+  completeDisasterPhase:
+    turn.completeDisaster,
 
-          return;
-        }
+  completeTurn:
+    turn.completeTurn,
 
-        turn.completeTurn(
-          additionallyDisabledPlayerIds,
-        );
+  cancelCurrentAction:
+    turn.cancelCurrentAction,
 
-        return;
-      }
-
-      const disasterType = forcedType ?? selectRandomDisasterType();
-      const result = createDisasterEvent({
-        type: disasterType,
-        turnNumber: turn.turnNumber,
-        properties,
-        ownerships: propertyOwnershipsRef.current,
-        market: propertyMarketRef.current,
-        insuranceContracts: insuranceContractsRef.current,
-        disabledPlayerIds: additionallyDisabledPlayerIds,
-        repairCostMultiplier:
-          getPolicyDisasterRepairCostMultiplier(activeMayorPolicy) *
-          getCityHallDisasterRepairCostMultiplier(
-            getActiveCityHallTerm(cityHallStateRef.current, turn.turnNumber),
-          ),
-      });
-
-      let nextAuctionState = auctionStateRef.current;
-      const supportedDamageByKey = new Map<string, number>();
-      const supportedAssessments = result.event.playerAssessments.map(
-        (assessment) => {
-          if (
-            assessment.totalAmount <= 0 ||
-            !hasAuctionItem(
-              nextAuctionState,
-              assessment.playerId,
-              "DISASTER_SUPPORT",
-            )
-          ) {
-            return assessment;
-          }
-
-          const consumed = consumeAuctionItem(
-            nextAuctionState,
-            assessment.playerId,
-            "DISASTER_SUPPORT",
-          );
-          if (!consumed) return assessment;
-          nextAuctionState = consumed.state;
-
-          const damages = assessment.damages.map((damage) => {
-            const finalRepairCost = Math.max(
-              1,
-              Math.round(damage.finalRepairCost * 0.5),
-            );
-            supportedDamageByKey.set(
-              `${assessment.playerId}:${damage.propertyId}`,
-              finalRepairCost,
-            );
-            return { ...damage, finalRepairCost };
-          });
-          return {
-            ...assessment,
-            damages,
-            totalAmount: damages.reduce(
-              (total, damage) => total + damage.finalRepairCost,
-              0,
-            ),
-          };
-        },
-      );
-      const supportedPropertyDamages = result.event.propertyDamages.map(
-        (damage) => {
-          if (!damage.ownerPlayerId) return damage;
-          const finalRepairCost = supportedDamageByKey.get(
-            `${damage.ownerPlayerId}:${damage.propertyId}`,
-          );
-          return finalRepairCost === undefined
-            ? damage
-            : { ...damage, finalRepairCost };
-        },
-      );
-      const supportedEvent = {
-        ...result.event,
-        propertyDamages: supportedPropertyDamages,
-        playerAssessments: supportedAssessments,
-        totalRepairCost: supportedAssessments.reduce(
-          (total, assessment) => total + assessment.totalAmount,
-          0,
-        ),
-      };
-
-      if (
-        isNetworkResolution &&
-        onNetworkGameEventRequest
-      ) {
-        onNetworkGameEventRequest({
-          kind: "DISASTER_RESOLVED",
-
-          payload: {
-            mode,
-            outcome: "EVENT",
-
-            turnNumber: serverTurnNumber,
-
-            turnSequence:
-              networkTurnSequence ??
-              turn.turnSequence,
-
-            additionallyDisabledPlayerIds: [
-              ...new Set(
-                additionallyDisabledPlayerIds,
-              ),
-            ],
-
-            event:
-              supportedEvent,
-
-            nextMarket:
-              result.market,
-
-            penalties:
-              result.penalties,
-
-            nextAuctionInventories:
-              nextAuctionState.inventories,
-          },
-        });
-
-        /*
-        * 여기서 로컬 적용하지 않는다.
-        * 자기 자신도 서버 이벤트가
-        * 돌아온 뒤 apply한다.
-        */
-        return;
-      }
-
-      if (nextAuctionState !== auctionStateRef.current) {
-        commitAuctionState(nextAuctionState);
-      }
-
-      commitPropertyMarket(result.market);
-      commitDisasterState(
-        applyDisasterEventToState(
-          disasterStateRef.current,
-          supportedEvent,
-          result.penalties,
-        ),
-      );
-      setPendingDisasterResolution({
-        event: supportedEvent,
-        mode,
-        stage: "EVENT",
-        currentAssessmentIndex: 0,
-        additionallyDisabledPlayerIds: [
-          ...new Set(additionallyDisabledPlayerIds),
-        ],
-        newlyBankruptPlayerIds: [],
-      });
-      setDisasterPaymentError(null);
-      setDisasterLiquidationError(null);
-      turn.startDisaster();
-    },
-    [
-      activeMayorPolicy,
-      commitAuctionState,
-      commitDisasterState,
-      commitPropertyMarket,
-      networkActivePlayerId,
-      networkTurnNumber,
-      networkTurnSequence,
-      onNetworkGameEventRequest,
-      properties,
-      resolvedLocalPlayerId,
-      turn,
-    ],
-  );
-
+  onNetworkGameEventRequest,
+});
+  
 const {
   startNewspaperEconomicNews,
   startRandomEconomicNewsResolution,
@@ -2425,6 +2021,8 @@ const {
     networkActivePlayerId ??
     turn.activePlayerId,
 
+  controllerPlayerId: networkControllerPlayerId,  
+
   turnNumber:
     turn.turnNumber,
 
@@ -2438,6 +2036,10 @@ const {
   completeTileResolution:
     completeTileResolutionBridge,
 
+  isTileResolutionReady:
+    turn.phase === "ARRIVED" ||
+    turn.phase === "RESOLVING_TILE",  
+
   startEconomicNewsPhase:
     turn.startEconomicNews,
 
@@ -2445,6 +2047,70 @@ const {
     turn.cancelCurrentAction,
 
   startDisasterResolution,
+
+  onNetworkGameEventRequest,
+});
+
+const {
+  startMayorElectionResolution,
+  castMayorElectionVote,
+  completePendingMayorElection,
+
+  applyMayorElectionStarted,
+  applyMayorElectionVoteCast,
+  applyMayorElectionResultResolved,
+  applyMayorElectionResultConfirmed,
+
+  resetMayorElectionResolution,
+
+  currentMayorElectionVoterId,
+  canVoteInMayorElection,
+  canConfirmMayorElectionResult,
+  } = useMayorElectionResolution({
+  pendingMayorElection,
+  setPendingMayorElection,
+
+  playersRef,
+  currentMayorTermRef,
+
+  localPlayerId:
+    resolvedLocalPlayerId,
+
+  controllerPlayerId:
+    networkControllerPlayerId,
+
+  /*
+   * apply WAIT/INVALID 판단은
+   * 현재 로컬 lifecycle 기준.
+   */
+  turnNumber:
+    turn.turnNumber,
+
+  turnSequence:
+    turn.turnSequence,
+
+  /*
+   * 이벤트 발행은
+   * 서버 authoritative 값 기준.
+   */
+  networkTurnNumber,
+  networkTurnSequence,
+
+  canRunDev:
+    turn.canRoll,
+
+  commitMayorTerm,
+
+  startMayorElectionPhase:
+    turn.startMayorElection,
+
+  completeMayorElectionPhase:
+    turn.completeMayorElection,
+
+  cancelCurrentAction:
+    turn.cancelCurrentAction,
+
+  startRandomEconomicNewsResolution,
 
   onNetworkGameEventRequest,
 });
@@ -2507,9 +2173,7 @@ const continueAfterLottoDraw =
     localPlayerId:
       resolvedLocalPlayerId,
 
-    activePlayerId:
-      networkActivePlayerId ??
-      turn.activePlayerId,
+    controllerPlayerId: networkControllerPlayerId,
 
     turnSequence:
       networkTurnSequence ??
@@ -2582,9 +2246,7 @@ const continueAfterLottoDraw =
     localPlayerId:
       resolvedLocalPlayerId,
 
-    activePlayerId:
-      networkActivePlayerId ??
-      turn.activePlayerId,
+    controllerPlayerId: networkControllerPlayerId,
 
     turnSequence:
       networkTurnSequence ??
@@ -2614,6 +2276,7 @@ const continueAfterLottoDraw =
     setPendingStockMarketResolution,
     stockMarketRef,
     stockPortfoliosRef,
+    companyDividendModifiersRef,
     auctionStateRef,
     cityHallStateRef,
     economicNewsStateRef,
@@ -2623,9 +2286,7 @@ const continueAfterLottoDraw =
     localPlayerId:
     resolvedLocalPlayerId,
 
-    activePlayerId:
-      networkActivePlayerId ??
-      turn.activePlayerId,
+    controllerPlayerId: networkControllerPlayerId,
 
     turnSequence:
       networkTurnSequence ??
@@ -2651,85 +2312,107 @@ const continueAfterLottoDraw =
     onNetworkGameEventRequest,
   });  
 
-  const castMayorElectionVote = useCallback(
-    (candidateId: string) => {
-      if (!pendingMayorElection || pendingMayorElection.result) return;
-      if (
-        !pendingMayorElection.candidates.some(
-          (candidate) => candidate.id === candidateId,
-        )
-      ) {
-        return;
-      }
+  const {
+    pendingCompanyDividendEvent,
 
-      const voterId =
-        pendingMayorElection.eligibleVoterIds[
-          pendingMayorElection.currentVoterIndex
-        ];
-      if (!voterId || pendingMayorElection.votes[voterId]) return;
+    startCompanyDividendEventResolution,
+    applyCompanyDividendEventResolved,
 
-      const nextVotes = {
-        ...pendingMayorElection.votes,
-        [voterId]: candidateId,
-      };
-      const nextVoterIndex = pendingMayorElection.currentVoterIndex + 1;
+    dismissCompanyDividendEvent,
 
-      if (nextVoterIndex < pendingMayorElection.eligibleVoterIds.length) {
-        setPendingMayorElection({
-          ...pendingMayorElection,
-          votes: nextVotes,
-          currentVoterIndex: nextVoterIndex,
-        });
-        return;
-      }
+    resetCompanyDividendEventResolution,
+  } = useCompanyDividendEventResolution({
+    companyDividendModifiersRef,
 
-      const result = resolveMayorElection(
-        pendingMayorElection.candidates,
-        nextVotes,
-      );
-      const winner = pendingMayorElection.candidates.find(
-        (candidate) => candidate.id === result.winnerCandidateId,
-      );
+    macroEconomyStateRef,
 
-      if (!winner) return;
+    stockCompanies,
 
-      commitMayorTerm({
-        candidate: winner,
-        policy: getCandidatePolicy(winner),
-        electedTurn: pendingMayorElection.electionTurn,
-        activeFromTurn: pendingMayorElection.electionTurn + 1,
-        expiresAfterTurn: pendingMayorElection.electionTurn + 10,
-      });
-      setPendingMayorElection({
-        ...pendingMayorElection,
-        votes: nextVotes,
-        currentVoterIndex: nextVoterIndex,
-        result,
-      });
-    },
-    [commitMayorTerm, pendingMayorElection],
-  );
+    localPlayerId:
+      resolvedLocalPlayerId,
 
-  const completePendingMayorElection = useCallback(() => {
-    if (!pendingMayorElection?.result) return;
+    controllerPlayerId:
+      networkControllerPlayerId,
 
-    const { mode, additionallyDisabledPlayerIds } = pendingMayorElection;
-    setPendingMayorElection(null);
+    turnNumber:
+      turn.turnNumber,
 
-    if (mode === "DEV") {
-      turn.cancelCurrentAction();
-      return;
-    }
+    turnSequence:
+      networkTurnSequence ??
+      turn.turnSequence,
 
-    startRandomEconomicNewsResolution(
-      "SCHEDULED",
-      additionallyDisabledPlayerIds,
-    );
-  }, [
-    pendingMayorElection,
-    startRandomEconomicNewsResolution,
-    turn,
-  ]);
+    startStockMarketResolution,
+
+    onNetworkGameEventRequest,
+  });
+
+  const {
+    startMacroEconomyResolution,
+    applyMacroEconomyResolved,
+    resetMacroEconomyResolution,
+  } = useMacroEconomyResolution({
+    macroEconomyStateRef,
+
+    commitMacroEconomyState,
+
+    localPlayerId:
+      resolvedLocalPlayerId,
+
+    controllerPlayerId:
+      networkControllerPlayerId,
+
+    /*
+    * 실제 경기 정산 대상은
+    * 로컬 완료 턴 N.
+    */
+    turnNumber:
+      turn.turnNumber,
+
+    /*
+    * 이벤트 sequence는
+    * 서버 authoritative sequence.
+    */
+    turnSequence:
+      networkTurnSequence ??
+      turn.turnSequence,
+
+    startStockMarketResolution: startCompanyDividendEventResolution,
+
+    onNetworkGameEventRequest,
+  });
+
+  const startPostFestivalMarketResolution =
+    useCallback(
+      (
+        mode:
+          | "SCHEDULED"
+          | "DEV",
+
+        additionallyDisabledPlayerIds:
+          string[] = [],
+      ): void => {
+        /*
+        * DEV 주식 정산은 기존처럼
+        * 경기 국면을 거치지 않는다.
+        */
+        if (mode === "DEV") {
+          startStockMarketResolution(
+            "DEV",
+            additionallyDisabledPlayerIds,
+          );
+
+          return;
+        }
+
+        startMacroEconomyResolution(
+          additionallyDisabledPlayerIds,
+        );
+      },
+      [
+        startMacroEconomyResolution,
+        startStockMarketResolution,
+      ],
+    );  
 
   const getActiveFestivalTollMultiplier = useCallback(
     (property: PropertyData): number =>
@@ -2737,249 +2420,94 @@ const continueAfterLottoDraw =
     [activeFestival],
   );
 
-  const startTouristTurn = useCallback(
-    async (continuationDisabledPlayerIds: string[] = []) => {
-      const festival = activeFestivalRef.current;
-      const currentNpc = touristNpcRef.current;
 
-      if (!festival || !currentNpc) {
-        commitFestivalSettlementBusy(false);
-        startStockMarketResolution(
-          "SCHEDULED",
-          continuationDisabledPlayerIds,
-        );
-        return;
-      }
+  const {
+    continueAfterPropertyMarket,
+    continueGlobalTurnSettlement,
 
-      commitFestivalSettlementBusy(true);
+    completeFestivalAnnouncement,
+    completePendingTouristTurn,
 
-      const firstDice = createDiceValue();
-      const secondDice = createDiceValue();
-      const fromPosition = currentNpc.position;
-      let nextNpc: TouristNpcState = {
-        ...currentNpc,
-        moving: true,
-        lastDice: [firstDice, secondDice],
-      };
-      let completedLap = false;
+    applyFestivalTriggerResolved,
+    applyFestivalAnnouncementConfirmed,
+    applyTouristTurnResolved,
+    applyTouristTurnConfirmed,
+    applyFestivalDevEnded,
 
-      commitTouristNpc(nextNpc);
+    devRunFestival,
+    devEndFestival,
 
-      for (
-        let stepIndex = 0;
-        stepIndex < firstDice + secondDice;
-        stepIndex += 1
-      ) {
-        await delay(TOURIST_MOVE_STEP_DELAY_MS);
-        const stepResult = advanceTouristNpcOneStep(
-          nextNpc,
-          tileCount,
-        );
-        nextNpc = stepResult.npc;
-        completedLap = stepResult.completedLap;
-        commitTouristNpc(nextNpc);
+    resetFestivalResolution,
 
-        if (completedLap) break;
-      }
+    canConfirmFestivalAnnouncement,
+    canConfirmTouristTurn,
+  } = useFestivalResolution({
+    festivalDeckStateRef,
 
-      const festivalDefinition = getFestivalDefinition(
-        festival.festivalId,
-      );
+    activeFestivalRef,
+    touristNpcRef,
 
-      if (completedLap) {
-        commitActiveFestival(null);
-        commitTouristNpc(null);
-        setPendingTouristTurnResult({
-          festivalId: festival.festivalId,
-          diceValues: [firstDice, secondDice],
-          fromPosition,
-          toPosition: 0,
-          landedTileName: tiles[0]?.name ?? "출발",
-          landingKind: "FESTIVAL_END",
-          propertyName: null,
-          ownerPlayerId: null,
-          ownerName: null,
-          bankPayout: 0,
-          finalToll: 0,
-          completedLap: true,
-          continuationDisabledPlayerIds: [
-            ...new Set(continuationDisabledPlayerIds),
-          ],
-        });
-        return;
-      }
+    festivalSettlementBusyRef,
 
-      nextNpc = {
-        ...nextNpc,
-        moving: false,
-      };
-      commitTouristNpc(nextNpc);
+    pendingFestivalAnnouncement,
+    setPendingFestivalAnnouncement,
 
-      const landedTile = tiles[nextNpc.position];
-      const landedProperty = landedTile?.propertyId
-        ? propertyMap.get(landedTile.propertyId)
-        : undefined;
-      const ownership = landedProperty
-        ? propertyOwnershipsRef.current[landedProperty.id]
-        : undefined;
+    pendingTouristTurnResult,
+    setPendingTouristTurnResult,
 
-      let landingKind: PendingTouristTurnResult["landingKind"] =
-        "SPECIAL_TILE";
-      let ownerPlayerId: string | null = null;
-      let ownerName: string | null = null;
-      let bankPayout = 0;
-      let finalToll = 0;
+    playersRef,
 
-      if (landedProperty && !ownership) {
-        landingKind = "UNOWNED_PROPERTY";
-      }
+    propertyOwnershipsRef,
+    propertyMarketRef,
 
-      if (landedProperty && ownership) {
-        landingKind = "OWNED_PROPERTY";
-        ownerPlayerId = ownership.ownerPlayerId;
-        ownerName =
-          playersRef.current.find(
-            (player) => player.id === ownership.ownerPlayerId,
-          )?.name ?? null;
-        finalToll = getPropertyTollAmount(
-          landedProperty,
-          ownership.stage,
-          getPropertyPriceIndex(
-            propertyMarketRef.current,
-            landedProperty.id,
-          ),
-          getPolicyTollMultiplier(activeMayorPolicy) *
-            getCityHallTollMultiplier(
-              getActiveCityHallTerm(
-                cityHallStateRef.current,
-                turn.turnNumber,
-              ),
-              ownership.stage,
-            ) *
-            economicNewsTollMultiplier *
-            getDisasterTollMultiplier(
-              disasterStateRef.current,
-              landedProperty.id,
-              turn.turnNumber,
-            ) *
-            getFestivalTollMultiplier(
-              festival,
-              landedProperty,
-            ),
-        );
-        bankPayout = getTouristOwnerPayout(finalToll);
+    cityHallStateRef,
+    disasterStateRef,
 
-        if (bankPayout > 0) {
-          const payoutResult = deposit(
-            ownership.ownerPlayerId,
-            bankPayout,
-            "EVENT",
-            `${festivalDefinition.name} 관광객 · ${landedProperty.name}`,
-          );
+    tiles,
+    properties,
 
-          if (!payoutResult.ok) {
-            bankPayout = 0;
-          }
-        }
-      }
+    localPlayerId:
+      resolvedLocalPlayerId,
 
-      setPendingTouristTurnResult({
-        festivalId: festival.festivalId,
-        diceValues: [firstDice, secondDice],
-        fromPosition,
-        toPosition: nextNpc.position,
-        landedTileName: landedTile?.name ?? "알 수 없는 칸",
-        landingKind,
-        propertyName: landedProperty?.name ?? null,
-        ownerPlayerId,
-        ownerName,
-        bankPayout,
-        finalToll,
-        completedLap: false,
-        continuationDisabledPlayerIds: [
-          ...new Set(continuationDisabledPlayerIds),
-        ],
-      });
-    },
-    [
-      activeMayorPolicy,
-      commitActiveFestival,
-      commitFestivalSettlementBusy,
-      commitTouristNpc,
-      deposit,
-      economicNewsTollMultiplier,
-      propertyMap,
-      startStockMarketResolution,
-      tileCount,
-      tiles,
+    controllerPlayerId:
+      networkControllerPlayerId,
+
+    /*
+    * apply WAIT 판단은 로컬 lifecycle 기준.
+    */
+    turnNumber:
       turn.turnNumber,
-    ],
-  );
 
-  const continueGlobalTurnSettlement = useCallback(
-    (continuationDisabledPlayerIds: string[] = []) => {
-      if (activeFestivalRef.current && touristNpcRef.current) {
-        void startTouristTurn(continuationDisabledPlayerIds);
-        return;
-      }
+    turnSequence:
+      turn.turnSequence,
 
-      commitFestivalSettlementBusy(false);
-      startStockMarketResolution(
-        "SCHEDULED",
-        continuationDisabledPlayerIds,
-      );
-    },
-    [
-      commitFestivalSettlementBusy,
-      startStockMarketResolution,
-      startTouristTurn,
-    ],
-  );
+    /*
+    * 이벤트 발행은 서버 authoritative 값.
+    */
+    networkTurnNumber,
+    networkTurnSequence,
 
-  const continueAfterPropertyMarket = useCallback(
-    (continuationDisabledPlayerIds: string[] = []) => {
-      const triggerResult = tryTriggerFestival(
-        festivalDeckStateRef.current,
-        activeFestivalRef.current,
-        turn.turnNumber,
-      );
+    canRunDev:
+      turn.canRoll,
 
-      if (triggerResult.deck !== festivalDeckStateRef.current) {
-        commitFestivalDeckState(triggerResult.deck);
-      }
+    policyTollMultiplier:
+      getPolicyTollMultiplier(
+        activeMayorPolicy,
+      ),
 
-      if (!triggerResult.festivalId) {
-        continueGlobalTurnSettlement(
-          continuationDisabledPlayerIds,
-        );
-        return;
-      }
+    economicNewsTollMultiplier,
 
-      const nextFestival: ActiveFestival = {
-        festivalId: triggerResult.festivalId,
-        startedTurn: turn.turnNumber,
-      };
+    commitFestivalDeckState,
+    commitActiveFestival,
+    commitTouristNpc,
+    commitFestivalSettlementBusy,
 
-      commitActiveFestival(nextFestival);
-      commitTouristNpc(createTouristNpcState());
-      commitFestivalSettlementBusy(true);
-      setPendingFestivalAnnouncement({
-        festivalId: triggerResult.festivalId,
-        turnNumber: turn.turnNumber,
-        continuationDisabledPlayerIds: [
-          ...new Set(continuationDisabledPlayerIds),
-        ],
-      });
-    },
-    [
-      commitActiveFestival,
-      commitFestivalDeckState,
-      commitFestivalSettlementBusy,
-      commitTouristNpc,
-      continueGlobalTurnSettlement,
-      turn.turnNumber,
-    ],
-  );
+    deposit,
+
+    startStockMarketResolution:startPostFestivalMarketResolution,
+
+    onNetworkGameEventRequest,
+  });
 
   const {
     startPropertyMarketResolution,
@@ -3004,9 +2532,7 @@ const continueAfterLottoDraw =
     properties,
     localPlayerId:resolvedLocalPlayerId,
 
-    activePlayerId:
-      networkActivePlayerId ??
-      turn.activePlayerId,
+    controllerPlayerId: networkControllerPlayerId,
 
     turnSequence:
       networkTurnSequence ??
@@ -3068,9 +2594,7 @@ const continueAfterLottoDraw =
     localPlayerId:
       resolvedLocalPlayerId,
 
-    activePlayerId:
-      networkActivePlayerId ??
-      turn.activePlayerId,
+    controllerPlayerId: networkControllerPlayerId,
 
     turnSequence:
       networkTurnSequence ??
@@ -3106,32 +2630,6 @@ const continueAfterLottoDraw =
 
     onNetworkGameEventRequest,
   });
-
-  const completeFestivalAnnouncement = useCallback(() => {
-    if (!pendingFestivalAnnouncement) return;
-
-    const continuationDisabledPlayerIds =
-      pendingFestivalAnnouncement.continuationDisabledPlayerIds;
-    setPendingFestivalAnnouncement(null);
-    void startTouristTurn(continuationDisabledPlayerIds);
-  }, [pendingFestivalAnnouncement, startTouristTurn]);
-
-  const completePendingTouristTurn = useCallback(() => {
-    if (!pendingTouristTurnResult) return;
-
-    const continuationDisabledPlayerIds =
-      pendingTouristTurnResult.continuationDisabledPlayerIds;
-    setPendingTouristTurnResult(null);
-    commitFestivalSettlementBusy(false);
-    startStockMarketResolution(
-      "SCHEDULED",
-      continuationDisabledPlayerIds,
-    );
-  }, [
-    commitFestivalSettlementBusy,
-    pendingTouristTurnResult,
-    startStockMarketResolution,
-  ]);
 
   const finishTurnAfterStockTrading = useCallback(
     (
@@ -3183,6 +2681,76 @@ const continueAfterLottoDraw =
     ],
   );
 
+  const sendNetworkTurnReady =
+    useCallback(() => {
+      if (
+        !onNetworkTurnReady ||
+        networkTurnSequence === undefined
+      ) {
+        return;
+      }
+
+      if (
+        turn.turnSequence !==
+        networkTurnSequence
+      ) {
+        console.log(
+          "[TURN READY WAIT SYNC]",
+          {
+            networkTurnSequence,
+            localTurnSequence:
+              turn.turnSequence,
+            phase: turn.phase,
+          },
+        );
+
+        return;
+      }
+
+      if (
+        sentTurnReadySequenceRef.current ===
+        networkTurnSequence
+      ) {
+        return;
+      }
+
+      sentTurnReadySequenceRef.current =
+        networkTurnSequence;
+
+      console.log(
+        "[TURN READY SEND]",
+        "turnSeq =",
+        networkTurnSequence,
+        "phase =",
+        turn.phase,
+        "localSeq =",
+        turn.turnSequence,
+      );
+
+      onNetworkTurnReady(
+        networkTurnSequence,
+      );
+    }, [
+      networkTurnSequence,
+      onNetworkTurnReady,
+      turn.phase,
+      turn.turnSequence,
+    ]);
+
+  useEffect(() => {
+    if (
+      turn.phase !==
+      "STOCK_TRADING"
+    ) {
+      return;
+    }
+
+    sendNetworkTurnReady();
+  }, [
+    sendNetworkTurnReady,
+    turn.phase,
+  ]);
+
   const prepareNetworkJailTurnAdvance =
     useCallback(
       (
@@ -3194,8 +2762,12 @@ const continueAfterLottoDraw =
             additionallyDisabledPlayerIds,
           ),
         ];
+
+        sendNetworkTurnReady();
       },
-      [],
+      [
+        sendNetworkTurnReady,
+      ],
     );
 
   const completeNetworkJailTurnAdvance =
@@ -3255,8 +2827,47 @@ const continueAfterLottoDraw =
       ],
     );
 
-  const completeTileResolution = useCallback(
-    (additionallyDisabledPlayerIds: string[] = []) => {
+  const completeTileResolution =
+    useCallback(
+      (
+        additionallyDisabledPlayerIds:
+          string[] = [],
+      ) => {
+        const canCompleteTileResolution =
+          turn.phase === "ARRIVED" ||
+          turn.phase === "RESOLVING_TILE";
+
+        if (!canCompleteTileResolution) {
+          console.warn(
+            "[TILE COMPLETE BLOCKED]",
+            {
+              phase:
+                turn.phase,
+              activePlayerId:
+                turn.activePlayerId,
+              networkTurnSequence,
+              localTurnSequence:
+                turn.turnSequence,
+            },
+          );
+
+          console.warn(
+            "[TILE COMPLETE BLOCKED]",
+            {
+              phase: turn.phase,
+              activePlayerId: turn.activePlayerId,
+              networkTurnSequence,
+              localTurnSequence: turn.turnSequence,
+            },
+          );
+
+          console.trace(
+            "[TILE COMPLETE BLOCKED TRACE]",
+          );
+
+          return;
+        }
+
       setPendingPropertyPurchase(null);
       setPropertyPurchaseError(null);
       setPendingPropertyDevelopment(null);
@@ -3415,6 +3026,10 @@ const continueAfterLottoDraw =
 
     withdraw,
 
+    isTileResolutionReady:
+      turn.phase === "ARRIVED" ||
+      turn.phase === "RESOLVING_TILE",    
+
     completeTileResolution,
 
     onNetworkGameEventRequest,
@@ -3489,8 +3104,10 @@ const continueAfterLottoDraw =
     commitDevelopmentRestrictions,
 
     completeTileResolution,
-
-    onNetworkGameEventRequest,
+    isTileResolutionReady:
+      turn.phase === "ARRIVED" ||
+      turn.phase === "RESOLVING_TILE",
+      onNetworkGameEventRequest,
   });
 
   const {
@@ -3506,10 +3123,21 @@ const continueAfterLottoDraw =
       playersRef,
       commitPlayers,
 
+      jailPosition:
+        Math.max(
+          0,
+          tiles.findIndex(
+            (tile) =>
+              tile.type === "JAIL",
+          ),
+        ),
+
       localPlayerId:
         resolvedLocalPlayerId,
 
-      turnSequence:turn.turnSequence,
+      turnSequence:
+        networkTurnSequence ??
+        turn.turnSequence,
 
       prepareNetworkTurnAdvance:
         prepareNetworkJailTurnAdvance,
@@ -3549,7 +3177,6 @@ const continueAfterLottoDraw =
       setAssetLiquidationError(null);
       setPendingBankShop(null);
       setBankShopError(null);
-      setPendingMiniGame(null);
       setMiniGameError(null);
 
       const tile = tiles[position];
@@ -3966,7 +3593,7 @@ const continueAfterLottoDraw =
         : undefined;
 
       if (!isPropertyTile(tile, property)) {
-        completeTileResolution();
+        completeTileResolutionBridge();
         return;
       }
 
@@ -4392,41 +4019,86 @@ const continueAfterLottoDraw =
 
     setLastMove(safeSteps);
 
-    let currentPosition = movingPlayer.position;
+    let currentPosition =
+      movingPlayer.position;
 
-    for (let step = 0; step < safeSteps; step += 1) {
-      await delay(MOVE_STEP_DELAY_MS);
-
-      const nextPosition = getNextBoardPosition(currentPosition, tileCount);
-      const passedStart = didPassStart(currentPosition, nextPosition);
-
-      const movedPlayers = playersRef.current.map((player) =>
-        player.id === movingPlayerId
-          ? { ...player, position: nextPosition }
-          : player,
+    let completedLaps =
+      Math.max(
+        0,
+        Math.trunc(
+          movingPlayer.completedLaps ?? 0,
+        ),
       );
 
-      commitPlayers(movedPlayers);
+    for (
+      let step = 0;
+      step < safeSteps;
+      step += 1
+    ) {
+      await delay(
+        MOVE_STEP_DELAY_MS,
+      );
+
+      const nextPosition =
+        getNextBoardPosition(
+          currentPosition,
+          tileCount,
+        );
+
+      const passedStart =
+        didPassStart(
+          currentPosition,
+          nextPosition,
+        );
 
       if (passedStart) {
-        const salaryAmount = getPolicySalary(baseSalary, activeMayorPolicy);
-        const salaryResult = deposit(
-          movingPlayerId,
-          salaryAmount,
-          "SALARY",
-          "출발지 통과",
+        completedLaps += 1;
+      }
+
+      const movedPlayers =
+        playersRef.current.map(
+          (player) =>
+            player.id === movingPlayerId
+              ? {
+                  ...player,
+                  position: nextPosition,
+                  completedLaps,
+                }
+              : player,
         );
+
+      commitPlayers(
+        movedPlayers,
+      );
+
+      if (passedStart) {
+        const salaryAmount =
+          getPolicySalary(
+            baseSalary,
+            activeMayorPolicy,
+            completedLaps,
+          );
+
+        const salaryResult =
+          deposit(
+            movingPlayerId,
+            salaryAmount,
+            "SALARY",
+            `${completedLaps}바퀴 완주 · 출발지 통과`,
+          );
 
         if (salaryResult.ok) {
           setSalaryNotice({
             id: Date.now(),
-            playerName: movingPlayer.name,
+            playerName:
+              movingPlayer.name,
             amount: salaryAmount,
           });
         }
       }
 
-      currentPosition = nextPosition;
+      currentPosition =
+        nextPosition;
     }
 
     turn.markArrived();
@@ -4718,11 +4390,30 @@ const continueAfterLottoDraw =
       (
         payload:
           UlsanMarbleTollPaidPayload,
-      ): boolean => {
+      ): NetworkGameEventApplyResult => {
+        /*
+        * 네트워크 이벤트가 상대 클라이언트의
+        * 이동/도착 처리보다 먼저 올 수 있다.
+        *
+        * pending이 아직 없다는 것은
+        * 이벤트 자체가 잘못됐다는 뜻이 아니다.
+        */
         if (!pendingTollPayment) {
-          return false;
+          console.log(
+            "[TOLL PAID WAIT]",
+            "payer =",
+            payload.payerPlayerId,
+            "property =",
+            payload.propertyId,
+          );
+
+          return "WAIT";
         }
 
+        /*
+        * 통행료 대상 자체가 다르면
+        * 단순 타이밍 문제가 아니라 실제 상태 불일치다.
+        */
         if (
           pendingTollPayment
             .payerPlayerId !==
@@ -4732,11 +4423,48 @@ const continueAfterLottoDraw =
             payload.ownerPlayerId ||
           pendingTollPayment
             .property.id !==
-            payload.propertyId ||
-          pendingTollPayment.amount !==
-            payload.amount
+            payload.propertyId
         ) {
-          return false;
+          console.warn(
+            "[TOLL PAID INVALID TARGET]",
+            {
+              pending: {
+                payerPlayerId:
+                  pendingTollPayment
+                    .payerPlayerId,
+                ownerPlayerId:
+                  pendingTollPayment
+                    .ownerPlayerId,
+                propertyId:
+                  pendingTollPayment
+                    .property.id,
+              },
+              payload,
+            },
+          );
+
+          return "INVALID";
+        }
+
+        /*
+        * 금액은 서버에 기록된 GAME EVENT를
+        * 최종 권위값으로 사용한다.
+        *
+        * 다른 클라이언트가 정책/이벤트 상태를
+        * 조금 늦게 반영해서 로컬 계산액이 달라도
+        * 이 이벤트 자체를 버리면 안 된다.
+        */
+        if (
+          pendingTollPayment.amount !==
+          payload.amount
+        ) {
+          console.warn(
+            "[TOLL PAID AMOUNT SYNC]",
+            "localAmount =",
+            pendingTollPayment.amount,
+            "serverAmount =",
+            payload.amount,
+          );
         }
 
         const payer =
@@ -4757,14 +4485,16 @@ const continueAfterLottoDraw =
           setTollPaymentError(
             "NO_PENDING_TOLL",
           );
-          return false;
+
+          return "INVALID";
         }
 
         if (!owner) {
           setTollPaymentError(
             "OWNER_NOT_FOUND",
           );
-          return false;
+
+          return "INVALID";
         }
 
         const payerCash =
@@ -4787,7 +4517,18 @@ const continueAfterLottoDraw =
           setTollPaymentError(
             "INSUFFICIENT_FUNDS",
           );
-          return false;
+
+          console.warn(
+            "[TOLL PAID INVALID FUNDS]",
+            "cash =",
+            payerCash,
+            "deposit =",
+            payerDeposit,
+            "amount =",
+            payload.amount,
+          );
+
+          return "INVALID";
         }
 
         if (
@@ -4805,7 +4546,8 @@ const continueAfterLottoDraw =
             setTollPaymentError(
               "INSUFFICIENT_FUNDS",
             );
-            return false;
+
+            return "INVALID";
           }
         }
 
@@ -4828,7 +4570,7 @@ const continueAfterLottoDraw =
               : "NO_PENDING_TOLL",
           );
 
-          return false;
+          return "INVALID";
         }
 
         const ownerDepositResult =
@@ -4848,13 +4590,15 @@ const continueAfterLottoDraw =
           setTollPaymentError(
             "OWNER_NOT_FOUND",
           );
-          return false;
+
+          return "INVALID";
         }
 
         setTollPaymentError(null);
+
         completeTileResolution();
 
-        return true;
+        return "APPLIED";
       },
       [
         completeTileResolution,
@@ -5300,1182 +5044,6 @@ const continueAfterLottoDraw =
     withdraw,
   ]);
 
-  const finalizeDisasterResolution = useCallback(
-    (resolution: PendingDisasterResolution) => {
-      const disabledPlayerIds = [
-        ...new Set([
-          ...resolution.additionallyDisabledPlayerIds,
-          ...resolution.newlyBankruptPlayerIds,
-        ]),
-      ];
-
-      setPendingDisasterResolution(null);
-      setDisasterPaymentError(null);
-      setDisasterLiquidationError(null);
-
-      if (resolution.mode === "DEV") {
-        turn.cancelCurrentAction();
-        return;
-      }
-
-      turn.completeDisaster(disabledPlayerIds);
-    },
-    [turn],
-  );
-
-  const completePendingDisasterResolution = useCallback(() => {
-    if (!pendingDisasterResolution) return;
-    finalizeDisasterResolution(pendingDisasterResolution);
-  }, [finalizeDisasterResolution, pendingDisasterResolution]);
-
-  const advancePendingDisasterSettlement = useCallback(
-    (bankruptPlayerId?: string) => {
-      if (!pendingDisasterResolution) {
-        setDisasterPaymentError("NO_PENDING_DISASTER");
-        return;
-      }
-
-      const newlyBankruptPlayerIds = bankruptPlayerId
-        ? [
-            ...new Set([
-              ...pendingDisasterResolution.newlyBankruptPlayerIds,
-              bankruptPlayerId,
-            ]),
-          ]
-        : pendingDisasterResolution.newlyBankruptPlayerIds;
-      const nextIndex = pendingDisasterResolution.currentAssessmentIndex + 1;
-      const nextResolution = {
-        ...pendingDisasterResolution,
-        currentAssessmentIndex: nextIndex,
-        newlyBankruptPlayerIds,
-      };
-
-      setDisasterPaymentError(null);
-      setDisasterLiquidationError(null);
-
-      if (
-        nextIndex <
-        pendingDisasterResolution.event.playerAssessments.length
-      ) {
-        setPendingDisasterResolution(nextResolution);
-        return;
-      }
-
-      finalizeDisasterResolution(nextResolution);
-    },
-    [finalizeDisasterResolution, pendingDisasterResolution],
-  );
-
-  const publishDisasterAction = useCallback(
-      (payload: UlsanMarbleDisasterActionDecidedPayload,): boolean => {
-        if (
-          publishedDisasterActionIdsRef
-            .current
-            .has(
-              payload.actionId,
-            )
-        ) {
-          return true;
-        }
-
-        publishedDisasterActionIdsRef
-          .current
-          .add(
-            payload.actionId,
-          );
-
-        if (
-          onNetworkGameEventRequest
-        ) {
-          try {
-            onNetworkGameEventRequest({
-              kind:
-                "DISASTER_ACTION_DECIDED",
-
-              payload,
-            });
-
-            return true;
-          } catch (error) {
-            publishedDisasterActionIdsRef
-              .current
-              .delete(
-                payload.actionId,
-              );
-
-            throw error;
-          }
-        }
-
-        return false;
-      },
-      [
-        onNetworkGameEventRequest,
-      ],
-    );
-
-  const applyDisasterActionDecided = useCallback(
-    (payload: UlsanMarbleDisasterActionDecidedPayload,): boolean => {
-      /*
-       * 이미 처리한 action은
-       * 다시 와도 성공 처리.
-       */
-      if (
-        processedDisasterActionIdsRef
-          .current
-          .has(
-            payload.actionId,
-          )
-      ) {
-        publishedDisasterActionIdsRef
-          .current
-          .delete(
-            payload.actionId,
-          );
-
-        return true;
-      }
-
-      const currentTurnSequence =
-        networkTurnSequence ??
-        turn.turnSequence;
-
-      if (
-        payload.turnSequence !==
-          currentTurnSequence
-      ) {
-        return false;
-      }
-
-      const resolution =
-        pendingDisasterResolution;
-
-      if (
-        !resolution ||
-        resolution.event.id !==
-          payload.disasterId ||
-        resolution.event.turnNumber !==
-          payload.turnNumber
-      ) {
-        return false;
-      }
-
-      /*
-       * 최초 재난 결과 확인.
-       */
-      if (
-        payload.action ===
-        "ACKNOWLEDGE"
-      ) {
-        if (
-          resolution.stage !==
-          "EVENT"
-        ) {
-          return false;
-        }
-
-        if (
-          payload.playerId !==
-          (
-            networkActivePlayerId ??
-            turn.activePlayerId
-          )
-        ) {
-          return false;
-        }
-
-        processedDisasterActionIdsRef
-          .current
-          .add(
-            payload.actionId,
-          );
-
-        publishedDisasterActionIdsRef
-          .current
-          .delete(
-            payload.actionId,
-          );
-
-        setDisasterPaymentError(null);
-        setDisasterLiquidationError(
-          null,
-        );
-
-        if (
-          resolution.event
-            .playerAssessments
-            .length === 0
-        ) {
-          finalizeDisasterResolution(
-            resolution,
-          );
-
-          return true;
-        }
-
-        setPendingDisasterResolution({
-          ...resolution,
-
-          stage: "SETTLEMENT",
-
-          currentAssessmentIndex: 0,
-        });
-
-        return true;
-      }
-
-      /*
-       * 여기부터는
-       * 피해 정산 단계.
-       */
-      if (
-        resolution.stage !==
-        "SETTLEMENT"
-      ) {
-        return false;
-      }
-
-      const assessment =
-        resolution.event
-          .playerAssessments[
-            resolution
-              .currentAssessmentIndex
-          ];
-
-      if (
-        !assessment ||
-        assessment.playerId !==
-          payload.playerId
-      ) {
-        return false;
-      }
-
-      if (
-        payload.action ===
-        "PAY"
-      ) {
-        if (
-          payload.totalAmount !==
-          assessment.totalAmount
-        ) {
-          return false;
-        }
-
-        const playerExists =
-          playersRef.current.some(
-            (player) =>
-              player.id ===
-              assessment.playerId,
-          );
-
-        if (!playerExists) {
-          setDisasterPaymentError(
-            "PLAYER_NOT_FOUND",
-          );
-
-          return false;
-        }
-
-        if (
-          !prepareMandatoryPayment(
-            assessment.playerId,
-            assessment.totalAmount,
-            `${resolution.event.name} 복구비 자동 인출`,
-          )
-        ) {
-          setDisasterPaymentError(
-            "INSUFFICIENT_FUNDS",
-          );
-
-          return false;
-        }
-
-        const paymentResult =
-          withdraw(
-            assessment.playerId,
-            assessment.totalAmount,
-            "DISASTER_REPAIR",
-            `${resolution.event.name} 복구비`,
-          );
-
-        if (!paymentResult.ok) {
-          setDisasterPaymentError(
-            paymentResult.error ===
-              "INSUFFICIENT_FUNDS"
-              ? "INSUFFICIENT_FUNDS"
-              : "PAYMENT_FAILED",
-          );
-
-          return false;
-        }
-
-        processedDisasterActionIdsRef
-          .current
-          .add(
-            payload.actionId,
-          );
-
-        publishedDisasterActionIdsRef
-          .current
-          .delete(
-            payload.actionId,
-          );
-
-        advancePendingDisasterSettlement();
-
-        return true;
-      }
-
-      if (
-        payload.action ===
-        "SELL_PROPERTY"
-      ) {
-        const property =
-          propertyMap.get(
-            payload.propertyId,
-          );
-
-        if (!property) {
-          setDisasterLiquidationError(
-            "SALE_FAILED",
-          );
-
-          return false;
-        }
-
-        const saleResult =
-          sellPropertyOwnership(
-            propertyOwnershipsRef.current,
-            payload.propertyId,
-            assessment.playerId,
-            property,
-            propertyMarketRef.current,
-            getPolicyPropertySaleRate(
-              activeMayorPolicy,
-            ),
-          );
-
-        if (!saleResult.ok) {
-          setDisasterLiquidationError(
-            saleResult.error ===
-              "NOT_OWNER"
-              ? "NOT_OWNER"
-              : "PROPERTY_NOT_OWNED",
-          );
-
-          return false;
-        }
-
-        /*
-         * 발행자가 본 가격과
-         * 수신자가 계산한 가격도 같아야 함.
-         */
-        if (
-          saleResult.salePrice !==
-          payload.salePrice
-        ) {
-          return false;
-        }
-
-        const depositResult =
-          deposit(
-            assessment.playerId,
-            payload.salePrice,
-            "SALE",
-            `${property.name} 재난 복구 자산 정리`,
-          );
-
-        if (!depositResult.ok) {
-          setDisasterLiquidationError(
-            "SALE_FAILED",
-          );
-
-          return false;
-        }
-
-        commitPropertyOwnerships(
-          saleResult.ownerships,
-        );
-
-        commitInsuranceContracts(
-          removeInsuranceContract(
-            insuranceContractsRef.current,
-            payload.propertyId,
-          ),
-        );
-
-        processedDisasterActionIdsRef
-          .current
-          .add(
-            payload.actionId,
-          );
-
-        publishedDisasterActionIdsRef
-          .current
-          .delete(
-            payload.actionId,
-          );
-
-        setDisasterLiquidationError(
-          null,
-        );
-
-        setDisasterPaymentError(
-          null,
-        );
-
-        return true;
-      }
-
-      if (
-        payload.action ===
-        "SELL_STOCK"
-      ) {
-        const company =
-          stockCompanyMap.get(
-            payload.companyId,
-          );
-
-        if (!company) {
-          setDisasterLiquidationError(
-            "COMPANY_NOT_FOUND",
-          );
-
-          return false;
-        }
-
-        if (
-          !Number.isInteger(
-            payload.quantity,
-          ) ||
-          payload.quantity <= 0
-        ) {
-          setDisasterLiquidationError(
-            "INVALID_STOCK_QUANTITY",
-          );
-
-          return false;
-        }
-
-        const holding =
-          getStockHolding(
-            stockPortfoliosRef.current,
-            assessment.playerId,
-            payload.companyId,
-          );
-
-        if (
-          !holding ||
-          holding.quantity <
-            payload.quantity
-        ) {
-          setDisasterLiquidationError(
-            "STOCK_NOT_OWNED",
-          );
-
-          return false;
-        }
-
-        /*
-         * 같은 종목 연속 매도 시
-         * 정확한 순서 보장.
-         */
-        if (
-          holding.quantity !==
-          payload.holdingBefore
-        ) {
-          return false;
-        }
-
-        const pricePerShare =
-          getStockPrice(
-            stockMarketRef.current,
-            payload.companyId,
-          );
-
-        if (
-          pricePerShare <= 0 ||
-          pricePerShare !==
-            payload.pricePerShare
-        ) {
-          return false;
-        }
-
-        const depositResult =
-          deposit(
-            assessment.playerId,
-            payload.quantity *
-              payload.pricePerShare,
-            "STOCK_SALE",
-            `${company.name} ${payload.quantity}주 재난 복구 자산 정리`,
-          );
-
-        if (!depositResult.ok) {
-          setDisasterLiquidationError(
-            "SALE_FAILED",
-          );
-
-          return false;
-        }
-
-        commitStockPortfolios(
-          sellStockHolding(
-            stockPortfoliosRef.current,
-            assessment.playerId,
-            payload.companyId,
-            payload.quantity,
-          ),
-        );
-
-        processedDisasterActionIdsRef
-          .current
-          .add(
-            payload.actionId,
-          );
-
-        publishedDisasterActionIdsRef
-          .current
-          .delete(
-            payload.actionId,
-          );
-
-        setDisasterLiquidationError(
-          null,
-        );
-
-        setDisasterPaymentError(
-          null,
-        );
-
-        return true;
-      }
-
-      /*
-       * 파산.
-       */
-      const remainingPropertyAssets =
-        getSellablePropertyAssets(
-          propertyOwnershipsRef.current,
-          properties,
-          assessment.playerId,
-          propertyMarketRef.current,
-          getPolicyPropertySaleRate(
-            activeMayorPolicy,
-          ),
-        );
-
-      const remainingStockAssets =
-        getSellableStockAssets(
-          stockPortfoliosRef.current,
-          stockCompanies,
-          stockMarketRef.current,
-          assessment.playerId,
-        );
-
-      if (
-        remainingPropertyAssets.length >
-          0 ||
-        remainingStockAssets.length >
-          0
-      ) {
-        setDisasterLiquidationError(
-          "ASSETS_REMAIN",
-        );
-
-        return false;
-      }
-
-      const player =
-        playersRef.current.find(
-          (item) =>
-            item.id ===
-            assessment.playerId,
-        );
-
-      if (!player) {
-        setDisasterPaymentError(
-          "PLAYER_NOT_FOUND",
-        );
-
-        return false;
-      }
-
-      if (
-        !settleBankAssetsForBankruptcy(
-          player.id,
-          `${resolution.event.name} 미납 복구비 예금 정산`,
-        )
-      ) {
-        setDisasterLiquidationError(
-          "SALE_FAILED",
-        );
-
-        return false;
-      }
-
-      const settledPlayer =
-        playersRef.current.find(
-          (item) =>
-            item.id === player.id,
-        );
-
-      if (!settledPlayer) {
-        return false;
-      }
-
-      if (
-        settledPlayer.money > 0
-      ) {
-        const settlementResult =
-          withdraw(
-            settledPlayer.id,
-            settledPlayer.money,
-            "BANKRUPTCY",
-            `${resolution.event.name} 미납 복구비 정산`,
-          );
-
-        if (!settlementResult.ok) {
-          setDisasterLiquidationError(
-            "SALE_FAILED",
-          );
-
-          return false;
-        }
-      }
-
-      commitStockPortfolios({
-        ...stockPortfoliosRef.current,
-
-        [player.id]: {},
-      });
-
-      commitLottoState({
-        ...lottoStateRef.current,
-
-        tickets:
-          lottoStateRef.current
-            .tickets
-            .filter(
-              (ticket) =>
-                ticket.playerId !==
-                player.id,
-            ),
-      });
-
-      commitInsuranceContracts(
-        removePlayerInsuranceContracts(
-          insuranceContractsRef.current,
-          player.id,
-        ),
-      );
-
-      commitPlayers(
-        playersRef.current.map(
-          (currentPlayer) =>
-            currentPlayer.id ===
-            player.id
-              ? {
-                  ...releasePlayerFromJail(
-                    currentPlayer,
-                  ),
-
-                  money: 0,
-                  isBankrupt: true,
-                  jailEscapeCards: 0,
-                }
-              : currentPlayer,
-        ),
-      );
-
-      processedDisasterActionIdsRef
-        .current
-        .add(
-          payload.actionId,
-        );
-
-      publishedDisasterActionIdsRef
-        .current
-        .delete(
-          payload.actionId,
-        );
-
-      advancePendingDisasterSettlement(
-        player.id,
-      );
-
-      return true;
-    },
-    [
-      activeMayorPolicy,
-      advancePendingDisasterSettlement,
-      commitInsuranceContracts,
-      commitLottoState,
-      commitPlayers,
-      commitPropertyOwnerships,
-      commitStockPortfolios,
-      deposit,
-      finalizeDisasterResolution,
-      networkActivePlayerId,
-      networkTurnSequence,
-      pendingDisasterResolution,
-      prepareMandatoryPayment,
-      properties,
-      propertyMap,
-      resolvedLocalPlayerId,
-      settleBankAssetsForBankruptcy,
-      stockCompanies,
-      stockCompanyMap,
-      turn,
-      withdraw,
-    ],
-  );  
-
-  const sendDisasterAction =
-    useCallback(
-      (
-        payload:
-          UlsanMarbleDisasterActionDecidedPayload,
-      ): boolean => {
-        if (
-          onNetworkGameEventRequest
-        ) {
-          return publishDisasterAction(
-            payload,
-          );
-        }
-
-        return applyDisasterActionDecided(
-          payload,
-        );
-      },
-      [
-        applyDisasterActionDecided,
-        onNetworkGameEventRequest,
-        publishDisasterAction,
-      ],
-    );
-
-  const payPendingDisasterRepair =
-    useCallback(() => {
-      if (
-        !pendingDisasterAssessment ||
-        !pendingDisasterResolution
-      ) {
-        setDisasterPaymentError(
-          "NO_PENDING_DISASTER",
-        );
-
-        return;
-      }
-
-      if (
-        onNetworkGameEventRequest &&
-        pendingDisasterAssessment
-          .playerId !==
-          resolvedLocalPlayerId
-      ) {
-        return;
-      }
-
-      /*
-      * 여기서는 돈을 빼지 않는다.
-      * 납부 가능 여부만 확인한다.
-      */
-      if (
-        getPlayerLiquidBalance(
-          pendingDisasterAssessment
-            .playerId,
-        ) <
-        pendingDisasterAssessment
-          .totalAmount
-      ) {
-        setDisasterPaymentError(
-          "INSUFFICIENT_FUNDS",
-        );
-
-        return;
-      }
-
-      sendDisasterAction({
-        actionId: [
-          pendingDisasterResolution
-            .event.id,
-
-          pendingDisasterAssessment
-            .playerId,
-
-          "PAY",
-        ].join(":"),
-
-        disasterId:
-          pendingDisasterResolution
-            .event.id,
-
-        playerId:
-          pendingDisasterAssessment
-            .playerId,
-
-        turnNumber:
-          pendingDisasterResolution
-            .event.turnNumber,
-
-        turnSequence:
-          networkTurnSequence ??
-          turn.turnSequence,
-
-        action: "PAY",
-
-        totalAmount:
-          pendingDisasterAssessment
-            .totalAmount,
-      });
-    }, [
-      getPlayerLiquidBalance,
-      networkTurnSequence,
-      onNetworkGameEventRequest,
-      pendingDisasterAssessment,
-      pendingDisasterResolution,
-      resolvedLocalPlayerId,
-      sendDisasterAction,
-      turn.turnSequence,
-    ]);
-
-  const sellPropertyForPendingDisaster =
-    useCallback(
-      (propertyId: string) => {
-        const resolution =
-          pendingDisasterResolution;
-
-        const assessment =
-          pendingDisasterAssessment;
-
-        if (
-          !resolution ||
-          !assessment
-        ) {
-          setDisasterLiquidationError(
-            "NO_PENDING_DISASTER",
-          );
-
-          return;
-        }
-
-        if (
-          onNetworkGameEventRequest &&
-          assessment.playerId !==
-            resolvedLocalPlayerId
-        ) {
-          return;
-        }
-
-        const property =
-          propertyMap.get(propertyId);
-
-        if (!property) {
-          setDisasterLiquidationError(
-            "SALE_FAILED",
-          );
-
-          return;
-        }
-
-        /*
-        * 여기서는 실제 매각하지 않는다.
-        * 매각 가능 여부와 가격만 계산.
-        */
-        const saleResult =
-          sellPropertyOwnership(
-            propertyOwnershipsRef.current,
-            propertyId,
-            assessment.playerId,
-            property,
-            propertyMarketRef.current,
-            getPolicyPropertySaleRate(
-              activeMayorPolicy,
-            ),
-          );
-
-        if (!saleResult.ok) {
-          setDisasterLiquidationError(
-            saleResult.error === "NOT_OWNER"
-              ? "NOT_OWNER"
-              : "PROPERTY_NOT_OWNED",
-          );
-
-          return;
-        }
-
-        sendDisasterAction({
-          actionId: [
-            resolution.event.id,
-            assessment.playerId,
-            "SELL_PROPERTY",
-            propertyId,
-          ].join(":"),
-
-          disasterId:
-            resolution.event.id,
-
-          playerId:
-            assessment.playerId,
-
-          turnNumber:
-            resolution.event.turnNumber,
-
-          turnSequence:
-            networkTurnSequence ??
-            turn.turnSequence,
-
-          action:
-            "SELL_PROPERTY",
-
-          propertyId,
-
-          salePrice:
-            saleResult.salePrice,
-        });
-      },
-      [
-        activeMayorPolicy,
-        networkTurnSequence,
-        onNetworkGameEventRequest,
-        pendingDisasterAssessment,
-        pendingDisasterResolution,
-        propertyMap,
-        resolvedLocalPlayerId,
-        sendDisasterAction,
-        turn.turnSequence,
-      ],
-    );
-
-  const sellStockForPendingDisaster =
-    useCallback(
-      (
-        companyId: string,
-        quantity: number,
-      ) => {
-        const resolution =
-          pendingDisasterResolution;
-
-        const assessment =
-          pendingDisasterAssessment;
-
-        if (
-          !resolution ||
-          !assessment
-        ) {
-          setDisasterLiquidationError(
-            "NO_PENDING_DISASTER",
-          );
-
-          return;
-        }
-
-        if (
-          onNetworkGameEventRequest &&
-          assessment.playerId !==
-            resolvedLocalPlayerId
-        ) {
-          return;
-        }
-
-        const company =
-          stockCompanyMap.get(companyId);
-
-        if (!company) {
-          setDisasterLiquidationError(
-            "COMPANY_NOT_FOUND",
-          );
-
-          return;
-        }
-
-        const safeQuantity =
-          Math.trunc(quantity);
-
-        if (safeQuantity <= 0) {
-          setDisasterLiquidationError(
-            "INVALID_STOCK_QUANTITY",
-          );
-
-          return;
-        }
-
-        const holding =
-          getStockHolding(
-            stockPortfoliosRef.current,
-            assessment.playerId,
-            companyId,
-          );
-
-        if (
-          !holding ||
-          holding.quantity <
-            safeQuantity
-        ) {
-          setDisasterLiquidationError(
-            "STOCK_NOT_OWNED",
-          );
-
-          return;
-        }
-
-        const pricePerShare =
-          getStockPrice(
-            stockMarketRef.current,
-            companyId,
-          );
-
-        if (pricePerShare <= 0) {
-          setDisasterLiquidationError(
-            "SALE_FAILED",
-          );
-
-          return;
-        }
-
-        sendDisasterAction({
-          actionId: [
-            resolution.event.id,
-            assessment.playerId,
-            "SELL_STOCK",
-            companyId,
-            holding.quantity,
-            safeQuantity,
-          ].join(":"),
-
-          disasterId:
-            resolution.event.id,
-
-          playerId:
-            assessment.playerId,
-
-          turnNumber:
-            resolution.event.turnNumber,
-
-          turnSequence:
-            networkTurnSequence ??
-            turn.turnSequence,
-
-          action:
-            "SELL_STOCK",
-
-          companyId,
-
-          quantity:
-            safeQuantity,
-
-          pricePerShare,
-
-          holdingBefore:
-            holding.quantity,
-        });
-      },
-      [
-        networkTurnSequence,
-        onNetworkGameEventRequest,
-        pendingDisasterAssessment,
-        pendingDisasterResolution,
-        resolvedLocalPlayerId,
-        sendDisasterAction,
-        stockCompanyMap,
-        turn.turnSequence,
-      ],
-    );
-
-  const declarePendingDisasterBankruptcy =
-    useCallback(() => {
-      const resolution =
-        pendingDisasterResolution;
-
-      const assessment =
-        pendingDisasterAssessment;
-
-      if (
-        !resolution ||
-        !assessment
-      ) {
-        setDisasterLiquidationError(
-          "NO_PENDING_DISASTER",
-        );
-
-        return;
-      }
-
-      if (
-        onNetworkGameEventRequest &&
-        assessment.playerId !==
-          resolvedLocalPlayerId
-      ) {
-        return;
-      }
-
-      const propertyAssets =
-        getSellablePropertyAssets(
-          propertyOwnershipsRef.current,
-          properties,
-          assessment.playerId,
-          propertyMarketRef.current,
-          getPolicyPropertySaleRate(
-            activeMayorPolicy,
-          ),
-        );
-
-      const stockAssets =
-        getSellableStockAssets(
-          stockPortfoliosRef.current,
-          stockCompanies,
-          stockMarketRef.current,
-          assessment.playerId,
-        );
-
-      if (
-        propertyAssets.length > 0 ||
-        stockAssets.length > 0
-      ) {
-        setDisasterLiquidationError(
-          "ASSETS_REMAIN",
-        );
-
-        return;
-      }
-
-      sendDisasterAction({
-        actionId: [
-          resolution.event.id,
-          assessment.playerId,
-          "DECLARE_BANKRUPTCY",
-        ].join(":"),
-
-        disasterId:
-          resolution.event.id,
-
-        playerId:
-          assessment.playerId,
-
-        turnNumber:
-          resolution.event.turnNumber,
-
-        turnSequence:
-          networkTurnSequence ??
-          turn.turnSequence,
-
-        action:
-          "DECLARE_BANKRUPTCY",
-      });
-    }, [
-      activeMayorPolicy,
-      networkTurnSequence,
-      onNetworkGameEventRequest,
-      pendingDisasterAssessment,
-      pendingDisasterResolution,
-      properties,
-      resolvedLocalPlayerId,
-      sendDisasterAction,
-      stockCompanies,
-      turn.turnSequence,
-    ]);
-
   const openStockMarket = useCallback(() => {
     if (turn.phase !== "STOCK_TRADING") {
       setStockTradeError("NOT_TRADING_PHASE");
@@ -6547,14 +5115,23 @@ const applyBuyStock = useCallback(
       return;
     }
 
+    const purchaseFee =
+      getStockTradeFee(
+        pricePerShare,
+        safeQuantity,
+      );
+
     const purchaseCost =
-      pricePerShare * safeQuantity;
+      getStockBuyTotalCost(
+        pricePerShare,
+        safeQuantity,
+      );
 
     const purchaseResult = withdraw(
       playerId,
       purchaseCost,
       "STOCK_PURCHASE",
-      `${company.name} ${safeQuantity}주`,
+      `${company.name} ${safeQuantity}주 · 거래수수료 ${purchaseFee}만원`,
     );
 
     if (!purchaseResult.ok) {
@@ -6587,62 +5164,6 @@ const applyBuyStock = useCallback(
     withdraw,
   ],
 );
-
-  const acknowledgePendingDisasterEvent =
-    useCallback(() => {
-      const resolution =
-        pendingDisasterResolution;
-
-      if (
-        !resolution ||
-        resolution.stage !== "EVENT"
-      ) {
-        return;
-      }
-
-      const actorPlayerId =
-        networkActivePlayerId ??
-        turn.activePlayerId;
-
-      if (
-        onNetworkGameEventRequest &&
-        actorPlayerId !==
-          resolvedLocalPlayerId
-      ) {
-        return;
-      }
-
-      sendDisasterAction({
-        actionId: [
-          resolution.event.id,
-          "ACKNOWLEDGE",
-        ].join(":"),
-
-        disasterId:
-          resolution.event.id,
-
-        playerId:
-          actorPlayerId,
-
-        turnNumber:
-          resolution.event.turnNumber,
-
-        turnSequence:
-          networkTurnSequence ??
-          turn.turnSequence,
-
-        action: "ACKNOWLEDGE",
-      });
-    }, [
-      networkActivePlayerId,
-      networkTurnSequence,
-      onNetworkGameEventRequest,
-      pendingDisasterResolution,
-      resolvedLocalPlayerId,
-      sendDisasterAction,
-      turn.activePlayerId,
-      turn.turnSequence,
-    ]);
 
 const applySellStock = useCallback(
   (
@@ -6704,15 +5225,24 @@ const applySellStock = useCallback(
       return;
     }
 
+    const saleFee =
+      getStockTradeFee(
+        pricePerShare,
+        safeQuantity,
+      );
+
     const saleProceeds =
-      pricePerShare * safeQuantity;
+      getStockSellNetProceeds(
+        pricePerShare,
+        safeQuantity,
+      );
 
     const saleResult = deposit(
       playerId,
       saleProceeds,
       "STOCK_SALE",
-      `${company.name} ${safeQuantity}주`,
-    );
+      `${company.name} ${safeQuantity}주 · 거래수수료 ${saleFee}만원`,
+);
 
     if (!saleResult.ok) {
       setStockTradeError(
@@ -6809,8 +5339,7 @@ const applySellStock = useCallback(
           companyId,
         );
 
-      const purchaseCost =
-        pricePerShare * safeQuantity;
+      const purchaseCost = getStockBuyTotalCost( pricePerShare, safeQuantity,);
 
       const playerBalance =
         getBalance(
@@ -7030,12 +5559,29 @@ const applySellStock = useCallback(
     ]);
 
   const devEndTurn = useCallback(() => {
-    if (turn.phase !== "STOCK_TRADING") {
+    /*
+    * 네트워크 DEV 턴 종료는
+    * 서버의 DEV_END_TURN 규칙을 따른다.
+    */
+    if (onNetworkDevEndTurnRequest) {
+      if (
+        turn.phase !==
+        "WAITING_FOR_ROLL"
+      ) {
+        return;
+      }
+
+      onNetworkDevEndTurnRequest();
       return;
     }
 
-    if (onNetworkDevEndTurnRequest) {
-      onNetworkDevEndTurnRequest();
+    /*
+    * 로컬 테스트에서는 기존 방식 유지.
+    */
+    if (
+      turn.phase !==
+      "STOCK_TRADING"
+    ) {
       return;
     }
 
@@ -7205,10 +5751,8 @@ const applySellStock = useCallback(
       setPendingStockMarketResolution(null);
       setPendingLotteryShop(null);
       setLotteryShopError(null);
-      setPendingMayorElection(null);
-      setPendingDisasterResolution(null);
-      setDisasterPaymentError(null);
-      setDisasterLiquidationError(null);
+      resetMayorElectionResolution();
+      clearPendingDisasterResolution();
       setPendingJailEntry(null);
       setPendingJailFine(null);
       setJailActionError(null);
@@ -7536,69 +6080,6 @@ const applySellStock = useCallback(
     );
   }, [commitEconomicNewsState, turn.canRoll]);
 
-  const devRunDisaster = useCallback(
-    (type: DisasterType) => {
-      if (!turn.canRoll) return;
-
-      startDisasterResolution("DEV", [], type);
-    },
-    [startDisasterResolution, turn.canRoll],
-  );
-
-  const devResetDisasterCooldown = useCallback(() => {
-    if (!turn.canRoll) return;
-
-    commitDisasterState({
-      ...disasterStateRef.current,
-      lastOccurredTurn: null,
-    });
-  }, [commitDisasterState, turn.canRoll]);
-
-  const devRunFestival = useCallback(
-    (festivalId: FestivalId) => {
-      if (
-        !turn.canRoll ||
-        festivalSettlementBusyRef.current ||
-        activeFestivalRef.current
-      ) {
-        return;
-      }
-
-      commitActiveFestival({
-        festivalId,
-        startedTurn: turn.turnNumber,
-      });
-      commitTouristNpc(createTouristNpcState());
-      commitFestivalSettlementBusy(true);
-      setPendingFestivalAnnouncement({
-        festivalId,
-        turnNumber: turn.turnNumber,
-        continuationDisabledPlayerIds: [],
-      });
-    },
-    [
-      commitActiveFestival,
-      commitFestivalSettlementBusy,
-      commitTouristNpc,
-      turn.canRoll,
-      turn.turnNumber,
-    ],
-  );
-
-  const devEndFestival = useCallback(() => {
-    if (festivalSettlementBusyRef.current) return;
-
-    setPendingFestivalAnnouncement(null);
-    setPendingTouristTurnResult(null);
-    commitActiveFestival(null);
-    commitTouristNpc(null);
-    commitFestivalSettlementBusy(false);
-  }, [
-    commitActiveFestival,
-    commitFestivalSettlementBusy,
-    commitTouristNpc,
-  ]);
-
   const devSetInsuranceContract = useCallback(
     (propertyId: string, planType: InsurancePlanType) => {
       if (!turn.canRoll) return;
@@ -7721,6 +6202,9 @@ const applySellStock = useCallback(
       turnSequence:
         networkTurnSequence,
 
+      onEventApplied:
+        onNetworkGameEventAck,
+
       handlers: {
       TOLL_PAID: applyResolvedTollPayment,
       GOLDEN_KEY_DRAWN: applyGoldenKeyDrawn,
@@ -7739,6 +6223,8 @@ const applySellStock = useCallback(
       TAX_ACTION_DECIDED: applyTaxActionDecided,
       PROPERTY_MARKET_RESOLVED: applyPropertyMarketResolved,
       PROPERTY_MARKET_SETTLEMENT_CONFIRMED: applyPropertyMarketSettlementConfirmed,
+      MACRO_ECONOMY_RESOLVED: applyMacroEconomyResolved,
+      COMPANY_DIVIDEND_EVENT_RESOLVED: applyCompanyDividendEventResolved,
       STOCK_MARKET_RESOLVED: applyStockMarketResolved,
       STOCK_MARKET_SETTLEMENT_CONFIRMED: applyStockMarketSettlementConfirmed,
       JAIL_ENTRY_CONFIRMED: applyJailEntryConfirmed,
@@ -7750,9 +6236,18 @@ const applySellStock = useCallback(
       ECONOMIC_NEWS_DRAW_DECIDED: applyEconomicNewsDrawDecided,
       ECONOMIC_NEWS_APPLIED: applyEconomicNewsApplied,
       ECONOMIC_NEWS_CONFIRMED: applyEconomicNewsConfirmed,
+      MAYOR_ELECTION_STARTED: applyMayorElectionStarted,
+      MAYOR_ELECTION_VOTE_CAST: applyMayorElectionVoteCast,
+      MAYOR_ELECTION_RESULT_RESOLVED: applyMayorElectionResultResolved,
+      MAYOR_ELECTION_RESULT_CONFIRMED: applyMayorElectionResultConfirmed,
       CITY_HALL_ACTION_DECIDED: applyCityHallActionDecided,
       DISASTER_RESOLVED: applyDisasterResolved,
       DISASTER_ACTION_DECIDED: applyDisasterActionDecided,
+      FESTIVAL_TRIGGER_RESOLVED: applyFestivalTriggerResolved,
+      FESTIVAL_ANNOUNCEMENT_CONFIRMED: applyFestivalAnnouncementConfirmed,
+      TOURIST_TURN_RESOLVED: applyTouristTurnResolved,
+      TOURIST_TURN_CONFIRMED: applyTouristTurnConfirmed,
+      FESTIVAL_DEV_ENDED: applyFestivalDevEnded,
     },
   });
 
@@ -7804,12 +6299,13 @@ const applySellStock = useCallback(
     resetPortShopResolution();
     resetPortSettlementResolution();
     resetStockMarketResolution();
+    resetCompanyDividendEventResolution();
+    resetMacroEconomyResolution();
     resetJailEntryResolution();
     resetJailTurnResolution();
     resetJailFineResolution();
     resetEconomicNewsResolution();
     resetCityHallResolution();
-     
     propertyOwnershipsRef.current = {};
     setPropertyOwnerships({});
     developmentRestrictionsRef.current = {};
@@ -7829,33 +6325,38 @@ const applySellStock = useCallback(
     );
     stockPortfoliosRef.current = resetStockPortfolios;
     setStockPortfolios(resetStockPortfolios);
+    companyDividendModifiersRef.current = createInitialCompanyDividendModifiers(stockCompanies,);
     setIsStockMarketOpen(false);
     setStockTradeError(null);
+
     const resetLottoState = createInitialLottoState();
     lottoStateRef.current = resetLottoState;
     setLottoState(resetLottoState);
     setPendingLotteryShop(null);
     setLotteryShopError(null);
     commitMayorTerm(null);
-    setPendingMayorElection(null);
+    resetMayorElectionResolution();
+
     const resetCityHallState = createInitialCityHallState();
     cityHallStateRef.current = resetCityHallState;
     setCityHallState(resetCityHallState);
     setPendingCityHallSelection(null);
-    const resetDisasterState = createInitialDisasterState();
-    disasterStateRef.current = resetDisasterState;
-    setDisasterState(resetDisasterState);
-    setPendingDisasterResolution(null);
-    setDisasterPaymentError(null);
-    setDisasterLiquidationError(null);
+    resetDisasterResolution();
+
     const resetInsuranceContracts = createInitialInsuranceContracts();
     insuranceContractsRef.current = resetInsuranceContracts;
     setInsuranceContracts(resetInsuranceContracts);
     resetInsuranceShopResolution();
+
     const resetGoldenKeyDeck = createInitialGoldenKeyDeck();
     goldenKeyDeckRef.current = resetGoldenKeyDeck;
     setGoldenKeyDeck(resetGoldenKeyDeck);
     setPendingGoldenKey(null);
+
+    const resetMacroEconomyState = createInitialMacroEconomyState();
+    macroEconomyStateRef.current = resetMacroEconomyState;
+    setMacroEconomyState( resetMacroEconomyState,);
+
     const resetEconomicNewsState = createInitialEconomicNewsState(
       economicNewsPool,
     );
@@ -7890,17 +6391,19 @@ const applySellStock = useCallback(
     resetTaxSettlementResolution();
     setTaxPaymentError(null);
     setTaxLiquidationError(null);
-    const resetFestivalDeckState = createInitialFestivalDeckState();
-    festivalDeckStateRef.current = resetFestivalDeckState;
-    setFestivalDeckState(resetFestivalDeckState);
-    activeFestivalRef.current = null;
-    setActiveFestival(null);
-    touristNpcRef.current = null;
-    setTouristNpc(null);
-    setPendingFestivalAnnouncement(null);
-    setPendingTouristTurnResult(null);
-    festivalSettlementBusyRef.current = false;
-    setIsFestivalSettlementBusy(false);
+    
+
+    const resetFestivalDeckState =
+      createInitialFestivalDeckState();
+
+    festivalDeckStateRef.current =
+      resetFestivalDeckState;
+
+    setFestivalDeckState(
+      resetFestivalDeckState,
+    );
+
+    resetFestivalResolution();
     
 
     turn.resetTurnSystem();
@@ -7926,9 +6429,9 @@ const applySellStock = useCallback(
     resetBankShopResolution,
     resetPortShopResolution,
     resetPortSettlementResolution,
-    resetJailEntryResolution,
     resetPropertyMarketResolution,
     resetStockMarketResolution,
+    resetCompanyDividendEventResolution,
     resetAuctionResolution,
     resetInsuranceShopResolution,
     resetTaxSettlementResolution,
@@ -7937,6 +6440,10 @@ const applySellStock = useCallback(
     resetJailFineResolution,
     resetEconomicNewsResolution,
     resetCityHallResolution,
+    resetFestivalResolution,
+    resetMayorElectionResolution,
+    resetDisasterResolution,
+    resetMacroEconomyResolution,
 
     stockCompanies,
     turn,
@@ -7948,13 +6455,11 @@ const applySellStock = useCallback(
     ) &&
     (
       !onNetworkGameEventRequest ||
-      (
-        networkActivePlayerId ??
-        turn.activePlayerId
-      ) === resolvedLocalPlayerId
+      networkControllerPlayerId ===
+        resolvedLocalPlayerId
     );
 
-  return {
+    return {
     players,
     activePlayer,
     activePlayerId: turn.activePlayerId,
@@ -7987,6 +6492,8 @@ const applySellStock = useCallback(
     pendingTouristTurnResult,
     isFestivalSettlementBusy,
     getActiveFestivalTollMultiplier,
+    canConfirmFestivalAnnouncement,
+    canConfirmTouristTurn,
     completeFestivalAnnouncement,
     completePendingTouristTurn,
     propertyOwnerships,
@@ -8000,6 +6507,9 @@ const applySellStock = useCallback(
     completePendingMarketResolution,
     stockMarket,
     stockPortfolios,
+    companyDividendModifiers:companyDividendModifiersRef.current,
+    pendingCompanyDividendEvent,
+    dismissCompanyDividendEvent,
     pendingStockMarketResolution,
     canConfirmPendingStockMarketResolution,
     completePendingStockMarketResolution:confirmStockMarketSettlement,
@@ -8027,6 +6537,7 @@ const applySellStock = useCallback(
     visibleEconomicNews,
     activeEconomicNews,
     economicNewsTollMultiplier,
+    macroEconomyState,
     pendingEconomicNews,
     pendingEconomicNewsPlayer,
     applyPendingEconomicNews,
@@ -8119,7 +6630,11 @@ const applySellStock = useCallback(
     confirmLottoDraw,
     currentMayorTerm,
     activeMayorPolicy,
+
     pendingMayorElection,
+    currentMayorElectionVoterId,
+    canVoteInMayorElection,
+    canConfirmMayorElectionResult,
     castMayorElectionVote,
     completePendingMayorElection,
     cityHallState,
@@ -8225,7 +6740,9 @@ const applySellStock = useCallback(
       canUseActions: turn.canRoll,
 
       canEndTurn:
-        turn.phase === "STOCK_TRADING",
+        onNetworkDevEndTurnRequest
+          ? turn.phase === "WAITING_FOR_ROLL"
+          : turn.phase === "STOCK_TRADING",
 
       canReset:
         !isDiceAnimating &&

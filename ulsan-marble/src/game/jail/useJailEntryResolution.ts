@@ -65,6 +65,7 @@ interface UseJailEntryResolutionOptions {
     >;
 
   commitPlayers: (nextPlayers:PlayerTokenData[],) => void;
+  jailPosition: number;
   localPlayerId: string;
   turnSequence: number;
   resetDoubleChain: () => void;
@@ -81,6 +82,7 @@ export function useJailEntryResolution({
   setJailLiquidationError,
   playersRef,
   commitPlayers,
+  jailPosition,
   localPlayerId,
   turnSequence,
   resetDoubleChain,
@@ -212,37 +214,91 @@ export function useJailEntryResolution({
         payload:
           UlsanMarbleJailEntryConfirmedPayload,
       ): boolean => {
+        if (
+          payload.turnSequence !==
+          turnSequence
+        ) {
+          return false;
+        }
+
+        const isTripleDoubleEntry =
+          payload.entryId ===
+          [
+            "JAIL_TRIPLE_DOUBLE",
+            payload.turnSequence,
+            payload.playerId,
+          ].join(":");
+
         const pending =
           pendingJailEntry;
 
-        if (!pending) {
+        if (pending) {
+          if (
+            pending.playerId !==
+              payload.playerId ||
+            pending.entryId !==
+              payload.entryId ||
+            pending.turnSequence !==
+              payload.turnSequence
+          ) {
+            return false;
+          }
+        } else if (!isTripleDoubleEntry) {
+          /*
+          * 일반 구치소 진입은 기존처럼
+          * pendingJailEntry가 반드시 있어야 한다.
+          *
+          * 3연속 더블만 네트워크 타이밍 차이로
+          * pending 생성보다 CONFIRMED가 먼저
+          * 도착할 수 있으므로 복구 적용한다.
+          */
           return false;
         }
 
-        if (
-          pending.playerId !==
-            payload.playerId ||
-          pending.entryId !==
-            payload.entryId ||
-          pending.turnSequence !==
-            payload.turnSequence ||
-          payload.turnSequence !==
-            turnSequence
-        ) {
-          return false;
-        }
-
-        const jailedPlayer =
+        const player =
           playersRef.current.find(
-            (player) =>
-              player.id ===
+            (currentPlayer) =>
+              currentPlayer.id ===
               payload.playerId,
           );
 
-        if (
-          !jailedPlayer ||
-          !jailedPlayer.isJailed
-        ) {
+        if (!player) {
+          return false;
+        }
+
+        if (isTripleDoubleEntry) {
+          /*
+          * 3연속 더블의 CONFIRMED 이벤트 자체를
+          * authoritative jail sync로 사용한다.
+          *
+          * 다른 클라이언트가 아직 로컬에서
+          * 3연속 더블 진입 처리를 만들지 못했어도
+          * 여기서 동일한 구치소 상태로 맞춘다.
+          */
+          if (
+            !player.isJailed ||
+            player.position !==
+              jailPosition
+          ) {
+            commitPlayers(
+              playersRef.current.map(
+                (currentPlayer) =>
+                  currentPlayer.id ===
+                  payload.playerId
+                    ? {
+                        ...incarceratePlayer(
+                          currentPlayer,
+                        ),
+                        position:
+                          jailPosition,
+                      }
+                    : currentPlayer,
+              ),
+            );
+          }
+
+          resetDoubleChain();
+        } else if (!player.isJailed) {
           return false;
         }
 
@@ -254,6 +310,7 @@ export function useJailEntryResolution({
 
         setPendingJailEntry(null);
         setJailActionError(null);
+        setJailLiquidationError(null);
 
         if (onNetworkEndTurnRequest) {
           prepareNetworkTurnAdvance?.();
@@ -273,19 +330,23 @@ export function useJailEntryResolution({
         finishTurnAfterStockTrading();
 
         return true;
-          },
-          [
-            finishTurnAfterStockTrading,
-            localPlayerId,
-            onNetworkEndTurnRequest,
-            pendingJailEntry,
-            playersRef,
-            prepareNetworkTurnAdvance,
-            setJailActionError,
-            setPendingJailEntry,
-            turnSequence,
-          ],
-        );
+      },
+      [
+        commitPlayers,
+        finishTurnAfterStockTrading,
+        jailPosition,
+        localPlayerId,
+        onNetworkEndTurnRequest,
+        pendingJailEntry,
+        playersRef,
+        prepareNetworkTurnAdvance,
+        resetDoubleChain,
+        setJailActionError,
+        setJailLiquidationError,
+        setPendingJailEntry,
+        turnSequence,
+      ],
+    );
 
   const confirmJailEntry =
     useCallback((): void => {

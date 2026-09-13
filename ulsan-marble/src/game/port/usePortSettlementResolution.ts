@@ -120,7 +120,7 @@ interface UsePortSettlementResolutionOptions {
     StockCompanyData[];
 
   localPlayerId: string;
-  activePlayerId: string;
+  controllerPlayerId?: string;
 
   turnNumber: number;
   turnSequence: number;
@@ -248,7 +248,7 @@ export function usePortSettlementResolution({
   stockCompanies,
 
   localPlayerId,
-  activePlayerId,
+  controllerPlayerId,
 
   turnNumber,
   turnSequence,
@@ -626,47 +626,50 @@ export function usePortSettlementResolution({
           );
 
         /*
-        * 정산할 계약이 없으면 난수 결과가 없으므로
-        * 서버 이벤트를 기다리지 않고 모든 클라이언트가
-        * 동일하게 다음 정산 단계로 이동한다.
+        * 네트워크 항구 정산은
+        * 계약 유무와 관계없이 고정 controller만 진행한다.
+        *
+        * 계약이 없는 경우에도 RESOLVED 이벤트를 발행해
+        * 모든 클라이언트의 다음 정산 진입 시점을 맞춘다.
         */
         if (
-          dueContracts.length === 0
+          onNetworkGameEventRequest &&
+          controllerPlayerId !==
+            localPlayerId
         ) {
-          if (
-            cleanedState.activeContracts.length !==
-            portStateRef.current.activeContracts.length
-          ) {
-            commitPortState(
-              cleanedState,
-            );
-          }
-
-          settlementPublishRef.current =
-            null;
-
-          setPendingPortSettlement(
-            null,
-          );
-
-          continueAfterPortSettlement(
-            additionallyDisabledPlayerIds,
-          );
-
           return;
         }
 
-          /*
-          * 실제 만기 계약이 있을 때만
-          * 현재 행동 플레이어가 난수 결과를 만든다.
-          */
-          if (
-            onNetworkGameEventRequest &&
-            activePlayerId !==
-              localPlayerId
-          ) {
-            return;
-          }
+        if (
+          dueContracts.length === 0
+        ) {
+          publishPortSettlementResolved({
+            settlementId,
+
+            turnNumber,
+            turnSequence,
+
+            additionallyDisabledPlayerIds: [
+              ...new Set(
+                additionallyDisabledPlayerIds,
+              ),
+            ],
+
+            nextActiveContracts:
+              cleanedState.activeContracts.map(
+                (contract) => ({
+                  ...contract,
+                }),
+              ),
+
+            results: [],
+
+            consumedCargoInsurancePlayerIds:
+              [],
+          });
+
+          return;
+        }
 
         const typhoonActive =
           getActiveDisasterPenalties(
@@ -839,7 +842,7 @@ export function usePortSettlementResolution({
         });
       },
     [
-      activePlayerId,
+      controllerPlayerId,
       auctionStateRef,
       cityHallStateRef,
       commitPortState,
@@ -922,7 +925,7 @@ export function usePortSettlementResolution({
 
       if (
         onNetworkGameEventRequest &&
-        activePlayerId !==
+        controllerPlayerId !==
           localPlayerId
       ) {
         return;
@@ -981,7 +984,7 @@ export function usePortSettlementResolution({
           null;
       }
     }, [
-      activePlayerId,
+      controllerPlayerId,
       applyPortSettlementConfirmed,
       localPlayerId,
       onNetworkGameEventRequest,

@@ -72,10 +72,20 @@ export interface UsePrototypeGameNetworkOptions {
       UlsanMarbleGameEventRequest,
   ) => void;
 
+  onNetworkGameEventAck?: (
+  eventId: number,
+    turnSequence: number,
+  ) => void;
+
+  onNetworkTurnReady?: (
+    turnSequence: number,
+  ) => void;
+
   onNetworkEndTurnRequest?: () => void;
   onNetworkDevEndTurnRequest?: () => void;
 
   networkTurnNumber?: number;
   networkTurnSequence?: number;
   networkActivePlayerId?: string;
+  networkControllerPlayerId?: string;
 }

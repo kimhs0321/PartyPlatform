@@ -23,6 +23,21 @@ import {validateEconomicNewsAppliedEvent,validateEconomicNewsConfirmedEvent,vali
 import {validateGoldenKeyConfirmedEvent} from "./validateGoldenKeyConfirmedEvent";
 import {validateCityHallActionDecidedEvent,} from "./validateCityHallEvent";
 import {validateDisasterResolvedEvent,validateDisasterActionDecidedEvent,} from "./validateDisasterEvent";
+import {validateMacroEconomyResolvedEvent,} from "./validateMacroEconomyEvent";
+import {
+  validateFestivalAnnouncementConfirmedEvent,
+  validateFestivalDevEndedEvent,
+  validateFestivalTriggerResolvedEvent,
+  validateTouristTurnConfirmedEvent,
+  validateTouristTurnResolvedEvent,
+} from "./validateFestivalEvent";
+import {
+  validateMayorElectionResultConfirmedEvent,
+  validateMayorElectionResultResolvedEvent,
+  validateMayorElectionStartedEvent,
+  validateMayorElectionVoteCastEvent,
+} from "./validateMayorElectionEvent";
+import {validateCompanyDividendEventResolvedEvent,} from "./validateCompanyDividendEvent";
 
 export function validateUlsanMarbleGameEvent(
   game: ClientUlsanMarbleGameState,
@@ -119,6 +134,14 @@ export function validateUlsanMarbleGameEvent(
         validateStockMarketResolvedEvent(game, playerId, request.payload,);
         return;      
 
+      case "COMPANY_DIVIDEND_EVENT_RESOLVED":
+        validateCompanyDividendEventResolvedEvent(game, playerId, request.payload,);
+        return;  
+
+      case "MACRO_ECONOMY_RESOLVED":
+        validateMacroEconomyResolvedEvent(game,playerId,request.payload,);
+        return;
+
       case "STOCK_MARKET_SETTLEMENT_CONFIRMED":
         validateStockMarketSettlementConfirmedEvent(game, playerId, request.payload,);
         return;  
@@ -158,6 +181,42 @@ export function validateUlsanMarbleGameEvent(
       case "DISASTER_ACTION_DECIDED":
         validateDisasterActionDecidedEvent(game,playerId,request.payload,);
         return;  
+
+      case "FESTIVAL_TRIGGER_RESOLVED":
+        validateFestivalTriggerResolvedEvent(game,playerId,request.payload,);
+        return;
+
+      case "FESTIVAL_ANNOUNCEMENT_CONFIRMED":
+        validateFestivalAnnouncementConfirmedEvent(game,playerId,request.payload,);
+        return;
+
+      case "TOURIST_TURN_RESOLVED":
+        validateTouristTurnResolvedEvent(game,playerId,request.payload,);
+        return;
+
+      case "TOURIST_TURN_CONFIRMED":
+        validateTouristTurnConfirmedEvent(game,playerId,request.payload,);
+        return;
+
+      case "FESTIVAL_DEV_ENDED":
+        validateFestivalDevEndedEvent(game,playerId,request.payload,);
+        return;
+
+      case "MAYOR_ELECTION_STARTED":
+        validateMayorElectionStartedEvent(game,playerId,request.payload,);
+        return;
+
+      case "MAYOR_ELECTION_VOTE_CAST":
+        validateMayorElectionVoteCastEvent(game,playerId,request.payload,);
+        return;
+
+      case "MAYOR_ELECTION_RESULT_RESOLVED":
+        validateMayorElectionResultResolvedEvent(game,playerId,request.payload,);
+        return;
+
+      case "MAYOR_ELECTION_RESULT_CONFIRMED":
+        validateMayorElectionResultConfirmedEvent(game,playerId,request.payload,);
+        return;
 
     default:
       console.error("[SERVER UNSUPPORTED GAME EVENT]", {

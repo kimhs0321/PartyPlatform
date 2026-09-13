@@ -23,22 +23,22 @@ const PORT_RULES: Record<
   }
 > = {
   COASTAL: {
-    investmentAmount: 100,
-    successPayout: 140,
-    failurePayout: 50,
-  },
+      investmentAmount: 500,
+      successPayout: 650,
+      failurePayout: 300,
+    },
 
-  EAST_ASIA: {
-    investmentAmount: 200,
-    successPayout: 340,
-    failurePayout: 80,
-  },
+    EAST_ASIA: {
+      investmentAmount: 900,
+      successPayout: 1500,
+      failurePayout: 300,
+    },
 
-  OCEAN: {
-    investmentAmount: 300,
-    successPayout: 650,
-    failurePayout: 0,
-  },
+    OCEAN: {
+      investmentAmount: 1500,
+      successPayout: 4500,
+      failurePayout: 0,
+    },
 };
 
 const PORT_MODIFIER_TYPES:
@@ -87,17 +87,25 @@ function validateBase(
   turnSequence: number,
 ): void {
   if (
-    game.activePlayerId !==
+    game.controllerPlayerId !==
     playerId
   ) {
     throw new Error(
-      "현재 플레이어만 울산항 정산을 처리할 수 있습니다.",
+      "게임 진행 담당자만 울산항 정산을 처리할 수 있습니다.",
     );
   }
+  /*
+   * 울산항 정산은 정기 턴 정산 체인의 일부다.
+   *
+   * 서버는 라운드 종료 시 다음 turnNumber로 먼저 넘어가고,
+   * 직전 turnNumber의 정산을 현재 turnSequence에서 처리한다.
+   */
+  const expectedTurnNumber =
+    game.turnNumber - 1;
 
   if (
     turnNumber !==
-      game.turnNumber ||
+      expectedTurnNumber ||
     turnSequence !==
       game.turnSequence
   ) {
@@ -449,7 +457,7 @@ export function validatePortSettlementResolvedEvent(
     if (
       validateResult(
         result,
-        game.turnNumber,
+        payload.turnNumber,
       )
     ) {
       cargoInsurancePlayerIds.add(
@@ -467,7 +475,7 @@ export function validatePortSettlementResolvedEvent(
   ) {
     validateContract(
       contract,
-      game.turnNumber,
+      payload.turnNumber,
       false,
     );
 

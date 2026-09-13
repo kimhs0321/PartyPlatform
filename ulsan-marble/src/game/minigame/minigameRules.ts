@@ -18,9 +18,7 @@ import type {
 } from "./minigameTypes";
 
 export const MINI_GAME_PRIZE_AMOUNT = 300;
-export const MINI_GAME_RESPONSE_TIME_MS = 8_000;
 export const MINI_GAME_BET_OPTIONS = [100, 200, 300] as const;
-
 export const MINI_GAME_DEFINITIONS: readonly MiniGameDefinition[] = [
   {
     id: "TIMING_STOP",
@@ -161,12 +159,7 @@ export function createPendingMiniGame(
         ? null
         : "참가 가능한 플레이어가 없습니다.",
 
-    deadlineAt:
-      hasParticipants
-        ? Date.now() +
-          MINI_GAME_RESPONSE_TIME_MS
-        : null,
-  };
+    deadlineAt: null,};
 
   if (gameId === "TIMING_STOP") {
     return {
@@ -241,9 +234,7 @@ export function recordTimingStopAttempt(
       currentPlayerIndex:
         nextPlayerIndex,
 
-      deadlineAt:
-        Date.now() +
-        MINI_GAME_RESPONSE_TIME_MS,
+      deadlineAt: null,
     };
   }
 
@@ -261,9 +252,7 @@ export function recordTimingStopAttempt(
       attempts: [],
       resultText: `${tiedPlayerIds.length}명이 동점이라 재대결합니다.`,
 
-      deadlineAt:
-        Date.now() +
-        MINI_GAME_RESPONSE_TIME_MS,
+      deadlineAt: null,
     };
   }
 
@@ -358,9 +347,7 @@ export function rollTargetDiceAttempt(
       currentPlayerIndex:
         nextPlayerIndex,
 
-      deadlineAt:
-        Date.now() +
-        MINI_GAME_RESPONSE_TIME_MS,
+      deadlineAt: null,
     };
   }
 
@@ -408,9 +395,7 @@ export function rollTargetDiceAttempt(
       resultText:
         `${tiedPlayerIds.length}명이 동점이라 새 목표 숫자로 재대결합니다.`,
 
-      deadlineAt:
-        Date.now() +
-        MINI_GAME_RESPONSE_TIME_MS,
+      deadlineAt: null,
     };
   }
 
@@ -451,9 +436,7 @@ export function recordOddEvenBet(
     pending.currentPlayerIndex +
     1,
 
-  deadlineAt:
-    Date.now() +
-    MINI_GAME_RESPONSE_TIME_MS,
+  deadlineAt: null,
 };
 }
 
@@ -500,9 +483,7 @@ export function recordHighLowBet(
     bets: [...pending.bets, bet],
     currentPlayerIndex: pending.currentPlayerIndex + 1,
 
-    deadlineAt:
-      Date.now() +
-      MINI_GAME_RESPONSE_TIME_MS,
+    deadlineAt: null,
   };
 }
 

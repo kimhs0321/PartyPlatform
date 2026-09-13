@@ -210,6 +210,55 @@ export function registerUlsanMarbleSocket(
             break;
           }   
 
+          case "ACK_GAME_EVENT": {
+            if (
+              !Number.isInteger(
+                command.eventId,
+              ) ||
+              command.eventId <= 0 ||
+              !Number.isInteger(
+                command.turnSequence,
+              ) ||
+              command.turnSequence < 0
+            ) {
+              throw new Error(
+                "게임 이벤트 ACK가 올바르지 않습니다.",
+              );
+            }
+
+            ulsanMarbleGameManager
+              .ackGameEvent(
+                roomId,
+                socket.id,
+                command.eventId,
+                command.turnSequence,
+              );
+
+            break;
+          }
+
+          case "TURN_READY": {
+            if (
+              !Number.isInteger(
+                command.turnSequence,
+              ) ||
+              command.turnSequence < 0
+            ) {
+              throw new Error(
+                "턴 준비 신호가 올바르지 않습니다.",
+              );
+            }
+
+            ulsanMarbleGameManager
+              .markTurnReady(
+                roomId,
+                socket.id,
+                command.turnSequence,
+              );
+
+            break;
+          }
+
           case "DEV_END_TURN": {
             ulsanMarbleGameManager.devEndTurn(
               roomId,

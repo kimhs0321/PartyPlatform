@@ -12,6 +12,9 @@ export interface PlayerTokenData {
   position: number;
   money: number;
   dock: "left" | "right";
+
+  completedLaps?: number;
+
   isBankrupt?: boolean;
   isJailed?: boolean;
   jailFailedAttempts?: number;

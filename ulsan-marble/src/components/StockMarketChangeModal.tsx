@@ -9,6 +9,7 @@ interface StockMarketChangeModalProps {
   industries: StockIndustryData[];
   devMode: boolean;
   canConfirm: boolean;
+  actionLabel?: string;
   onConfirm: () => void;
 }
 
@@ -22,6 +23,7 @@ export function StockMarketChangeModal({
   cycle,
   industries,
   devMode,
+  actionLabel = "확인",
   canConfirm,
   onConfirm,
 }: StockMarketChangeModalProps) {
@@ -78,9 +80,9 @@ export function StockMarketChangeModal({
           disabled={!canConfirm}
         >
           {canConfirm
-            ? "확인"
+            ? actionLabel
             : "진행 플레이어 확인 대기 중"}
-      </button>
+        </button>
       </section>
     </div>
   );

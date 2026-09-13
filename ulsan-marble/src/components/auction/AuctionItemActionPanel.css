@@ -1,22 +1,25 @@
 .auction-item-actions {
-  position: absolute;
-  left: 50%;
-  bottom: 38px;
-  z-index: 105;
+  position: static;
+  z-index: auto;
+
   display: flex;
-  align-items: stretch;
-  max-width: min(760px, calc(100vw - 420px));
-  overflow: hidden;
-  border: 1px solid rgba(211, 161, 94, 0.36);
-  border-radius: 11px;
+  align-items: center;
+  gap: 6px;
+
+  max-width: 420px;
+  min-height: 108px;
+  box-sizing: border-box;
+  padding: 7px 9px;
+
+  transform: none;
+
+  border: 1px solid
+    rgba(221, 164, 101, 0.28);
+  border-radius: 12px;
+
   background:
-    linear-gradient(
-      90deg,
-      rgba(68, 39, 24, 0.96),
-      rgba(16, 28, 34, 0.94)
-    );
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.32);
-  transform: translateX(-50%);
+    rgba(13, 26, 34, 0.94);
+
   pointer-events: auto;
 }
 
@@ -131,4 +134,15 @@
   .auction-item-actions {
     max-width: calc(100vw - 24px);
   }
+}
+
+/* 어두운 경매 UI에서 전역 strong/h2 색상 침범 방지 */
+.auction-modal__brand strong,
+.auction-modal__lot b,
+.auction-modal__timer strong,
+.auction-modal__participants strong,
+.auction-modal__inventory-check > div:first-child strong,
+.auction-modal__discard-list button strong,
+.auction-modal__final-item h2 {
+  color: #edf4f7;
 }
