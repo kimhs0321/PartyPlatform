@@ -39,15 +39,34 @@ export function getLandmarkPurchaseRequirement(
         ownedPropertyIds.has(candidate.id),
     ).length;
 
-    const enteredDistrictCount = new Set(
-      properties
-        .filter(
-          (candidate) =>
-            !candidate.isLandmark &&
-            ownedPropertyIds.has(candidate.id),
-        )
-        .map((candidate) => candidate.district),
-    ).size;
+    const ownedGeneralPropertyCountsByDistrict =
+      new Map<PropertyData["district"], number>();
+
+    properties.forEach((candidate) => {
+      if (
+        candidate.isLandmark ||
+        !ownedPropertyIds.has(candidate.id)
+      ) {
+        return;
+      }
+
+      ownedGeneralPropertyCountsByDistrict.set(
+        candidate.district,
+        (
+          ownedGeneralPropertyCountsByDistrict.get(
+            candidate.district,
+          ) ?? 0
+        ) + 1,
+      );
+    });
+
+    const enteredDistrictCount =
+      Array.from(
+        ownedGeneralPropertyCountsByDistrict.values(),
+      ).filter(
+        (ownedCount) =>
+          ownedCount >= 2,
+      ).length;
 
     const requiredDistrictLandmarkCount = 1;
     const requiredDistrictCount = 3;

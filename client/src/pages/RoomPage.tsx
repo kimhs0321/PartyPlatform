@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { socket } from "../socket/socket";
+import {playerSessionId,socket,
+} from "../socket/socket";
 import { EVENTS } from "../shared/events";
 import "./RoomPage.css";
 import LiarRoom from "../rooms/LiarRoom";
@@ -204,7 +205,7 @@ export default function RoomPage() {
   }
 
   const readyCount = room.players.filter((player) => player.isReady).length;
-  const me = room.players.find((player) => player.id === socket.id);
+  const me = room.players.find((player) => player.id === playerSessionId,);
   const isHost = Boolean(me?.isHost);
 
   const handleUpdateLiarSetting = (key: keyof LiarSettings, value: number) => {

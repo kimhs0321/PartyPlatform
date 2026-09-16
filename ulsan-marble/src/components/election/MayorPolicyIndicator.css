@@ -1,7 +1,14 @@
 .mayor-policy-indicator {
   position: absolute;
   left: 50%;
-  top: 190px;
+  top:
+    calc(
+      var(
+        --board-inner-top,
+        100px
+      ) +
+      58px
+    );
   z-index: 42;
   min-width: 230px;
   max-width: 360px;

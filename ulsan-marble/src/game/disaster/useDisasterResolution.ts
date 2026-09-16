@@ -188,6 +188,12 @@ interface UseDisasterResolutionOptions {
 
   canRunDev: boolean;
 
+  initialDisasterState?:
+    DisasterState | null;
+
+  initialPendingDisasterResolution?:
+    PendingDisasterResolution | null;
+
   commitPlayers: (
     next: PlayerTokenData[],
   ) => void;
@@ -292,6 +298,10 @@ export function useDisasterResolution({
 
   canRunDev,
 
+  initialDisasterState,
+  initialPendingDisasterResolution,
+
+
   commitPlayers,
   commitPropertyOwnerships,
   commitPropertyMarket,
@@ -316,13 +326,15 @@ export function useDisasterResolution({
   const [
     disasterState,
     setDisasterState,
-  ] = useState(
-    () => createInitialDisasterState(),
+  ] = useState<DisasterState>(
+    () =>
+      initialDisasterState ??
+      createInitialDisasterState(),
   );
 
   const disasterStateRef =
-    useRef(
-      createInitialDisasterState(),
+    useRef<DisasterState>(
+      disasterState,
     );
 
   const [
@@ -330,7 +342,11 @@ export function useDisasterResolution({
     setPendingDisasterResolution,
   ] = useState<
     PendingDisasterResolution | null
-  >(null);
+  >(
+    () =>
+      initialPendingDisasterResolution ??
+      null,
+  );
 
   const [
     disasterPaymentError,

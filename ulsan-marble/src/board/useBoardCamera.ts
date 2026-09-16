@@ -15,6 +15,8 @@ import {
 } from "./layout";
 
 const FOLLOW_SCALE = 1.15;
+const OVERVIEW_PADDING = 16;
+const UI_INNER_GAP = 12;
 
 type CameraMode = "overview" | "follow";
 
@@ -82,6 +84,148 @@ export function useBoardCamera({ activeTile, mode }: UseBoardCameraOptions) {
     };
   }, [measureLayout]);
 
+  const overviewScale =
+    useMemo(
+      () => {
+        if (
+          viewportSize.width === 0 ||
+          viewportSize.height === 0 ||
+          boardSize.width === 0 ||
+          boardSize.height === 0
+        ) {
+          return 1;
+        }
+
+        return Math.min(
+          (
+            viewportSize.width -
+            OVERVIEW_PADDING * 2
+          ) / boardSize.width,
+
+          (
+            viewportSize.height -
+            OVERVIEW_PADDING * 2
+          ) / boardSize.height,
+
+          1,
+        );
+      },
+      [
+        boardSize.height,
+        boardSize.width,
+        viewportSize.height,
+        viewportSize.width,
+      ],
+    );
+
+
+  const uiLayoutStyle =
+    useMemo<CSSProperties>(
+      () => {
+        if (
+          viewportSize.width === 0 ||
+          viewportSize.height === 0 ||
+          boardSize.width === 0 ||
+          boardSize.height === 0
+        ) {
+          return {};
+        }
+
+        const scaledBoardWidth =
+          boardSize.width *
+          overviewScale;
+
+        const scaledBoardHeight =
+          boardSize.height *
+          overviewScale;
+
+        const boardLeft =
+          (
+            viewportSize.width -
+            scaledBoardWidth
+          ) / 2;
+
+        const boardTop =
+          (
+            viewportSize.height -
+            scaledBoardHeight
+          ) / 2;
+
+        const boardRight =
+          viewportSize.width -
+          boardLeft -
+          scaledBoardWidth;
+
+        const boardBottom =
+          viewportSize.height -
+          boardTop -
+          scaledBoardHeight;
+
+        const tileWidth =
+          scaledBoardWidth /
+          BOARD_GRID_COLUMNS;
+
+        const tileHeight =
+          scaledBoardHeight /
+          BOARD_GRID_ROWS;
+
+        return {
+          "--board-visual-left":
+            `${boardLeft}px`,
+
+          "--board-visual-right":
+            `${boardRight}px`,
+
+          "--board-visual-top":
+            `${boardTop}px`,
+
+          "--board-visual-bottom":
+            `${boardBottom}px`,
+
+          "--board-tile-width":
+            `${tileWidth}px`,
+
+          "--board-tile-height":
+            `${tileHeight}px`,
+
+          "--board-inner-left":
+            `${
+              boardLeft +
+              tileWidth +
+              UI_INNER_GAP
+            }px`,
+
+          "--board-inner-right":
+            `${
+              boardRight +
+              tileWidth +
+              UI_INNER_GAP
+            }px`,
+
+          "--board-inner-top":
+            `${
+              boardTop +
+              tileHeight +
+              UI_INNER_GAP
+            }px`,
+
+          "--board-inner-bottom":
+            `${
+              boardBottom +
+              tileHeight +
+              UI_INNER_GAP
+            }px`,
+        } as CSSProperties;
+      },
+      [
+        boardSize.height,
+        boardSize.width,
+        overviewScale,
+        viewportSize.height,
+        viewportSize.width,
+      ],
+    );
+
   const cameraTransform = useMemo<CameraTransform>(() => {
     if (
       viewportSize.width === 0 ||
@@ -92,18 +236,6 @@ export function useBoardCamera({ activeTile, mode }: UseBoardCameraOptions) {
       return { x: 0, y: 0, scale: 1 };
     }
 
-  const containScale = Math.min(
-    viewportSize.width / boardSize.width,
-    viewportSize.height / boardSize.height,
-  );
-
-  const coverScale = Math.max(
-    viewportSize.width / boardSize.width,
-    viewportSize.height / boardSize.height,
-  );
-
-  const overviewScale =
-    containScale + (coverScale - containScale) * 0;
     if (mode === "overview") {
       return {
         x: 0,
@@ -149,7 +281,13 @@ export function useBoardCamera({ activeTile, mode }: UseBoardCameraOptions) {
       y: clamp(desiredY - currentY, -maximumY, maximumY),
       scale: FOLLOW_SCALE,
     };
-  }, [activeTile, boardSize, mode, viewportSize]);
+    }, [
+      activeTile,
+      boardSize,
+      mode,
+      overviewScale,
+      viewportSize,
+    ]);
 
   const cameraPositionStyle: CSSProperties = {
     transform: `translate(-50%, -50%) translate3d(${cameraTransform.x}px, ${cameraTransform.y}px, 0)`,
@@ -162,7 +300,10 @@ export function useBoardCamera({ activeTile, mode }: UseBoardCameraOptions) {
   return {
     viewportRef,
     boardRef,
+
     cameraPositionStyle,
     cameraScaleStyle,
+
+    uiLayoutStyle,
   };
 }

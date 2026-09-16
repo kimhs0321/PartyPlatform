@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { socket } from "../socket/socket";
+import {playerSessionId,socket,} from "../socket/socket";
 import { EVENTS } from "../shared/events";
 import LiarGame from "../games/LiarGame";
 import UnknownGame from "../games/UnknownGame";
@@ -13,6 +13,10 @@ import type {
   ClientRelayDrawingGameState,
 } from "../../../server/src/shared/types/relayDrawing";
 import UlsanMarbleGame from "../../../ulsan-marble/src/App";
+import UlsanGameControls from "../components/UlsanGameControls";
+import {
+  removeUlsanMarbleSnapshot,
+} from "../../../ulsan-marble/src/game/persistence/ulsanMarbleSnapshot";
 import type {
   ClientUlsanMarbleGameState,
   UlsanMarbleGameError,
@@ -64,6 +68,14 @@ export default function GamePage() {
     };
 
     const handleGameEnded = (roomInfo: RoomDto) => {
+      removeUlsanMarbleSnapshot(
+        roomInfo.id,
+      );
+
+      sessionStorage.removeItem(
+        `ulsan-marble:chat:${roomInfo.id}`,
+      );
+
       navigate(`/room/${roomInfo.id}`, {
         state: { room: roomInfo },
       });
@@ -123,7 +135,7 @@ export default function GamePage() {
 
   }, [roomId, navigate]);
 
-  const me = room?.players.find((player) => player.id === socket.id);
+  const me = room?.players.find((player) => player.id === playerSessionId,);
   const isHost = Boolean(me?.isHost);
 
   const handleEndGame = () => {
@@ -132,6 +144,16 @@ export default function GamePage() {
 
   const handleLeaveRoom = () => {
     socket.once(EVENTS.LEAVE_ROOM, () => {
+      removeUlsanMarbleSnapshot(
+        roomId,
+      );
+
+      if (roomId) {
+        sessionStorage.removeItem(
+          `ulsan-marble:chat:${roomId}`,
+        );
+      }
+
       navigate("/lobby");
     });
 
@@ -164,28 +186,48 @@ export default function GamePage() {
 
   if (room?.game === "울산마블") {
     return (
-      <UlsanMarbleGame
-        participants={room.players.map(
-          (player) => ({
-            id: player.id,
-            nickname: player.nickname,
-          }),
-        )}
-        localPlayerId={socket.id}
-        settings={
-          room.gameSettings.ulsanMarble
-        }
-        network={{
-          state: ulsanMarbleGameState,
+      <div className="ulsan-platform-game">
+        <UlsanMarbleGame
+          roomId={roomId}
+          participants={room.players.map(
+            (player) => ({
+              id: player.id,
+              nickname:
+                player.nickname,
+            }),
+          )}
+          localPlayerId={
+            playerSessionId
+          }
+          settings={
+            room.gameSettings
+              .ulsanMarble
+          }
+          network={{
+            state:
+              ulsanMarbleGameState,
 
-          sendCommand: (command) => {
-            socket.emit(
-              EVENTS.ULSAN_MARBLE_COMMAND,
+            sendCommand: (
               command,
-            );
-          },
-        }}
-      />
+            ) => {
+              socket.emit(
+                EVENTS
+                  .ULSAN_MARBLE_COMMAND,
+                command,
+              );
+            },
+          }}
+        />
+
+        {roomId && (
+          <UlsanGameControls
+            roomId={roomId}
+            onLeave={
+              handleLeaveRoom
+            }
+          />
+        )}
+      </div>
     );
   }
 

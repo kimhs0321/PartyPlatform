@@ -4,11 +4,18 @@ import {
   useRef,
 } from "react";
 
+interface NetworkTurnSequenceCursorRef {
+  current: number | null;
+}
+
 interface UseNetworkTurnSyncOptions {
   turnSequence:
     number | undefined;
 
   turnPhase: string;
+
+  processedTurnSequenceCursorRef?:
+    NetworkTurnSequenceCursorRef;
 
   completeStockTrading:
     () => boolean;
@@ -23,14 +30,19 @@ interface UseNetworkTurnSyncOptions {
 export function useNetworkTurnSync({
   turnSequence,
   turnPhase,
+  processedTurnSequenceCursorRef,
   completeStockTrading,
   shouldCompleteImmediately,
   completeImmediately,
 }: UseNetworkTurnSyncOptions) {
-  const processedTurnSequenceRef =
+  const fallbackProcessedTurnSequenceRef =
     useRef<number | null>(
       turnSequence ?? null,
     );
+
+  const processedTurnSequenceRef =
+    processedTurnSequenceCursorRef ??
+    fallbackProcessedTurnSequenceRef;
 
   useEffect(() => {
     if (
@@ -151,6 +163,7 @@ export function useNetworkTurnSync({
   }, [
     completeImmediately,
     completeStockTrading,
+    processedTurnSequenceRef,
     shouldCompleteImmediately,
     turnPhase,
     turnSequence,
@@ -158,14 +171,10 @@ export function useNetworkTurnSync({
 
   const resetNetworkTurnSync =
     useCallback(() => {
-      /*
-       * 현재 서버 시퀀스를 기준점으로 삼는다.
-       * 0으로 되돌리면 현재 턴을 새 종료 이벤트로
-       * 잘못 처리할 수 있다.
-       */
       processedTurnSequenceRef.current =
         turnSequence ?? null;
     }, [
+      processedTurnSequenceRef,
       turnSequence,
     ]);
 

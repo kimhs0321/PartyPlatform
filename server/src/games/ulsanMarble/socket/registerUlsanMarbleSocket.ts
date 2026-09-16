@@ -68,6 +68,13 @@ export function registerUlsanMarbleSocket(
 
       if (!roomId) return;
 
+      const player =
+        playerManager.getPlayer(socket.id);
+
+      if (!player) return;
+
+      const playerId = player.id;
+
       try {
         if (!command || typeof command !== "object") {
           throw new Error(
@@ -79,7 +86,7 @@ export function registerUlsanMarbleSocket(
           case "ROLL_DICE": {
             ulsanMarbleGameManager.rollDice(
               roomId,
-              socket.id,
+              playerId,
             );
             break;
           }
@@ -102,7 +109,7 @@ export function registerUlsanMarbleSocket(
 
             ulsanMarbleGameManager.rollDice(
               roomId,
-              socket.id,
+              playerId,
               command.values,
             );
 
@@ -132,7 +139,7 @@ export function registerUlsanMarbleSocket(
 
             ulsanMarbleGameManager.decideProperty(
               roomId,
-              socket.id,
+              playerId,
               {
                 arrivalId:
                   command.arrivalId.trim(),
@@ -173,7 +180,7 @@ export function registerUlsanMarbleSocket(
 
             ulsanMarbleGameManager.tradeStock(
               roomId,
-              socket.id,
+              playerId,
               {
                 action: command.action,
                 companyId:
@@ -202,7 +209,7 @@ export function registerUlsanMarbleSocket(
 
             ulsanMarbleGameManager.publishGameEvent(
               roomId,
-              socket.id,
+              playerId,
               command.expectedTurnSequence,
               command.event,
             );
@@ -229,7 +236,7 @@ export function registerUlsanMarbleSocket(
             ulsanMarbleGameManager
               .ackGameEvent(
                 roomId,
-                socket.id,
+                playerId,
                 command.eventId,
                 command.turnSequence,
               );
@@ -252,7 +259,7 @@ export function registerUlsanMarbleSocket(
             ulsanMarbleGameManager
               .markTurnReady(
                 roomId,
-                socket.id,
+                playerId,
                 command.turnSequence,
               );
 
@@ -262,7 +269,7 @@ export function registerUlsanMarbleSocket(
           case "DEV_END_TURN": {
             ulsanMarbleGameManager.devEndTurn(
               roomId,
-              socket.id,
+              playerId,
             );
 
             break;
@@ -271,7 +278,7 @@ export function registerUlsanMarbleSocket(
           case "END_TURN": {
             ulsanMarbleGameManager.endTurn(
               roomId,
-              socket.id,
+              playerId,
             );
             break;
           }

@@ -65,6 +65,10 @@ interface UseCompanyDividendEventResolutionOptions {
   turnSequence:
     number;
 
+  initialPendingCompanyDividendEvent?:
+    UlsanMarbleCompanyDividendEventResolvedPayload["event"]
+    | null;
+
   startStockMarketResolution: (
     mode:
       StockMarketResolutionMode,
@@ -107,6 +111,8 @@ export function useCompanyDividendEventResolution({
   turnNumber,
   turnSequence,
 
+  initialPendingCompanyDividendEvent,
+
   startStockMarketResolution,
 
   onNetworkGameEventRequest,
@@ -127,7 +133,11 @@ export function useCompanyDividendEventResolution({
   ] = useState<
     UlsanMarbleCompanyDividendEventResolvedPayload["event"]
     | null
-  >(null);
+  >(
+    () =>
+      initialPendingCompanyDividendEvent ??
+      null,
+  );
 
   const applyCompanyDividendEventResolved =
     useCallback(
@@ -162,11 +172,31 @@ export function useCompanyDividendEventResolution({
           return true;
         }
 
+        const beforeModifiers =
+          companyDividendModifiersRef.current;
+
         companyDividendModifiersRef.current =
           applyCompanyDividendEvent(
-            companyDividendModifiersRef.current,
+            beforeModifiers,
             payload.event,
           );
+
+        console.log(
+          "[COMPANY DIVIDEND EVENT]",
+          {
+            turnNumber,
+            event: payload.event,
+            before:
+              beforeModifiers[
+                payload.event.companyId
+              ],
+            after:
+              companyDividendModifiersRef
+                .current[
+                  payload.event.companyId
+                ],
+          },
+        );
 
         setPendingCompanyDividendEvent(
           payload.event,

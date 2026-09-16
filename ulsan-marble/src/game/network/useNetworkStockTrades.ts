@@ -15,12 +15,19 @@ type ApplyStockTrade = (
   pricePerShare: number,
 ) => void;
 
+interface NetworkStockTradeCursorRef {
+  current: number;
+}
+
 interface UseNetworkStockTradesOptions {
   trades?:
     UlsanMarbleNetworkStockTrade[];
 
   activePlayerId: string;
   turnPhase: string;
+
+  processedTradeCursorRef?:
+    NetworkStockTradeCursorRef;
 
   applyBuyStock:
     ApplyStockTrade;
@@ -33,11 +40,16 @@ export function useNetworkStockTrades({
   trades,
   activePlayerId,
   turnPhase,
+  processedTradeCursorRef,
   applyBuyStock,
   applySellStock,
 }: UseNetworkStockTradesOptions): () => void {
-  const processedTradeIdRef =
+  const fallbackProcessedTradeIdRef =
     useRef(0);
+
+  const processedTradeIdRef =
+    processedTradeCursorRef ??
+    fallbackProcessedTradeIdRef;
 
   const applyBuyStockRef =
     useRef(applyBuyStock);
@@ -124,11 +136,12 @@ export function useNetworkStockTrades({
     }
   }, [
     activePlayerId,
+    processedTradeIdRef,
     trades,
     turnPhase,
   ]);
 
   return useCallback(() => {
     processedTradeIdRef.current = 0;
-  }, []);
+  }, [processedTradeIdRef]);
 }

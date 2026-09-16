@@ -262,9 +262,31 @@ export function turnReducer(
         phase: "RESOLVING_TILE",
       };
 
+    case "RESTORE_STATE":
+      return {
+        turnNumber: Math.max(
+          1,
+          Math.trunc(action.state.turnNumber),
+        ),
+
+        activePlayerIndex: Math.max(
+          0,
+          Math.trunc(
+            action.state.activePlayerIndex,
+          ),
+        ),
+
+        phase: action.state.phase,
+
+        sequence: Math.max(
+          0,
+          Math.trunc(action.state.sequence),
+        ),
+      };
+
     case "RESET":
       return INITIAL_TURN_STATE;
-
+      
     default:
       return state;
   }

@@ -4,7 +4,6 @@ import type {BoardTile,PropertyData,} from "../../types";
 import type {MoneyOperationResult,TransactionReason,} from "../economy/economyTypes";
 import {getPolicySalary,} from "../election/policyEffects";
 import type {PropertyMarketMap,} from "../market/marketTypes";
-import {delay,} from "../movement";
 import type {PropertyOwnershipMap,} from "../property/propertyTypes";
 import {getPortfolioMarketValue,} from "../stock/stockMarket";
 import type {StockCompanyData,StockMarketMap,StockPortfolioMap,} from "../stock/stockTypes";
@@ -978,23 +977,19 @@ export function useGoldenKeyResolution({
       }
 
       if (followUpPosition !== null) {
-        void (async () => {
-          await delay(240);
+        const goldenKeyArrival: UlsanMarbleArrivalContext = {
+          arrivalId: `GOLDEN_KEY:${payload.turnSequence}:${card.id}`,
+          cause: "GOLDEN_KEY",
+          playerId,
+          position: followUpPosition,
+          turnSequence: payload.turnSequence,
+        };
 
-          const goldenKeyArrival: UlsanMarbleArrivalContext = {
-            arrivalId: `GOLDEN_KEY:${payload.turnSequence}:${card.id}`,
-            cause: "GOLDEN_KEY",
-            playerId,
-            position: followUpPosition,
-            turnSequence: payload.turnSequence,
-          };
-
-          resolveArrivalTile(
-            followUpPosition,
-            playerId,
-            goldenKeyArrival,
-          );
-        })();
+        resolveArrivalTile(
+          followUpPosition,
+          playerId,
+          goldenKeyArrival,
+        );
 
         return true;
       }

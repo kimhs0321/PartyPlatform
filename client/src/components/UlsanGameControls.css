@@ -1,0 +1,585 @@
+.ulsan-platform-game {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.ulsan-game-controls {
+  position: fixed;
+
+  /*
+   * 외곽 보드칸을 피해서
+   * 중앙 빈 공간의 우하단에 배치
+   */
+  right: clamp(
+    105px,
+    6.5vw,
+    150px
+  );
+
+  bottom: clamp(
+    105px,
+    12vh,
+    145px
+  );
+
+  z-index: 1200;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  pointer-events: auto;
+}
+
+.ulsan-control-button {
+  position: relative;
+
+  min-width: 88px;
+  height: 42px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  padding: 0 14px;
+
+  color: #dff5ff;
+
+  border:
+    1px solid
+    rgba(122, 194, 226, 0.36);
+
+  border-radius: 12px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(18, 59, 82, 0.94),
+      rgba(6, 30, 46, 0.96)
+    );
+
+  box-shadow:
+    0 9px 24px
+      rgba(0, 0, 0, 0.3),
+    inset 0 1px
+      rgba(255, 255, 255, 0.08);
+
+  backdrop-filter: blur(10px);
+
+  font-size: 13px;
+  font-weight: 850;
+
+  cursor: pointer;
+
+  transition:
+    transform 140ms ease,
+    border-color 140ms ease,
+    background 140ms ease;
+}
+
+.ulsan-control-button:hover {
+  transform: translateY(-1px);
+
+  border-color:
+    rgba(150, 221, 249, 0.72);
+}
+
+.ulsan-control-button.is-active {
+  color: #ffffff;
+
+  border-color:
+    rgba(105, 213, 255, 0.8);
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(18, 105, 142, 0.97),
+      rgba(7, 53, 78, 0.98)
+    );
+}
+
+.ulsan-control-button--leave:hover {
+  color: #ffe3e3;
+
+  border-color:
+    rgba(255, 126, 126, 0.62);
+}
+
+.ulsan-control-button__icon {
+  font-size: 14px;
+}
+
+.ulsan-chat-badge {
+  position: absolute;
+  right: -5px;
+  top: -7px;
+
+  min-width: 20px;
+  height: 20px;
+
+  padding: 0 5px;
+
+  display: grid;
+  place-items: center;
+
+  color: white;
+
+  border:
+    2px solid
+    #071722;
+
+  border-radius: 999px;
+
+  background: #e84c4c;
+
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.ulsan-chat-drawer {
+  position: fixed;
+
+  /*
+   * 중앙 정가운데가 아니라
+   * 중앙 빈 공간의 오른쪽 영역
+   */
+  left: auto;
+
+  right: clamp(
+    115px,
+    8vw,
+    165px
+  );
+
+  top: 60%;
+
+  z-index: 1190;
+
+  width: min(
+    430px,
+    calc(100vw - 360px)
+  );
+
+  height: min(
+    420px,
+    calc(100vh - 320px)
+  );
+
+  min-width: 360px;
+  min-height: 320px;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  border:
+    1px solid
+    rgba(117, 193, 226, 0.4);
+
+  border-radius: 18px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(9, 31, 47, 0.97),
+      rgba(5, 20, 32, 0.98)
+    );
+
+  box-shadow:
+    0 24px 68px
+      rgba(0, 0, 0, 0.5),
+    inset 0 1px
+      rgba(255, 255, 255, 0.06);
+
+  backdrop-filter: blur(18px);
+
+  opacity: 0;
+
+  transform:
+    translateY(-50%)
+    scale(0.97);
+
+  pointer-events: none;
+
+  transition:
+    transform 180ms ease,
+    opacity 160ms ease;
+}
+
+.ulsan-chat-drawer.is-open {
+  opacity: 1;
+
+  transform:
+    translateY(-50%)
+    scale(1);
+
+  pointer-events: auto;
+}
+
+.ulsan-chat-drawer__header {
+  flex: 0 0 auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 17px 18px;
+
+  border-bottom:
+    1px solid
+    rgba(128, 195, 224, 0.16);
+}
+
+.ulsan-chat-drawer__header > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ulsan-chat-drawer__header small {
+  color: #65b7d9;
+
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+}
+
+.ulsan-chat-drawer__header strong {
+  color: #eefaff;
+
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.ulsan-chat-drawer__header button {
+  width: 32px;
+  height: 32px;
+
+  border: 0;
+  border-radius: 9px;
+
+  color: #b8d5e1;
+  background:
+    rgba(255, 255, 255, 0.06);
+
+  font-size: 22px;
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+.ulsan-chat-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  padding: 16px;
+}
+
+.ulsan-chat-message {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
+
+.ulsan-chat-message strong {
+  color: #73c8ea;
+
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.ulsan-chat-message span {
+  max-width: 92%;
+
+  padding: 8px 11px;
+
+  color: #edf8fc;
+
+  border:
+    1px solid
+    rgba(116, 188, 218, 0.15);
+
+  border-radius:
+    4px
+    12px
+    12px
+    12px;
+
+  background:
+    rgba(29, 66, 86, 0.72);
+
+  font-size: 13px;
+  line-height: 1.45;
+
+  word-break: break-word;
+}
+
+.ulsan-chat-empty {
+  margin: auto;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+
+  color: #8ba9b8;
+
+  text-align: center;
+}
+
+.ulsan-chat-empty > span {
+  font-size: 30px;
+  opacity: 0.6;
+}
+
+.ulsan-chat-empty strong {
+  color: #bfd7e2;
+  font-size: 13px;
+}
+
+.ulsan-chat-empty small {
+  font-size: 11px;
+}
+
+.ulsan-chat-input {
+  flex: 0 0 auto;
+
+  display: flex;
+  gap: 8px;
+
+  padding: 12px;
+
+  border-top:
+    1px solid
+    rgba(128, 195, 224, 0.16);
+
+  background:
+    rgba(0, 0, 0, 0.12);
+}
+
+.ulsan-chat-input input {
+  flex: 1;
+  min-width: 0;
+
+  height: 40px;
+
+  padding: 0 12px;
+
+  color: #f3fbff;
+
+  border:
+    1px solid
+    rgba(120, 190, 220, 0.28);
+
+  border-radius: 10px;
+
+  outline: none;
+
+  background:
+    rgba(19, 48, 66, 0.82);
+
+  font-size: 13px;
+}
+
+.ulsan-chat-input input:focus {
+  border-color:
+    rgba(91, 203, 247, 0.72);
+}
+
+.ulsan-chat-input input::placeholder {
+  color: #7893a0;
+}
+
+.ulsan-chat-input button {
+  width: 60px;
+
+  border: 0;
+  border-radius: 10px;
+
+  color: white;
+
+  background:
+    linear-gradient(
+      145deg,
+      #2788b3,
+      #176485
+    );
+
+  font-size: 12px;
+  font-weight: 850;
+
+  cursor: pointer;
+}
+
+.ulsan-chat-input button:disabled {
+  opacity: 0.38;
+  cursor: default;
+}
+
+.ulsan-leave-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1500;
+
+  display: grid;
+  place-items: center;
+
+  padding: 20px;
+
+  background:
+    rgba(1, 8, 13, 0.68);
+
+  backdrop-filter:
+    blur(5px);
+}
+
+.ulsan-leave-dialog {
+  width: min(
+    380px,
+    calc(100vw - 36px)
+  );
+
+  padding: 28px;
+
+  color: #edf8fc;
+
+  border:
+    1px solid
+    rgba(145, 199, 220, 0.32);
+
+  border-radius: 20px;
+
+  background:
+    linear-gradient(
+      160deg,
+      #102c3d,
+      #071923
+    );
+
+  box-shadow:
+    0 28px 80px
+      rgba(0, 0, 0, 0.55);
+
+  text-align: center;
+}
+
+.ulsan-leave-dialog__icon {
+  width: 50px;
+  height: 50px;
+
+  margin: 0 auto 13px;
+
+  display: grid;
+  place-items: center;
+
+  color: #ffb5b5;
+
+  border-radius: 50%;
+
+  background:
+    rgba(219, 76, 76, 0.15);
+
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.ulsan-leave-dialog h2 {
+  margin: 0 0 8px;
+
+  font-size: 21px;
+}
+
+.ulsan-leave-dialog p {
+  margin: 0;
+
+  color: #a9c1cc;
+
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.ulsan-leave-dialog__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+
+  margin-top: 22px;
+}
+
+.ulsan-leave-dialog__actions button {
+  height: 42px;
+
+  border:
+    1px solid
+    rgba(142, 194, 215, 0.25);
+
+  border-radius: 11px;
+
+  color: #dbeaf0;
+
+  background:
+    rgba(255, 255, 255, 0.06);
+
+  font-weight: 850;
+
+  cursor: pointer;
+}
+
+.ulsan-leave-dialog__actions
+  button.is-danger {
+  color: white;
+
+  border-color:
+    rgba(255, 104, 104, 0.36);
+
+  background:
+    linear-gradient(
+      145deg,
+      #bd4040,
+      #8e2929
+    );
+}
+
+.ulsan-leave-dialog__actions
+  button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+@media (max-width: 640px) {
+  .ulsan-game-controls {
+    top: auto;
+    right: 82px;
+    bottom: 82px;
+  }
+
+  .ulsan-control-button {
+    min-width: 72px;
+    height: 38px;
+    padding: 0 10px;
+  }
+
+.ulsan-chat-drawer {
+  right: 76px;
+  top: 58%;
+
+  width:
+    calc(100vw - 170px);
+
+  height:
+    calc(100vh - 250px);
+
+  min-width: 0;
+  min-height: 280px;
+}
+}

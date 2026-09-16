@@ -2,7 +2,11 @@
   position: absolute;
   right: clamp(550px, 15vw, 270px);
   left: auto;
-  bottom: clamp(104px, 12vh, 140px);
+  bottom:
+    var(
+      --board-inner-bottom,
+      120px
+    );
   z-index: 56;
 
   display: flex;

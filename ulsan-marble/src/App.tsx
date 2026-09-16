@@ -23,6 +23,9 @@ export type UlsanMarblePlatformSettings = {
 
 export type UlsanMarbleNetworkState = {
   activePlayerId: string;
+  controllerPlayerId: string;
+
+  turnNumber: number;
   turnSequence: number;
 
   phase:
@@ -54,6 +57,7 @@ export type UlsanMarbleAppProps = {
   participants?: UlsanMarbleParticipantInput[];
   localPlayerId?: string;
   settings?: UlsanMarblePlatformSettings;
+  roomId?: string;
 
   network?: UlsanMarbleNetworkAdapter;
 };
@@ -63,11 +67,13 @@ export default function App({
   localPlayerId,
   settings,
   network,
+  roomId,
 }: UlsanMarbleAppProps = {}) {
     return (
       <UlsanBoard
         participants={participants}
         localPlayerId={localPlayerId}
+        roomId={roomId}
         settings={settings}
         network={network}
       />

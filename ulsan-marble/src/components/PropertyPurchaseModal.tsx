@@ -450,7 +450,7 @@ export function PropertyPurchaseModal({
                         </dd>
                       </div>
                       <div>
-                        <dt>일반 부동산 진출 구·군</dt>
+                        <dt>일반 부동산 2필지 이상 구·군</dt>
                         <dd>
                           {displayLandmarkRequirement.enteredDistrictCount} /{" "}
                           {displayLandmarkRequirement.requiredDistrictCount}곳

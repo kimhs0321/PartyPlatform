@@ -123,6 +123,7 @@ import {CompanyDividendEventModal,} from "./CompanyDividendEventModal";
 const board = boardJson as BoardData;
 const propertyData = propertiesJson as PropertiesData;
 const stockData = companiesJson as unknown as CompaniesData;
+const SHOW_DEV_TOOLS = false;
 
 function getPropertyDistrictDisplayName(
   property: PropertyData,
@@ -143,6 +144,7 @@ function getPropertyDistrictDisplayName(
 type UlsanBoardProps = {
   participants?: UlsanMarbleParticipantInput[];
   localPlayerId?: string;
+  roomId?: string;
 
   settings?: {
     startingMoney: number;
@@ -186,6 +188,7 @@ validateBoardLayout(board.tiles);
 export function UlsanBoard({
   participants,
   localPlayerId,
+  roomId,
   settings,
   network,
 }: UlsanBoardProps) {
@@ -261,6 +264,7 @@ export function UlsanBoard({
     initialPlayers: platformPlayers,
     localPlayerId,
     salary: salaryInTenThousands,
+    roomId,
 
     networkDiceRoll:
       network?.state?.diceRoll ?? null,
@@ -1335,10 +1339,16 @@ export function UlsanBoard({
           </div>
         </div>
 
-        <div className="game-ui-layer">
-          {import.meta.env.DEV && (
-            <DevTestPanel
-            players={game.players}
+        <div
+          className="game-ui-layer"
+          style={
+            camera.uiLayoutStyle
+          }
+        >
+          {SHOW_DEV_TOOLS &&
+            import.meta.env.DEV && (
+              <DevTestPanel
+              players={game.players}
               activePlayerId={game.activePlayerId}
               tiles={board.tiles}
               properties={propertyData.properties}
@@ -1571,33 +1581,60 @@ export function UlsanBoard({
             itemNamesByPlayer={itemNamesByPlayer}
           />
 
-          <TurnIndicator
-            turnNumber={
-              roundLimit === null
-                ? game.turnNumber
-                : Math.min(game.turnNumber, roundLimit)
-            }
-            roundLimit={roundLimit ?? undefined}
-            phase={game.turnPhase}
-            player={game.activePlayer}
-            tile={activeTile}
-            lastMove={game.lastMove}
-          />
+          <div className="top-hud-stack">
+            <TurnIndicator
+              turnNumber={
+                roundLimit === null
+                  ? game.turnNumber
+                  : Math.min(
+                      game.turnNumber,
+                      roundLimit,
+                    )
+              }
+              roundLimit={
+                roundLimit ?? undefined
+              }
+              phase={game.turnPhase}
+              player={game.activePlayer}
+              tile={activeTile}
+              lastMove={game.lastMove}
+            />
 
-          <MayorPolicyIndicator
-            mayorTerm={game.currentMayorTerm}
-            turnNumber={game.turnNumber}
-          />
+            <MayorPolicyIndicator
+              mayorTerm={
+                game.currentMayorTerm
+              }
+              turnNumber={
+                game.turnNumber
+              }
+            />
 
-          <EconomicNewsIndicator
-            news={game.visibleEconomicNews}
-            cityHallTerm={game.activeCityHallTerm}
-            disasterPenalties={game.activeDisasterPenalties}
-            industries={stockData.industries}
-            interestRateLevel={game.macroEconomyState.interestRateLevel}
-            macroReports={game.macroEconomyState.reportHistory}
-            turnNumber={game.turnNumber}
-          />
+            <EconomicNewsIndicator
+              news={
+                game.visibleEconomicNews
+              }
+              cityHallTerm={
+                game.activeCityHallTerm
+              }
+              disasterPenalties={
+                game.activeDisasterPenalties
+              }
+              industries={
+                stockData.industries
+              }
+              interestRateLevel={
+                game.macroEconomyState
+                  .interestRateLevel
+              }
+              macroReports={
+                game.macroEconomyState
+                  .reportHistory
+              }
+              turnNumber={
+                game.turnNumber
+              }
+            />
+          </div>
 
           {!game.activePlayerIsJailed && (
             <DiceAction

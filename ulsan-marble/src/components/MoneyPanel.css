@@ -1,7 +1,22 @@
 .money-panel {
   position: absolute;
-  left: clamp(250px, 18vw, 360px);
-  bottom: clamp(104px, 12vh, 140px);
+  left:
+    calc(
+      var(
+        --board-inner-left,
+        100px
+      ) +
+      clamp(
+        130px,
+        8vw,
+        180px
+      )
+    );
+  bottom:
+    var(
+      --board-inner-bottom,
+      120px
+    );
   z-index: 48;
   min-width: 225px;
   padding: 11px 14px;

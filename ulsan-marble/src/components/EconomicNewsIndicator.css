@@ -1,7 +1,14 @@
 .economic-news-indicator {
   position: absolute;
   left: 50%;
-  top: calc(clamp(148px, 17vh, 188px) + 92px);
+  top:
+    calc(
+      var(
+        --board-inner-top,
+        100px
+      ) +
+      112px
+    );
   z-index: 40;
 
   width: min(680px, calc(100vw - 40px));

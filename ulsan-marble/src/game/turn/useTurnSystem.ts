@@ -1,14 +1,37 @@
-import { useMemo, useReducer } from "react";
-import { INITIAL_TURN_STATE, turnReducer } from "./turnUtils";
+import {
+  useCallback,
+  useMemo,
+  useReducer,
+} from "react";
+
+import {
+  INITIAL_TURN_STATE,
+  turnReducer,
+} from "./turnUtils";
+
+import type {
+  TurnPhase,
+  TurnState,
+} from "./turnTypes";
 
 interface UseTurnSystemOptions {
   playerIds: string[];
   disabledPlayerIds?: string[];
+
+  initialSnapshot?:
+    TurnRestoreSnapshot | null;
 }
 
 interface TurnAdvancePreview {
   nextPlayerIndex: number;
   completedGlobalTurn: boolean;
+}
+
+export interface TurnRestoreSnapshot {
+  turnNumber: number;
+  turnSequence: number;
+  activePlayerId: string;
+  phase: TurnPhase;
 }
 
 function findNextEligiblePlayer(
@@ -39,8 +62,54 @@ function findNextEligiblePlayer(
 export function useTurnSystem({
   playerIds,
   disabledPlayerIds = [],
+  initialSnapshot = null,
 }: UseTurnSystemOptions) {
-  const [state, dispatch] = useReducer(turnReducer, INITIAL_TURN_STATE);
+  const initialTurnState =
+    useMemo<TurnState>(() => {
+      if (!initialSnapshot) {
+        return INITIAL_TURN_STATE;
+      }
+
+      const playerIndex =
+        playerIds.indexOf(
+          initialSnapshot.activePlayerId,
+        );
+
+      if (playerIndex < 0) {
+        return INITIAL_TURN_STATE;
+      }
+
+      return {
+        turnNumber: Math.max(
+          1,
+          Math.trunc(
+            initialSnapshot.turnNumber,
+          ),
+        ),
+
+        activePlayerIndex:
+          playerIndex,
+
+        phase:
+          initialSnapshot.phase,
+
+        sequence: Math.max(
+          0,
+          Math.trunc(
+            initialSnapshot.turnSequence,
+          ),
+        ),
+      };
+    }, [
+      initialSnapshot,
+      playerIds,
+    ]);
+
+  const [state, dispatch] =
+    useReducer(
+      turnReducer,
+      initialTurnState,
+    );
 
   const disabledPlayerIdSet = useMemo(
     () => new Set(disabledPlayerIds),
@@ -94,6 +163,43 @@ export function useTurnSystem({
     });
   };
 
+  const restoreTurnState =
+    useCallback(
+      (
+        snapshot:
+          TurnRestoreSnapshot,
+      ): boolean => {
+        const playerIndex =
+          playerIds.indexOf(
+            snapshot.activePlayerId,
+          );
+
+        if (playerIndex < 0) {
+          return false;
+        }
+
+        dispatch({
+          type: "RESTORE_STATE",
+          state: {
+            turnNumber:
+              snapshot.turnNumber,
+
+            activePlayerIndex:
+              playerIndex,
+
+            phase:
+              snapshot.phase,
+
+            sequence:
+              snapshot.turnSequence,
+          },
+        });
+
+        return true;
+      },
+      [playerIds],
+    );
+
   return {
     turnNumber: state.turnNumber,
     turnSequence: state.sequence,
@@ -141,8 +247,14 @@ export function useTurnSystem({
     completeEconomicNews: completeTurn,
     completeDisaster: completeTurn,
     cancelCurrentAction: () =>
-      dispatch({ type: "CANCEL_CURRENT_ACTION" }),
-    resetTurnSystem: () => dispatch({ type: "RESET" }),
+      dispatch({
+        type: "CANCEL_CURRENT_ACTION",
+      }),
+
+    restoreTurnState,
+
+    resetTurnSystem: () =>
+      dispatch({ type: "RESET" }),
 
     overrideActivePlayer: (playerId: string) => {
       if (disabledPlayerIdSet.has(playerId)) return;

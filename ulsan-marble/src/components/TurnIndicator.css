@@ -1,7 +1,11 @@
 .turn-indicator {
   position: absolute;
   left: 50%;
-  top: 110px;
+  top:
+    var(
+      --board-inner-top,
+      100px
+    );
   z-index: 42;
   min-width: 220px;
   display: flex;

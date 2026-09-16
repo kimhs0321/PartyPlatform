@@ -499,14 +499,10 @@ class UlsanMarbleGameManager {
     playerId ===
       game.controllerPlayerId &&
     (
-      /*
-      * 회사 배당 이벤트
-      */
+      request.kind ===
+        "MACRO_ECONOMY_RESOLVED" ||
       request.kind ===
         "COMPANY_DIVIDEND_EVENT_RESOLVED" ||  
-      /*
-      * 주식시장 전역 정산
-      */
       request.kind ===
         "STOCK_MARKET_RESOLVED" ||
       request.kind ===

@@ -1,6 +1,10 @@
 .player-dock {
   position: absolute;
-  top: clamp(110px, 9vh, 110px);
+  top:
+    var(
+      --board-inner-top,
+      100px
+    );
   bottom: auto;
   width: clamp(205px, 12vw, 228px);
   display: flex;
@@ -12,11 +16,19 @@
 }
 
 .player-dock--left {
-  left: clamp(100px, 4.6vw, 96px);
+  left:
+    var(
+      --board-inner-left,
+      100px
+    );
 }
 
 .player-dock--right {
-  right: clamp(100px, 4.6vw, 96px);
+  right:
+    var(
+      --board-inner-right,
+      100px
+    );
 }
 
 .player-card {

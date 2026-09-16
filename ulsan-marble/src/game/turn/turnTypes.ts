@@ -45,4 +45,5 @@ export type TurnAction =
   | { type: "START_FORCED_MOVEMENT";}
   | { type: "START_FORCED_TILE_RESOLUTION";}
   | { type: "CANCEL_CURRENT_ACTION" }
+  | { type: "RESTORE_STATE"; state: TurnState;}
   | { type: "RESET" };

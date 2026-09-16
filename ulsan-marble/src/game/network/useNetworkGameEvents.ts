@@ -97,10 +97,17 @@ interface UlsanMarbleGameEventHandlers {
   MAYOR_ELECTION_RESULT_CONFIRMED: (payload: UlsanMarbleMayorElectionResultConfirmedPayload,) => NetworkGameEventApplyResult;
 }
 
+interface NetworkGameEventCursorRef {
+  current: number;
+}
+
 interface UseNetworkGameEventsOptions {
   events?: UlsanMarbleGameEvent[];
 
   turnSequence?: number;
+
+  processedEventCursorRef?:
+    NetworkGameEventCursorRef;
 
   onEventApplied?: (
     eventId: number,
@@ -114,11 +121,16 @@ interface UseNetworkGameEventsOptions {
 export function useNetworkGameEvents({
   events,
   turnSequence,
+  processedEventCursorRef,
   handlers,
   onEventApplied,
 }: UseNetworkGameEventsOptions): () => void {
+  const fallbackProcessedEventIdRef =
+    useRef(0);
+
   const processedEventIdRef =
-  useRef(0);
+    processedEventCursorRef ??
+    fallbackProcessedEventIdRef;
 
   const [
     processedVersion,
@@ -383,8 +395,9 @@ export function useNetworkGameEvents({
 ]);
   return useCallback(() => {
     processedEventIdRef.current = 0;
+
     setProcessedVersion(
       (current) => current + 1,
     );
-  }, []);
+  }, [processedEventIdRef]);
 }

@@ -130,6 +130,8 @@
 
 .company-dividend-event-modal__header
   strong {
+  color: #eaf7fb;
+
   font-size: 13px;
   font-weight: 900;
 
@@ -193,6 +195,8 @@
 
 .company-dividend-event-modal__company
   strong {
+  color: #f3f9fc;
+
   font-size: 22px;
   font-weight: 900;
 }
@@ -272,6 +276,8 @@
   h2 {
   margin:
     7px 0 9px;
+
+  color: #f4f9fb;
 
   font-size:
     clamp(

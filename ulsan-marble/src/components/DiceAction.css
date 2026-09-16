@@ -1,7 +1,7 @@
 .dice-action {
   position: absolute;
   left: 50%;
-  bottom: clamp(104px, 12vh, 140px);
+ bottom:var(--board-inner-bottom, 120px);
   z-index: 40;
   transform: translateX(-50%);
   pointer-events: auto;

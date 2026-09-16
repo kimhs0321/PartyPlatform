@@ -12,6 +12,14 @@ import type {
   UlsanMarbleNetworkPropertyDecision,
 } from "./networkTypes";
 
+interface NetworkPropertyDecisionCursorRef {
+  current: number;
+}
+
+interface NetworkPropertyDecisionCursorRef {
+  current: number;
+}
+
 interface UseNetworkPropertyDecisionOptions {
   decision?:
     UlsanMarbleNetworkPropertyDecision | null;
@@ -21,6 +29,9 @@ interface UseNetworkPropertyDecisionOptions {
   pendingPurchase:
     PendingPropertyPurchase | null;
 
+  processedDecisionCursorRef?:
+    NetworkPropertyDecisionCursorRef;
+
   applyPurchase: () => void;
   applyDecline: () => void;
 }
@@ -29,11 +40,16 @@ export function useNetworkPropertyDecision({
   decision,
   currentArrivalId,
   pendingPurchase,
+  processedDecisionCursorRef,
   applyPurchase,
   applyDecline,
 }: UseNetworkPropertyDecisionOptions): () => void {
-  const processedDecisionIdRef =
+  const fallbackProcessedDecisionIdRef =
     useRef(0);
+
+  const processedDecisionIdRef =
+    processedDecisionCursorRef ??
+    fallbackProcessedDecisionIdRef;
 
   const applyPurchaseRef =
     useRef(applyPurchase);
@@ -105,9 +121,10 @@ export function useNetworkPropertyDecision({
     currentArrivalId,
     decision,
     pendingPurchase,
+    processedDecisionIdRef,
   ]);
 
   return useCallback(() => {
     processedDecisionIdRef.current = 0;
-  }, []);
+  }, [processedDecisionIdRef]);
 }

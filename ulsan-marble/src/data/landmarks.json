@@ -1,6 +1,6 @@
 {
   "id": "ulsan_marble_regional_landmarks",
-  "version": 1,
+  "version": 2,
   "rules": {
     "definition": {
       "normalLandmarkStage": "모든 일반 부동산이 도달할 수 있는 최종 개발 단계",
@@ -52,7 +52,7 @@
       "district": "NAM",
       "requiredOwnedProperties": 6,
       "districtPropertyCount": 9,
-      "basePrice": 440,
+      "basePrice": 930,
       "tags": [
         "TOURISM",
         "PARK"
@@ -68,17 +68,18 @@
       }
     },
     {
-      "id": "jung_taehwagang_national_garden",
-      "propertyId": "taehwagang_national_garden",
-      "boardTileId": 39,
-      "name": "태화강 국가정원",
+      "id": "jung_jungang_market",
+      "propertyId": "jungang_market",
+      "boardTileId": 30,
+      "name": "중앙시장",
       "district": "JUNG",
       "requiredOwnedProperties": 6,
       "districtPropertyCount": 9,
-      "basePrice": 360,
+      "basePrice": 640,
       "tags": [
-        "TOURISM",
-        "PARK"
+        "COMMERCIAL",
+        "MARKET",
+        "TOURISM"
       ],
       "linkedFestival": {
         "id": "maduhee_festival",
@@ -93,12 +94,12 @@
     {
       "id": "buk_mongdol_beach",
       "propertyId": "mongdol_beach",
-      "boardTileId": 46,
+      "boardTileId": 58,
       "name": "몽돌해변",
       "district": "BUK",
       "requiredOwnedProperties": 7,
       "districtPropertyCount": 11,
-      "basePrice": 300,
+      "basePrice": 390,
       "tags": [
         "TOURISM",
         "COAST"
@@ -116,12 +117,12 @@
     {
       "id": "dong_daewangam_park",
       "propertyId": "daewangam_park",
-      "boardTileId": 27,
+      "boardTileId": 43,
       "name": "대왕암공원",
       "district": "DONG",
       "requiredOwnedProperties": 5,
       "districtPropertyCount": 7,
-      "basePrice": 170,
+      "basePrice": 390,
       "tags": [
         "TOURISM",
         "COAST",
@@ -140,12 +141,12 @@
     {
       "id": "ulju_ganjeolgot",
       "propertyId": "ganjeolgot",
-      "boardTileId": 15,
+      "boardTileId": 20,
       "name": "간절곶",
       "district": "ULJU",
       "requiredOwnedProperties": 3,
       "districtPropertyCount": 5,
-      "basePrice": 80,
+      "basePrice": 460,
       "tags": [
         "TOURISM",
         "COAST"

@@ -85,7 +85,14 @@ import {
 } from "./economy/insolvency";
 import {getDisasterTollMultiplier,} from "./disaster/disasterRules";
 import {useDisasterResolution,} from "./disaster/useDisasterResolution";
-import {didPassStart,getNextBoardPosition,START_SALARY,} from "./economy/salary";
+import {
+  didPassStart,
+  getNextBoardPosition,
+  getSalaryCycle,
+  isScheduledSalaryTurn,
+  SALARY_INTERVAL_TURNS,
+  START_SALARY,
+} from "./economy/salary";
 import { isScheduledTaxTurn,} from "./economy/tax";
 import { createEconomicNewsPool } from "./economicNews/economicNewsPool";
 import {
@@ -270,6 +277,12 @@ import {useMayorElectionResolution } from "./election/useMayorElectionResolution
 import {createInitialMacroEconomyState,getMacroBankInterestMultiplier,} from "./economy/macroEconomyRules";
 import type {MacroEconomyState,} from "./economy/macroEconomyTypes";
 import {useMacroEconomyResolution,} from "./economy/useMacroEconomyResolution";
+import {
+  ULSAN_MARBLE_SNAPSHOT_VERSION,
+  readUlsanMarbleSnapshot,
+  writeUlsanMarbleSnapshot,
+  removeUlsanMarbleSnapshot,
+} from "./persistence/ulsanMarbleSnapshot";
 
 export type {
   UlsanMarbleNetworkDiceRoll,
@@ -289,11 +302,10 @@ interface UsePrototypeGameOptions
   initialPlayers?: PlayerTokenData[];
   localPlayerId?: string;
   salary?: number;
-
+  roomId?: string;
 }
 
-
-const SALARY_NOTICE_DURATION_MS = 1600;
+const SALARY_NOTICE_DURATION_MS = 5000;
 const BANK_NOTICE_DURATION_MS = 2200;
 const DOUBLE_NOTICE_DURATION_MS = 2200;
 const JAIL_NOTICE_DURATION_MS = 4000;
@@ -312,6 +324,7 @@ export function usePrototypeGame({
   initialPlayers,
   localPlayerId,
   salary,
+  roomId,
 
   networkDiceRoll,
   onNetworkRollRequest,
@@ -339,8 +352,7 @@ export function usePrototypeGame({
   const tileCount = tiles.length;
   const initialGamePlayers = useMemo<PlayerTokenData[]>(
     () =>
-      (
-        initialPlayers && initialPlayers.length > 0
+      (initialPlayers && initialPlayers.length > 0
           ? initialPlayers
           : INITIAL_PLAYERS
       ).map((player) => ({ ...player })),
@@ -370,58 +382,251 @@ export function usePrototypeGame({
     playerIds,
   ]);
 
-  const baseSalary = Math.max( 0, Math.round(salary ?? START_SALARY),);  
-  const economicNewsPool = useMemo( () => createEconomicNewsPool(stockIndustries), [stockIndustries],);
-  const [players, setPlayers] = useState<PlayerTokenData[]>(() => initialGamePlayers.map((player) => ({ ...player })),);
-  const playersRef = useRef<PlayerTokenData[]>(players);
-  const [transactions, setTransactions] = useState<MoneyTransaction[]>(() => createStartingCashTransactions(initialGamePlayers),);
+const baseSalary = Math.max(
+  0,
+  Math.round(
+    salary ?? START_SALARY,
+  ),
+);
+
+const economicNewsPool = useMemo(
+  () =>
+    createEconomicNewsPool(
+      stockIndustries,
+    ),
+  [stockIndustries],
+);
+
+const initialSnapshot = useMemo(
+  () =>
+    readUlsanMarbleSnapshot(
+      roomId,
+      playerIds,
+    ),
+  [
+    roomId,
+    playerIds,
+  ],
+);
+
+const [players, setPlayers] =
+  useState<PlayerTokenData[]>(
+    () =>
+      (
+        initialSnapshot?.players ??
+        initialGamePlayers
+      ).map(
+        (player) => ({
+          ...player,
+        }),
+      ),
+  );
+
+const playersRef =
+  useRef<PlayerTokenData[]>(
+    players,
+  );
+
+const [
+  transactions,
+  setTransactions,
+] = useState<MoneyTransaction[]>(
+  () =>
+    initialSnapshot
+      ? initialSnapshot.transactions.map(
+          (transaction) => ({
+            ...transaction,
+          }),
+        )
+      : createStartingCashTransactions(
+          initialGamePlayers,
+        ),
+);
+
+const processedNetworkRollIdRef =
+  useRef(
+    initialSnapshot
+      ?.networkCursors
+      .processedRollId ?? 0,
+  );
+
+const processedNetworkPropertyDecisionIdRef =
+  useRef(
+    initialSnapshot
+      ?.networkCursors
+      .processedPropertyDecisionId ??
+      0,
+  );
+
+const processedNetworkStockTradeIdRef =
+  useRef(
+    initialSnapshot
+      ?.networkCursors
+      .processedStockTradeId ?? 0,
+  );
+
+const processedNetworkGameEventIdRef =
+  useRef(
+    initialSnapshot
+      ?.networkCursors
+      .processedGameEventId ?? 0,
+  );
+
+const processedNetworkTurnSequenceRef =
+  useRef<number | null>(
+    initialSnapshot
+      ? initialSnapshot
+          .networkCursors
+          .processedTurnSequence
+      : networkTurnSequence ?? null,
+  );
   const [lastMove, setLastMove] = useState<number | null>(null);
   const [diceValues, setDiceValues] = useState<[DiceValue, DiceValue]>([1, 1]);
   const [isDiceAnimating, setIsDiceAnimating] = useState(false);
   const [isDiceVisible, setIsDiceVisible] = useState(false);
   const [salaryNotice, setSalaryNotice] = useState<SalaryNoticeData | null>(null);
+  const [lastSalaryPaidTurn,setLastSalaryPaidTurn,] = useState<number>(() =>initialSnapshot ?.lastSalaryPaidTurn ?? 0,);
   const [doubleDiceNotice, setDoubleDiceNotice] = useState<DoubleDiceNoticeData | null>(null);
-  const doubleStreakRef = useRef<DoubleStreakState>(EMPTY_DOUBLE_STREAK);
-  const pendingExtraRollRef = useRef(false);
+  const doubleStreakRef = useRef<DoubleStreakState>(initialSnapshot?.doubleStreak ?? EMPTY_DOUBLE_STREAK,);
+  const pendingExtraRollRef = useRef(initialSnapshot?.pendingExtraRoll ?? false, );
   const pendingJailTurnAdvanceRef =  useRef<string[] | null>(null);
   const completeTileResolutionRef = useRef<(disabledPlayerIds?: string[]) => void>(() => {});
   const completeTileResolutionBridge = useCallback((disabledPlayerIds: string[] = []) => {completeTileResolutionRef.current(disabledPlayerIds);}, []);
-  const [propertyOwnerships, setPropertyOwnerships] = useState<PropertyOwnershipMap>({});
-  const propertyOwnershipsRef = useRef<PropertyOwnershipMap>({});
-  const [developmentRestrictions, setDevelopmentRestrictions] = useState<DevelopmentRestrictionMap>({});
-  const developmentRestrictionsRef = useRef<DevelopmentRestrictionMap>({});
-  const [propertyMarket, setPropertyMarket] = useState<PropertyMarketMap>( () => createInitialPropertyMarket(properties),);
-  const propertyMarketRef = useRef<PropertyMarketMap>( createInitialPropertyMarket(properties),);
+  const [propertyOwnerships,setPropertyOwnerships,] = useState<PropertyOwnershipMap>(() => initialSnapshot ?.propertyOwnerships ?? {},);
+  const propertyOwnershipsRef = useRef<PropertyOwnershipMap>(propertyOwnerships,);
+  const [developmentRestrictions,setDevelopmentRestrictions,] = useState<DevelopmentRestrictionMap>(() => initialSnapshot?.developmentRestrictions ?? {}, );
+  const developmentRestrictionsRef = useRef<DevelopmentRestrictionMap>(developmentRestrictions,);
+  const [propertyMarket,setPropertyMarket,] = useState<PropertyMarketMap>(() => initialSnapshot?.propertyMarket ?? createInitialPropertyMarket(properties,),);
+  const propertyMarketRef = useRef<PropertyMarketMap>(propertyMarket,);
   const [pendingMarketResolution, setPendingMarketResolution] = useState<PendingMarketResolution | null>(null);
-  const [stockMarket, setStockMarket] = useState<StockMarketMap>(() => createInitialStockMarket(stockCompanies),);
-  const stockMarketRef = useRef<StockMarketMap>(createInitialStockMarket(stockCompanies),);
-  const [stockPortfolios, setStockPortfolios] = useState<StockPortfolioMap>(() => createInitialStockPortfolios(playerIds),);
-  const stockPortfoliosRef = useRef<StockPortfolioMap>(createInitialStockPortfolios(playerIds),);
-  const [pendingStockMarketResolution, setPendingStockMarketResolution] = useState<PendingStockMarketResolution | null>(null);
-  const companyDividendModifiersRef = useRef<CompanyDividendModifierMap>(createInitialCompanyDividendModifiers(stockCompanies,),);
+  const [
+    stockMarket,
+    setStockMarket,
+  ] = useState<StockMarketMap>(
+    () =>
+      initialSnapshot?.stockMarket ??
+      createInitialStockMarket(
+        stockCompanies,
+      ),
+  );
+
+  const stockMarketRef =
+    useRef<StockMarketMap>(
+      stockMarket,
+    );
+
+  const [
+    stockPortfolios,
+    setStockPortfolios,
+  ] = useState<StockPortfolioMap>(
+    () =>
+      initialSnapshot?.stockPortfolios ??
+      createInitialStockPortfolios(
+        playerIds,
+      ),
+  );
+
+  const stockPortfoliosRef =
+    useRef<StockPortfolioMap>(
+      stockPortfolios,
+    );
+
+  const [
+    pendingStockMarketResolution,
+    setPendingStockMarketResolution,
+  ] = useState<
+    PendingStockMarketResolution | null
+  >(null);
+
+  const companyDividendModifiersRef =
+    useRef<CompanyDividendModifierMap>(
+      initialSnapshot
+        ?.companyDividendModifiers ??
+        createInitialCompanyDividendModifiers(
+          stockCompanies,
+        ),
+    );
   const [isStockMarketOpen, setIsStockMarketOpen] = useState(false);
-  const [lottoState, setLottoState] = useState<LottoState>(() => createInitialLottoState(),);
-  const lottoStateRef = useRef<LottoState>(createInitialLottoState());
+  const [lottoState, setLottoState] = useState<LottoState>(() => initialSnapshot?.lottoState ?? createInitialLottoState(),);
+  const lottoStateRef = useRef<LottoState>(lottoState,);
   const [pendingLotteryShop, setPendingLotteryShop] = useState<PendingLotteryShop | null>(null);
   const [lotteryShopError, setLotteryShopError] = useState<LotteryShopError | null>(null);
   const [pendingLottoDrawResolution, setPendingLottoDrawResolution] = useState<PendingLottoDrawResolution | null>(null);
-  const [currentMayorTerm, setCurrentMayorTerm] = useState<MayorTerm | null>(null);
-  const currentMayorTermRef = useRef<MayorTerm | null>(null);
+  const [currentMayorTerm,setCurrentMayorTerm,] = useState<MayorTerm | null>(() => initialSnapshot ?.currentMayorTerm ?? null,);
+  const currentMayorTermRef = useRef<MayorTerm | null>(currentMayorTerm,);
   const [pendingMayorElection, setPendingMayorElection] = useState<PendingMayorElection | null>(null);
-  const [cityHallState, setCityHallState] = useState<CityHallState>(() => createInitialCityHallState(),);
-  const cityHallStateRef = useRef<CityHallState>(createInitialCityHallState());
+  const [cityHallState, setCityHallState] =
+    useState<CityHallState>(
+      () =>
+        initialSnapshot?.cityHallState ??
+        createInitialCityHallState(),
+    );
+
+  const cityHallStateRef =
+    useRef<CityHallState>(
+      cityHallState,
+    );
   const [pendingCityHallSelection, setPendingCityHallSelection] = useState<PendingCityHallSelection | null>(null);
-  const [insuranceContracts, setInsuranceContracts] = useState<InsuranceContractMap>(() => createInitialInsuranceContracts());
-  const insuranceContractsRef = useRef<InsuranceContractMap>(createInitialInsuranceContracts(),);
+  const [
+    insuranceContracts,
+    setInsuranceContracts,
+  ] = useState<InsuranceContractMap>(
+    () =>
+      initialSnapshot
+        ?.insuranceContracts ??
+      createInitialInsuranceContracts(),
+  );
+
+  const insuranceContractsRef =
+    useRef<InsuranceContractMap>(
+      insuranceContracts,
+    );
   const [pendingInsuranceShop, setPendingInsuranceShop] = useState<PendingInsuranceShop | null>(null);
   const [insuranceShopError, setInsuranceShopError] = useState<InsuranceShopError | null>(null);
-  const [goldenKeyDeck, setGoldenKeyDeck] = useState<GoldenKeyDeckState>(() => createInitialGoldenKeyDeck());
-  const goldenKeyDeckRef = useRef<GoldenKeyDeckState>(goldenKeyDeck);
+  const [
+    goldenKeyDeck,
+    setGoldenKeyDeck,
+  ] = useState<GoldenKeyDeckState>(
+    () =>
+      initialSnapshot?.goldenKeyDeck ??
+      createInitialGoldenKeyDeck(),
+  );
+
+  const goldenKeyDeckRef =
+    useRef<GoldenKeyDeckState>(
+      goldenKeyDeck,
+    );
   const [pendingGoldenKey, setPendingGoldenKey] = useState<PendingGoldenKeyResolution | null>(null);
-  const [economicNewsState, setEconomicNewsState] = useState<EconomicNewsState>(() => createInitialEconomicNewsState(economicNewsPool),);
-  const economicNewsStateRef = useRef<EconomicNewsState>(economicNewsState);
-  const [macroEconomyState,setMacroEconomyState,] = useState<MacroEconomyState>(() =>createInitialMacroEconomyState(),);
-  const macroEconomyStateRef = useRef<MacroEconomyState>(macroEconomyState,);
+  const [
+    economicNewsState,
+    setEconomicNewsState,
+  ] = useState<EconomicNewsState>(
+    () =>
+      initialSnapshot
+        ?.economicNewsState ??
+      createInitialEconomicNewsState(
+        economicNewsPool,
+      ),
+  );
+
+  const economicNewsStateRef =
+    useRef<EconomicNewsState>(
+      economicNewsState,
+    );
+  const [
+    macroEconomyState,
+    setMacroEconomyState,
+  ] = useState<MacroEconomyState>(
+    () =>
+      initialSnapshot
+        ?.macroEconomyState ??
+      createInitialMacroEconomyState(),
+  );
+
+  const macroEconomyStateRef =
+    useRef<MacroEconomyState>(
+      macroEconomyState,
+    );
   const [pendingEconomicNews, setPendingEconomicNews] = useState<PendingEconomicNewsResolution | null>(null);
   const [pendingJailEntry, setPendingJailEntry] = useState<PendingJailEntry | null>(null);
   const [pendingJailFine, setPendingJailFine] = useState<PendingJailFine | null>(null);
@@ -430,33 +635,87 @@ export function usePrototypeGame({
   const [pendingAirportTravel, setPendingAirportTravel] = useState<PendingAirportTravel | null>(null);
   const [airportTravelError, setAirportTravelError] = useState<AirportTravelError | null>(null);
   const [airportFlight, setAirportFlight] = useState<AirportFlightState | null>(null);
-  const [portState, setPortState] = useState<PortState>(() => createInitialPortState(),);
-  const portStateRef = useRef<PortState>(createInitialPortState());
+  const [portState, setPortState] =
+    useState<PortState>(
+      () =>
+        initialSnapshot?.portState ??
+        createInitialPortState(),
+    );
+
+  const portStateRef =
+    useRef<PortState>(
+      portState,
+    );
   const [pendingPortShop, setPendingPortShop] = useState<PendingPortShop | null>(null);
   const [portShopError, setPortShopError] = useState<PortShopError | null>(null);
   const [pendingPortSettlement, setPendingPortSettlement] = useState<PendingPortSettlement | null>(null);
-  const [bankState, setBankState] = useState<BankState>(() => createInitialBankState(playerIds),);
-  const bankStateRef = useRef<BankState>(createInitialBankState(playerIds),);
+  const [bankState, setBankState] = useState<BankState>(() => initialSnapshot?.bankState ?? createInitialBankState(playerIds,),);
+  const bankStateRef = useRef<BankState>(bankState,);
   const [pendingBankShop, setPendingBankShop] = useState<PendingBankShop | null>(null);
   const [bankShopError, setBankShopError] = useState<BankShopError | null>(null);
   const [bankNoticeQueue, setBankNoticeQueue] = useState<BankNoticeData[]>([]);
   const bankNoticeSequenceRef = useRef(0);
-  const [auctionState, setAuctionState] = useState<AuctionState>(() => createInitialAuctionState(playerIds),);
-  const auctionStateRef = useRef<AuctionState>(auctionState);
+  const [auctionState,setAuctionState,] = useState<AuctionState>(() => initialSnapshot?.auctionState ?? createInitialAuctionState(playerIds,),);
+  const auctionStateRef = useRef<AuctionState>(auctionState,);
   const [pendingAuction, setPendingAuction] = useState<PendingAuction | null>(null);
   const [auctionError, setAuctionError] = useState<AuctionError | null>(null);
   const [pendingAuctionTarget, setPendingAuctionTarget] = useState<PendingAuctionTargetSelection | null>(null);
   const [pendingDiceReroll, setPendingDiceReroll] = useState<PendingDiceReroll | null>(null);
-  const [miniGameState, setMiniGameState] = useState<MiniGameState>(() => createInitialMiniGameState(),);
-  const miniGameStateRef = useRef<MiniGameState>(miniGameState);
+  const [
+    miniGameState,
+    setMiniGameState,
+  ] = useState<MiniGameState>(
+    () =>
+      initialSnapshot?.miniGameState ??
+      createInitialMiniGameState(),
+  );
+
+  const miniGameStateRef =
+    useRef<MiniGameState>(
+      miniGameState,
+    );
   const [pendingMiniGame, setPendingMiniGame] = useState<PendingMiniGame | null>(null);
   const [miniGameError, setMiniGameError] = useState<MiniGameError | null>(null);
-  const [festivalDeckState, setFestivalDeckState] = useState<FestivalDeckState>(() => createInitialFestivalDeckState(),);
-  const festivalDeckStateRef = useRef<FestivalDeckState>(festivalDeckState,);
-  const [activeFestival, setActiveFestival] = useState<ActiveFestival | null>(null);
-  const activeFestivalRef = useRef<ActiveFestival | null>(null);
-  const [touristNpc, setTouristNpc] = useState<TouristNpcState | null>(null);
-  const touristNpcRef = useRef<TouristNpcState | null>(null);
+  const [
+    festivalDeckState,
+    setFestivalDeckState,
+  ] = useState<FestivalDeckState>(
+    () =>
+      initialSnapshot
+        ?.festivalDeckState ??
+      createInitialFestivalDeckState(),
+  );
+
+  const festivalDeckStateRef =
+    useRef<FestivalDeckState>(
+      festivalDeckState,
+    );
+  const [
+    activeFestival,
+    setActiveFestival,
+  ] = useState<ActiveFestival | null>(
+    () =>
+      initialSnapshot
+        ?.activeFestival ?? null,
+  );
+
+  const activeFestivalRef =
+    useRef<ActiveFestival | null>(
+      activeFestival,
+    );
+  const [
+    touristNpc,
+    setTouristNpc,
+  ] = useState<TouristNpcState | null>(
+    () =>
+      initialSnapshot?.touristNpc ??
+      null,
+  );
+
+  const touristNpcRef =
+    useRef<TouristNpcState | null>(
+      touristNpc,
+    );
   const [pendingFestivalAnnouncement, setPendingFestivalAnnouncement] = useState<PendingFestivalAnnouncement | null>(null);
   const [pendingTouristTurnResult, setPendingTouristTurnResult] = useState<PendingTouristTurnResult | null>(null);
   const [isFestivalSettlementBusy, setIsFestivalSettlementBusy] = useState(false);
@@ -473,29 +732,10 @@ export function usePrototypeGame({
   const [taxPaymentError, setTaxPaymentError] = useState<TaxPaymentError | null>(null);
   const [taxLiquidationError, setTaxLiquidationError] = useState<TaxLiquidationError | null>(null);
   const sentTurnReadySequenceRef =useRef<number | null>(null);
-
-
-  const bankruptPlayerIds = useMemo(
-    () =>
-      players
-        .filter((player) => player.isBankrupt)
-        .map((player) => player.id),
-    [players],
-  );
-
-  const turn = useTurnSystem({
-    playerIds: playerIds,
-    disabledPlayerIds: bankruptPlayerIds,
-  });
-
-  const activeMayorPolicy = useMemo(
-    () => getActiveMayorPolicy(currentMayorTerm, turn.turnNumber),
-    [currentMayorTerm, turn.turnNumber],
-  );
-  const activeCityHallTerm = useMemo(
-    () => getActiveCityHallTerm(cityHallState, turn.turnNumber),
-    [cityHallState, turn.turnNumber],
-  );
+  const bankruptPlayerIds = useMemo(() => players.filter((player) => player.isBankrupt).map((player) => player.id),[players],);
+  const turn = useTurnSystem({playerIds: playerIds,disabledPlayerIds:bankruptPlayerIds,initialSnapshot:initialSnapshot?.turn ?? null,});
+  const activeMayorPolicy = useMemo(() => getActiveMayorPolicy(currentMayorTerm, turn.turnNumber),[currentMayorTerm, turn.turnNumber],);
+  const activeCityHallTerm = useMemo(() => getActiveCityHallTerm(cityHallState, turn.turnNumber),[cityHallState, turn.turnNumber],);
   const cityHallConstructionCostMultiplier = useMemo(
     () => getCityHallConstructionCostMultiplier(activeCityHallTerm),
     [activeCityHallTerm],
@@ -1663,6 +1903,177 @@ export function usePrototypeGame({
   }, [salaryNotice]);
 
   useEffect(() => {
+    /*
+    * 정기 월급은 한 글로벌 턴이
+    * 완전히 종료된 뒤 지급한다.
+    *
+    * 예:
+    * 5턴 종료 -> 6턴 시작 시 지급
+    * 10턴 종료 -> 11턴 시작 시 지급
+    */
+    if (
+      turn.phase !==
+      "WAITING_FOR_ROLL"
+    ) {
+      return;
+    }
+
+    /*
+    * 온라인 게임에서는 서버 턴과
+    * 로컬 턴이 완전히 동기화된 뒤에만
+    * 월급을 지급한다.
+    */
+    if (roomId) {
+      if (
+        networkTurnNumber === undefined ||
+        networkTurnSequence === undefined
+      ) {
+        return;
+      }
+
+      if (
+        turn.turnNumber !==
+          networkTurnNumber ||
+        turn.turnSequence !==
+          networkTurnSequence
+      ) {
+        return;
+      }
+    }
+
+    const settlementTurn =
+      turn.turnNumber - 1;
+
+    if (
+      !isScheduledSalaryTurn(
+        settlementTurn,
+      )
+    ) {
+      return;
+    }
+
+    if (
+      lastSalaryPaidTurn >=
+      settlementTurn
+    ) {
+      return;
+    }
+
+    const salaryCycle =
+      getSalaryCycle(
+        settlementTurn,
+      );
+
+    const settlementMayorPolicy =
+      getActiveMayorPolicy(
+        currentMayorTerm,
+        settlementTurn,
+      );
+
+    /*
+    * 시장 정책을 제외한 정기급여.
+    * 이 값을 이용해 명세서의
+    * "누적 정기 인상"을 계산한다.
+    */
+    const salaryBeforePolicy =
+      getPolicySalary(
+        baseSalary,
+        null,
+        salaryCycle,
+      );
+
+    const salaryAmount =
+      getPolicySalary(
+        baseSalary,
+        settlementMayorPolicy,
+        salaryCycle,
+      );
+
+    const increaseAmount =
+      Math.max(
+        0,
+        salaryBeforePolicy -
+          baseSalary,
+      );
+
+    const policyBonus =
+      salaryAmount -
+      salaryBeforePolicy;
+
+    const eligiblePlayers =
+      playersRef.current.filter(
+        (player) =>
+          !player.isBankrupt,
+      );
+
+    for (
+      const player of
+      eligiblePlayers
+    ) {
+      if (salaryAmount > 0) {
+        deposit(
+          player.id,
+          salaryAmount,
+          "SALARY",
+          `${settlementTurn}턴 정기 월급 · 제${salaryCycle}회 급여`,
+        );
+      }
+
+      /*
+      * 화면에는 각 브라우저의
+      * 자기 명세서만 표시한다.
+      */
+      if (
+        player.id ===
+        resolvedLocalPlayerId
+      ) {
+        setSalaryNotice({
+          id: Date.now(),
+
+          playerName:
+            player.name,
+
+          settlementTurn,
+          salaryCycle,
+
+          baseSalary,
+          increaseAmount,
+          policyBonus,
+
+          amount:
+            salaryAmount,
+
+          nextSalaryTurn:
+            settlementTurn +
+            SALARY_INTERVAL_TURNS,
+        });
+      }
+    }
+
+    /*
+    * 돈 지급이 끝난 뒤에 기록한다.
+    * snapshot과 함께 저장되므로
+    * F5 후 같은 5턴 급여가
+    * 다시 지급되지 않는다.
+    */
+    setLastSalaryPaidTurn(
+      settlementTurn,
+    );
+  }, [
+    baseSalary,
+    currentMayorTerm,
+    deposit,
+    lastSalaryPaidTurn,
+    networkTurnNumber,
+    networkTurnSequence,
+    resolvedLocalPlayerId,
+    roomId,
+    turn.phase,
+    turn.turnNumber,
+    turn.turnSequence,
+  ]);
+
+  useEffect(() => {
     const currentNotice = bankNoticeQueue[0];
     if (!currentNotice) return;
 
@@ -1962,6 +2373,15 @@ const {
 
   canRunDev:
     turn.canRoll,
+
+  initialDisasterState:
+    initialSnapshot?.disasterState ??
+    null,
+
+  initialPendingDisasterResolution:
+    initialSnapshot
+      ?.pendingDisasterResolution ??
+    null,
 
   commitPlayers,
   commitPropertyOwnerships,
@@ -2340,6 +2760,11 @@ const continueAfterLottoDraw =
     turnSequence:
       networkTurnSequence ??
       turn.turnSequence,
+
+    initialPendingCompanyDividendEvent:
+      initialSnapshot
+        ?.pendingCompanyDividendEvent ??
+      null,
 
     startStockMarketResolution,
 
@@ -3813,7 +4238,7 @@ const continueAfterLottoDraw =
           .map(({ tile, position }) => ({
             id: String(position),
             label: tile.name,
-            description: "특수 이동 · 출발지 통과 급여 없음",
+            description: "원하는 부동산으로 즉시 이동",
           }));
       } else if (itemId === "TOLL_BOOST" || itemId === "PROPERTY_DEFENSE") {
         options = Object.values(propertyOwnershipsRef.current)
@@ -4071,32 +4496,6 @@ const continueAfterLottoDraw =
         movedPlayers,
       );
 
-      if (passedStart) {
-        const salaryAmount =
-          getPolicySalary(
-            baseSalary,
-            activeMayorPolicy,
-            completedLaps,
-          );
-
-        const salaryResult =
-          deposit(
-            movingPlayerId,
-            salaryAmount,
-            "SALARY",
-            `${completedLaps}바퀴 완주 · 출발지 통과`,
-          );
-
-        if (salaryResult.ok) {
-          setSalaryNotice({
-            id: Date.now(),
-            playerName:
-              movingPlayer.name,
-            amount: salaryAmount,
-          });
-        }
-      }
-
       currentPosition =
         nextPosition;
     }
@@ -4324,14 +4723,15 @@ const continueAfterLottoDraw =
       pendingPurchase:
         pendingPropertyPurchase,
 
+      processedDecisionCursorRef:
+        processedNetworkPropertyDecisionIdRef,
+
       applyPurchase:
         applyPendingPropertyPurchase,
 
       applyDecline:
         applyPendingPropertyDecline,
-    });
-
-
+  });
 
   const clearDevelopmentRestriction = useCallback(
     (propertyId: string) => {
@@ -5487,6 +5887,9 @@ const applySellStock = useCallback(
       turnPhase:
         turn.phase,
 
+      processedTradeCursorRef:
+        processedNetworkStockTradeIdRef,
+
       applyBuyStock,
       applySellStock,
     });
@@ -5599,6 +6002,9 @@ const applySellStock = useCallback(
 
       turnPhase:
         turn.phase,
+
+      processedTurnSequenceCursorRef:
+        processedNetworkTurnSequenceRef,
 
       completeStockTrading,
 
@@ -5784,6 +6190,9 @@ const applySellStock = useCallback(
 
       canRoll:
         turn.canRoll,
+
+      processedRollCursorRef:
+        processedNetworkRollIdRef,
 
       runDiceRoll,
     });
@@ -6202,6 +6611,9 @@ const applySellStock = useCallback(
       turnSequence:
         networkTurnSequence,
 
+      processedEventCursorRef:
+        processedNetworkGameEventIdRef,
+
       onEventApplied:
         onNetworkGameEventAck,
 
@@ -6251,6 +6663,203 @@ const applySellStock = useCallback(
     },
   });
 
+  useEffect(() => {
+    if (!roomId) {
+      return;
+    }
+
+    /*
+    * 서버 상태가 아직 도착하지 않았거나
+    * 로컬 턴이 서버 턴과 동기화되지 않은 동안에는
+    * snapshot을 저장하지 않는다.
+    */
+    if (
+      networkTurnNumber === undefined ||
+      networkTurnSequence === undefined ||
+      !networkActivePlayerId
+    ) {
+      return;
+    }
+
+    /*
+    * 현재 단계에서는 WAITING_FOR_ROLL만
+    * 완전히 안전한 checkpoint로 취급한다.
+    *
+    * ROLLING_DICE / MOVING 등의 중간 상태를
+    * 저장하면 F5 후 비동기 작업이 사라져
+    * 해당 phase에 갇힐 수 있다.
+    */
+    if (
+      turn.phase !==
+      "WAITING_FOR_ROLL"
+    ) {
+      return;
+    }
+
+    if (
+      turn.turnNumber !==
+        networkTurnNumber ||
+      turn.turnSequence !==
+        networkTurnSequence ||
+      turn.activePlayerId !==
+        networkActivePlayerId
+    ) {
+      return;
+    }
+
+    writeUlsanMarbleSnapshot({
+      version:
+        ULSAN_MARBLE_SNAPSHOT_VERSION,
+
+      roomId,
+
+      playerIds: [
+        ...playerIds,
+      ],
+
+      players:
+        players.map(
+          (player) => ({
+            ...player,
+          }),
+        ),
+
+      transactions:
+        transactions.map(
+          (transaction) => ({
+            ...transaction,
+          }),
+        ),
+
+      lastSalaryPaidTurn,
+
+      doubleStreak:
+        doubleStreakRef.current,
+
+      pendingExtraRoll:
+        pendingExtraRollRef.current,
+
+      propertyOwnerships,
+
+      developmentRestrictions,
+
+      propertyMarket,
+
+      stockMarket,
+
+      stockPortfolios,
+
+      companyDividendModifiers:
+        companyDividendModifiersRef.current,
+
+      bankState,
+
+      auctionState,
+
+      lottoState,
+
+      currentMayorTerm,
+
+      cityHallState,
+
+      insuranceContracts,
+
+      goldenKeyDeck,
+
+      economicNewsState,
+
+      macroEconomyState,
+
+      portState,
+
+      miniGameState,
+
+      festivalDeckState,
+
+      activeFestival,
+
+      touristNpc,
+
+      disasterState,
+
+      pendingDisasterResolution,
+
+      pendingCompanyDividendEvent,
+
+      turn: {
+        turnNumber:
+          turn.turnNumber,
+
+        turnSequence:
+          turn.turnSequence,
+
+        activePlayerId:
+          turn.activePlayerId,
+
+        phase:
+          turn.phase,
+      },
+
+      networkCursors: {
+        processedRollId:
+          processedNetworkRollIdRef.current,
+
+        processedPropertyDecisionId:
+          processedNetworkPropertyDecisionIdRef.current,
+
+        processedStockTradeId:
+          processedNetworkStockTradeIdRef.current,
+
+        processedGameEventId:
+          processedNetworkGameEventIdRef.current,
+
+        processedTurnSequence:
+          processedNetworkTurnSequenceRef.current,
+      },
+    });
+  }, [
+    networkActivePlayerId,
+    networkTurnNumber,
+    networkTurnSequence,
+
+    playerIds,
+    players,
+    roomId,
+    transactions,
+
+    propertyOwnerships,
+    developmentRestrictions,
+    propertyMarket,
+    lastSalaryPaidTurn,
+    stockMarket,
+    stockPortfolios,
+
+    bankState,
+    auctionState,
+
+    lottoState,
+    currentMayorTerm,
+    cityHallState,
+    insuranceContracts,
+    goldenKeyDeck,
+    economicNewsState,
+    macroEconomyState,
+    portState,
+    miniGameState,
+    festivalDeckState,
+    activeFestival,
+    touristNpc,
+
+    disasterState,
+    pendingDisasterResolution,
+    pendingCompanyDividendEvent,
+
+    turn.activePlayerId,
+    turn.phase,
+    turn.turnNumber,
+    turn.turnSequence,
+  ]);
+
   const devMoveActivePlayer = useCallback(
     async (steps: number) => {
       await applyDevMoveActivePlayer(steps);
@@ -6273,6 +6882,10 @@ const applySellStock = useCallback(
   );
 
   const resetGame = useCallback(() => {
+    removeUlsanMarbleSnapshot(
+      roomId,
+    );
+
     const resetPlayers =
       initialGamePlayers.map((player) => ({
         ...player,
@@ -6285,6 +6898,7 @@ const applySellStock = useCallback(
     setIsDiceAnimating(false);
     setIsDiceVisible(false);
     setSalaryNotice(null);
+    setLastSalaryPaidTurn(0);
     setDoubleDiceNotice(null);
     resetDoubleChain();
     resetNetworkDiceRoll();
@@ -6416,6 +7030,7 @@ const applySellStock = useCallback(
     initialGamePlayers,
     playerIds,
     properties,
+    roomId,
 
     resetAirportTravelResolution,
     resetDoubleChain,
